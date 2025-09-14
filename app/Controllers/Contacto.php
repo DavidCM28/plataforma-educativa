@@ -47,44 +47,44 @@ class Contacto extends BaseController
         $this->enviarCorreo($data);
 
         return redirect()->to('/')
-                         ->with('mensaje', '✅ Tu mensaje fue enviado y la administración fue notificada.');
+                         ->with('mensaje', 'Tu mensaje fue enviado y la administración fue notificada.');
     }
 
     private function enviarCorreo($data)
-    {
-        $mail = new PHPMailer(true);
+{
+    $mail = new PHPMailer(true);
 
-        try {
-            // Configuración servidor Gmail
-            $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com';
-            $mail->SMTPAuth   = true;
-            $mail->Username   = 'davidcm281104@gmail.com'; // 🔴 cambia esto
-            $mail->Password   = 'yxyz veai jzac ydjj';     // 🔴 clave de aplicación de Gmail
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = 587;
+    try {
+        // Configuración servidor Gmail
+        $mail->isSMTP();
+        $mail->Host       = getenv('email.host');
+        $mail->SMTPAuth   = true;
+        $mail->Username   = getenv('email.user');
+        $mail->Password   = getenv('email.pass');
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = getenv('email.port');
 
-            // Remitente y destinatario
-            $mail->setFrom('davidcm281104@gmail.com', 'Plataforma Educativa');
-            $mail->addAddress('bdavid281104@outlook.com', 'Administración'); // 🔴 cambia esto
+        // Remitente y destinatario
+        $mail->setFrom(getenv('email.from'), getenv('email.fromName'));
+        $mail->addAddress(getenv('email.to'), getenv('email.toName'));
 
-            $mail->CharSet = 'UTF-8';
-            $mail->Encoding = 'base64';
+        $mail->CharSet  = 'UTF-8';
+        $mail->Encoding = 'base64';
 
-            // Contenido
-            $mail->isHTML(true);
-            $mail->Subject = "📩 Nuevo contacto de {$data['nombre']}";
-            $mail->Body    = "
-                <h3>Nuevo mensaje de contacto</h3>
-                <p><strong>Nombre:</strong> {$data['nombre']}</p>
-                <p><strong>Correo:</strong> {$data['correo']}</p>
-                <p><strong>Teléfono:</strong> {$data['telefono']}</p>
-                <p><strong>Mensaje:</strong><br>{$data['mensaje']}</p>
-            ";
+        // Contenido
+        $mail->isHTML(true);
+        $mail->Subject = "📩 Nuevo contacto de {$data['nombre']}";
+        $mail->Body    = "
+            <h3>Nuevo mensaje de contacto</h3>
+            <p><strong>Nombre:</strong> {$data['nombre']}</p>
+            <p><strong>Correo:</strong> {$data['correo']}</p>
+            <p><strong>Teléfono:</strong> {$data['telefono']}</p>
+            <p><strong>Mensaje:</strong><br>{$data['mensaje']}</p>
+        ";
 
-            $mail->send();
-        } catch (Exception $e) {
-            log_message('error', "Error enviando correo: {$mail->ErrorInfo}");
-        }
+        $mail->send();
+    } catch (Exception $e) {
+        log_message('error', "Error enviando correo: {$mail->ErrorInfo}");
     }
+}
 }
