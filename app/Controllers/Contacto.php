@@ -46,8 +46,9 @@ class Contacto extends BaseController
         // Enviar notificación por correo
         $this->enviarCorreo($data);
 
-        return redirect()->to('/')
-                         ->with('mensaje', 'Tu mensaje fue enviado y la administración fue notificada.');
+        return redirect()->back()
+                 ->with('mensaje', '✅ Tu mensaje fue enviado y la administración fue notificada.');
+
     }
 
     private function enviarCorreo($data)
