@@ -1,132 +1,150 @@
 <?= $this->include('layouts/header') ?>
+<link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init();</script>
+<script>
+    document.querySelectorAll(".faq-item summary").forEach((summary) => {
+        summary.addEventListener("click", function () {
+            const open = this.parentNode.open;
+            document.querySelectorAll(".faq-item details").forEach((d) => d.removeAttribute("open"));
+            if (!open) this.parentNode.setAttribute("open", true);
+        });
+    });
+</script>
 
-<!-- Hero -->
-<section class="hero">
+<!-- ====================
+     NOTICIAS
+==================== -->
+<section id="noticias" class="news">
+    <div class="container">
+        <h2 class="section-title">Noticias y Avisos</h2>
+        <div class="swiper news-slider">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <div class="news-card">
+                        <h3>Convocatoria de Becas 2025</h3>
+                        <p>Ya está disponible la convocatoria para solicitar becas este semestre.</p>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="news-card">
+                        <h3>Semana de Ciencia y Tecnología</h3>
+                        <p>Del 15 al 20 de octubre, conferencias y talleres abiertos a todo público.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-button-prev"><i class="fas fa-chevron-left"></i></div>
+            <div class="swiper-button-next"><i class="fas fa-chevron-right"></i></div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+</section>
+
+<!-- SwiperJS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+<script>
+    new Swiper(".news-slider", {
+        loop: true,
+        pagination: { el: ".swiper-pagination", clickable: true },
+        autoplay: { delay: 5000 },
+        navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+        },
+    });
+</script>
+
+
+<!-- ====================
+     INICIO / HERO
+==================== -->
+<section id="inicio" class="hero">
     <div class="container hero-content">
         <div class="hero-text">
-            <span class="hero-badge" id="heroBadge">Abiertas inscripciones 2025</span>
-            <h1 id="heroTitle">Formación de calidad para el futuro</h1>
-            <p id="heroDescription">Descubre cómo nuestra institución puede transformar tu futuro con programas académicos de vanguardia y una comunidad de aprendizaje excepcional. Únete a más de 5,000 estudiantes que han elegido UTSC para su formación profesional.</p>
-            
+            <span class="hero-badge">Abiertas inscripciones 2025</span>
+            <h1>Formación de calidad para el futuro</h1>
+            <p>
+                Descubre cómo nuestra institución puede transformar tu futuro con programas académicos
+                de vanguardia y una comunidad de aprendizaje excepcional.
+            </p>
+
             <div class="hero-buttons">
-                <a href="#programas" class="btn">Explorar programas</a>
-                <a href="#contacto-rapido" class="btn-secondary">Solicitar información</a>
-            </div>
-            
-            <div class="hero-stats">
-                <div class="stat-item">
-                    <h3>+5K</h3>
-                    <p>Estudiantes</p>
-                </div>
-                <div class="stat-item">
-                    <h3>98%</h3>
-                    <p>Egresados empleados</p>
-                </div>
-                <div class="stat-item">
-                    <h3>25+</h3>
-                    <p>Programas académicos</p>
-                </div>
-                <div class="stat-item">
-                    <h3>15+</h3>
-                    <p>Laboratorios especializados</p>
-                </div>
+                <a href="#oferta-educativa" class="btn">Explorar programas</a>
+                <a href="<?= base_url('contacto') ?>" class="btn-secondary">Solicitar información</a>
             </div>
         </div>
-        
+
         <div class="hero-image">
             <div class="image-placeholder">
                 <img src="<?= base_url('assets/img/alumno.jpg') ?>" alt="Estudiante UTSC">
             </div>
-            <div class="floating-element">
-                <i class="fas fa-book-open"></i>
+        </div>
+    </div>
+</section>
+
+
+<!-- ====================
+     NOSOTROS
+==================== -->
+<section id="nosotros" class="features">
+    <div class="container">
+        <h2 class="section-title">Sobre Nosotros</h2>
+        <p class="section-desc">
+            Somos una institución comprometida con la excelencia académica y la formación integral de nuestros
+            estudiantes.
+            Nuestros valores, misión y visión nos impulsan a transformar vidas a través de la educación.
+        </p>
+
+        <!-- Opcional: Video institucional -->
+        <div class="video-container" style="margin-top:40px;">
+            <iframe width="100%" height="480" src="https://www.youtube.com/embed/rgdTHDdlDhU"
+                title="Video institucional" frameborder="0" allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+</section>
+
+<!-- ====================
+     ADMISIONES
+==================== -->
+<section id="admisiones" class="admissions">
+    <div class="container">
+        <h2 class="section-title">Proceso de Admisión</h2>
+        <div class="steps">
+            <div class="step" data-aos="fade-up" data-aos-delay="100">
+                <span class="step-number">1</span>
+                <h3>Registro en línea</h3>
+                <p>Completa el formulario de preinscripción.</p>
             </div>
-            <div class="floating-element">
-                <i class="fas fa-flask"></i>
+            <div class="step" data-aos="fade-up" data-aos-delay="100">
+                <span class="step-number">2</span>
+                <h3>Entrega de documentos</h3>
+                <p>Presenta tu papelería en servicios escolares.</p>
+            </div>
+            <div class="step" data-aos="fade-up" data-aos-delay="100">
+                <span class="step-number">3</span>
+                <h3>Examen de admisión</h3>
+                <p>Demuestra tus conocimientos básicos.</p>
+            </div>
+            <div class="step" data-aos="fade-up" data-aos-delay="100">
+                <span class="step-number">4</span>
+                <h3>Inscripción</h3>
+                <p>Formaliza tu lugar y recibe tu matrícula.</p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Quick stats extras -->
-<section class="quick-stats">
-    <div class="container">
-        <div class="stats-grid">
-            <div class="stat-box">
-                <i class="fas fa-university"></i>
-                <h3>5</h3>
-                <p>Carreras disponibles</p>
-            </div>
-            <div class="stat-box">
-                <i class="fas fa-globe"></i>
-                <h3>10</h3>
-                <p>Convenios internacionales</p>
-            </div>
-            <div class="stat-box">
-                <i class="fas fa-briefcase"></i>
-                <h3>95%</h3>
-                <p>Tasa de empleabilidad</p>
-            </div>
-            <div class="stat-box">
-                <i class="fas fa-flask"></i>
-                <h3>10</h3>
-                <p>Laboratorios especializados</p>
-            </div>
-        </div>
-    </div>
-</section>
 
-<!-- Video institucional -->
-<section class="video-section">
-    <div class="container">
-        <h2 class="section-title">Conoce nuestra universidad</h2>
-        <div class="video-container">
-            <iframe width="100%" height="480" src="https://www.youtube.com/embed/rgdTHDdlDhU?si=bgv6hFZ1Pdyp2_x-"
-                    title="Video institucional" frameborder="0" allowfullscreen></iframe>
-        </div>
-    </div>
-</section>
 
-<!-- Features -->
-<section class="features">
+<!-- ====================
+     OFERTA EDUCATIVA
+==================== -->
+<section id="oferta-educativa" class="programs">
     <div class="container">
-        <h2 class="section-title">¿Por qué elegir UTSC?</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-user-graduate"></i>
-                </div>
-                <h3>Profesores expertos</h3>
-                <p>Nuestro equipo docente está compuesto por profesionales con amplia experiencia en la industria y certificaciones internacionales.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-laptop-code"></i>
-                </div>
-                <h3>Tecnología de punta</h3>
-                <p>Laboratorios con la última tecnología para tu formación práctica en entornos reales de trabajo.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-handshake"></i>
-                </div>
-                <h3>Vinculación laboral</h3>
-                <p>Convenios con más de 100 empresas líderes para prácticas profesionales y empleabilidad.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-globe-americas"></i>
-                </div>
-                <h3>Intercambios internacionales</h3>
-                <p>Programas de intercambio con universidades de más de 20 países.</p>
-            </div>
-        </div>
-    </div>
-</section>
+        <h2 class="section-title">Nuestra Oferta Educativa</h2>
 
-<!-- Programas -->
-<section class="programs" id="programas">
-    <div class="container">
-        <h2 class="section-title">Nuestros Programas Académicos</h2>
         <div class="programs-grid">
             <div class="program-card">
                 <div class="program-image">
@@ -138,6 +156,7 @@
                     <a href="#" class="btn">Más información</a>
                 </div>
             </div>
+
             <div class="program-card">
                 <div class="program-image">
                     <i class="fas fa-chart-line"></i>
@@ -152,82 +171,97 @@
     </div>
 </section>
 
-<!-- Testimonios -->
-<section class="testimonials">
+<!-- ====================
+     BECAS
+==================== -->
+<section id="becas" class="scholarships">
     <div class="container">
-        <h2 class="section-title">Testimonios de Nuestros Egresados</h2>
-        <div class="testimonials-grid">
-            <div class="testimonial-card">
-                <div class="testimonial-content">
-                    "UTSC me dio las herramientas necesarias para destacar en el campo tecnológico."
+        <h2 class="section-title">Becas y Apoyos</h2>
+        <div class="scholarships-grid">
+
+            <div class="scholarship-card">
+                <div class="scholarship-header">
+                    <i class="fas fa-graduation-cap"></i>
                 </div>
-                <div class="testimonial-author">
-                    <div class="author-avatar">MC</div>
-                    <div class="author-info">
-                        <h4>María Cortés</h4>
-                        <p>Ingeniera en Software, Google</p>
-                    </div>
-                </div>
+                <button class="info-btn"><i class="fas fa-info"></i></button>
+                <h3>Beca Académica</h3>
+                <p>Apoyo a estudiantes con alto rendimiento académico.</p>
             </div>
-            <div class="testimonial-card">
-                <div class="testimonial-content">
-                    "La formación en UTSC fue integral, no solo académica sino también en valores."
+
+            <div class="scholarship-card">
+                <div class="scholarship-header">
+                    <i class="fas fa-dumbbell"></i>
                 </div>
-                <div class="testimonial-author">
-                    <div class="author-avatar">JL</div>
-                    <div class="author-info">
-                        <h4>Javier López</h4>
-                        <p>Gerente de Proyectos, Microsoft</p>
-                    </div>
+                <button class="info-btn"><i class="fas fa-info"></i></button>
+                <h3>Beca Deportiva</h3>
+                <p>Para alumnos destacados en disciplinas deportivas.</p>
+            </div>
+
+            <div class="scholarship-card">
+                <div class="scholarship-header">
+                    <i class="fas fa-hand-holding-usd"></i>
                 </div>
+                <button class="info-btn"><i class="fas fa-info"></i></button>
+                <h3>Beca Socioeconómica</h3>
+                <p>Apoyo a familias con bajos ingresos.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+
+<!-- ====================
+     DIRECTORIO
+==================== -->
+<section id="directorio" class="directory">
+    <div class="container">
+        <h2 class="section-title">Directorio Rápido</h2>
+        <div class="directory-grid">
+            <div class="contact-card">
+                <h3>Escolares</h3>
+                <p><i class="fas fa-envelope"></i> escolares@utsc.edu.mx</p>
+                <p><i class="fas fa-phone"></i> (123) 456 7890</p>
+            </div>
+            <div class="contact-card">
+                <h3>Finanzas</h3>
+                <p><i class="fas fa-envelope"></i> finanzas@utsc.edu.mx</p>
+                <p><i class="fas fa-phone"></i> (123) 456 7891</p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Eventos -->
-<section class="events">
+<!-- ====================
+     FAQ
+==================== -->
+<section id="faq" class="faq">
     <div class="container">
-        <h2 class="section-title">Próximos Eventos</h2>
-        <div class="events-grid">
-            <div class="event-card">
-                <div class="event-date">
-                    <span class="day">15</span>
-                    <span class="month">Sept</span>
-                </div>
-                <div class="event-content">
-                    <h3>Jornada de Puertas Abiertas</h3>
-                    <p>Conoce instalaciones, programas y becas disponibles.</p>
-                    <a href="#" class="btn">Registrarse</a>
-                </div>
-            </div>
+        <h2 class="section-title">Preguntas Frecuentes</h2>
+        <div class="faq-item">
+            <details>
+                <summary>¿Cómo solicito una beca?</summary>
+                <p>Puedes hacerlo en línea en la sección de Becas o acudiendo al departamento de servicios escolares.
+                </p>
+            </details>
+        </div>
+        <div class="faq-item">
+            <details>
+                <summary>¿Cuándo son las inscripciones?</summary>
+                <p>El proceso de inscripción inicia en junio y se extiende hasta agosto.</p>
+            </details>
         </div>
     </div>
 </section>
 
-<!-- CTA section -->
-<section class="cta">
-    <div class="container">
-        <h2>¿Listo para transformar tu futuro?</h2>
-        <p>Únete a nuestra comunidad estudiantil y forma parte de la nueva generación de profesionales.</p>
-        <div class="cta-buttons">
-            <a href="#contacto-rapido" class="btn-light">Registrarse ahora</a>
-            <a href="#" class="btn-secondary">Agendar tour virtual</a>
-        </div>
-    </div>
-</section>
-
-<!-- Contacto rápido -->
-<section class="contact-cta" id="contacto-rapido">
-    <div class="container">
-        <h2>¿Tienes dudas? Contáctanos</h2>
-        <p>Estamos listos para resolver tus preguntas y brindarte toda la información que necesites.</p>
-        <a href="<?= base_url('contacto') ?>" class="btn">Ir a la sección de contacto</a>
-    </div>
-</section>
 
 
-<!-- Botón flotante de WhatsApp -->
+
+
+<!-- ====================
+     BOTÓN WHATSAPP
+==================== -->
 <a href="https://wa.me/521234567890" target="_blank" class="whatsapp-btn">
     <i class="fab fa-whatsapp"></i>
 </a>

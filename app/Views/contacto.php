@@ -26,35 +26,26 @@
 </script>
 <?php endif; ?>
 
+<section id="contacto" class="contact-cta">
+    <div class="container">
+        <h2 class="section-title-contacto">Contáctanos</h2>
+        <p>
+            Déjanos tus datos y un asesor académico se pondrá en contacto contigo para resolver todas tus dudas.
+        </p>
 
-<section class="contacto container py-5">
-    <h2 class="section-title">Contáctanos</h2>
-
-    <form action="<?= site_url('contacto/guardar') ?>" method="post">
-        <?= csrf_field() ?>
-        
-        <div class="form-group">
-            <label>Nombre</label>
-            <input type="text" name="nombre" class="form-control" value="<?= old('nombre') ?>" required>
-        </div>
-
-        <div class="form-group">
-            <label>Correo</label>
-            <input type="email" name="correo" class="form-control" value="<?= old('correo') ?>" required>
-        </div>
-
-        <div class="form-group">
-            <label>Teléfono</label>
-            <input type="text" name="telefono" class="form-control" value="<?= old('telefono') ?>">
-        </div>
-
-        <div class="form-group">
-            <label>Mensaje</label>
-            <textarea name="mensaje" class="form-control" rows="4"><?= old('mensaje') ?></textarea>
-        </div>
-
-        <button class="btn btn-primary">Enviar</button>
-    </form>
+        <form action="<?= site_url('api/contacto/guardar') ?>" method="post" class="contact-form">
+            <?= csrf_field() ?>
+            
+            <input type="text" name="nombre" placeholder="Nombre completo" value="<?= old('nombre') ?>" required>
+            <input type="email" name="correo" placeholder="Correo electrónico" value="<?= old('correo') ?>" required>
+            <input type="text" name="telefono" placeholder="Teléfono" value="<?= old('telefono') ?>">
+            <input type="text" name="asunto" placeholder="Asunto" required>
+            <textarea name="mensaje" placeholder="Tu mensaje" rows="5" required><?= old('mensaje') ?></textarea>
+            
+            <button type="submit" class="btn">Enviar mensaje</button>
+        </form>
+    </div>
 </section>
+
 
 <?= $this->include('layouts/footer') ?>
