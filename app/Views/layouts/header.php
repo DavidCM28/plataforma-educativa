@@ -14,13 +14,20 @@
     <!-- Tus estilos -->
     <link rel="stylesheet" href="<?= base_url('assets/css/style.css') ?>">
 
+    <!-- FONTAWESOME -->
+    <script src="https://kit.fontawesome.com/54f8dc33fe.js" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
     <!-- Navbar -->
-    <nav class="navbar">
+    <nav class="main-navbar">
         <div class="container nav-container">
             <a href="<?= base_url() ?>" class="logo">
                 <div class="logo-img">

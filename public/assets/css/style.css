@@ -1,25 +1,36 @@
 :root {
+  /* Colores claros (modo normal) */
+  --color-bg: #fff5eb; /* Fondo general */
+  --color-surface: #ffffff; /* Superficies como cards, navbar */
+  --color-text: #2a2a2a; /* Texto principal */
+  --color-text-muted: #8b7d6b; /* Texto secundario */
+
+  /* Paleta */
   --primary: #ff9e64;
   --primary-dark: #e58c53;
   --secondary: #ffbfa0;
   --accent: #ff7f3f;
-  --light: #fff5eb;
-  --dark: #2a2a2a;
-  --gray: #8b7d6b;
-  --transition: all 0.3s ease;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+  /* Extras */
   --radius: 12px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
 }
 
-.dark-mode {
-  --light: #1a1a1a;
-  --dark: #ffffff;
-  --gray: #b8b8b8;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+body.dark-mode {
+  /* Colores oscuros */
+  --color-bg: #1a1a1a;
+  --color-surface: #2a2a2a;
+  --color-text: #ffffff;
+  --color-text-muted: #b8b8b8;
+
+  /* Paleta adaptada */
   --primary: #ffac7a;
   --primary-dark: #ff9e64;
   --secondary: #ffd1b8;
   --accent: #ff9157;
+
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 * {
@@ -30,10 +41,11 @@
 }
 
 body {
-  background-color: var(--light);
-  color: var(--dark);
+  background-color: var(--color-bg);
+  color: var(--color-text);
   transition: var(--transition);
   line-height: 1.6;
+  padding-top: 50px;
 }
 
 .container {
@@ -43,7 +55,7 @@ body {
   padding: 0 15px;
 }
 
-.navbar {
+.main-navbar {
   background-color: rgba(255, 245, 235, 0.95);
   backdrop-filter: blur(10px);
   box-shadow: var(--shadow);
@@ -55,7 +67,7 @@ body {
   transition: var(--transition);
 }
 
-.dark-mode .navbar {
+.dark-mode .main-navbar {
   background-color: rgba(26, 26, 26, 0.95);
 }
 
@@ -80,7 +92,7 @@ body {
   position: absolute;
   top: 100%;
   left: 0;
-  background: #fff;
+  background: var(--color-surface);
   box-shadow: var(--shadow);
   border-radius: var(--radius);
   padding: 10px 0;
@@ -93,7 +105,7 @@ body {
 }
 
 .dropdown-menu li a {
-  color: var(--dark);
+  color: var(--color-text);
   font-size: 0.9rem;
   display: block;
 }
@@ -144,7 +156,7 @@ body {
 
 .nav-links a {
   text-decoration: none;
-  color: var(--dark);
+  color: var(--color-text);
   font-weight: 500;
   transition: var(--transition);
   position: relative;
@@ -152,7 +164,7 @@ body {
 }
 
 .dark-mode .nav-links a {
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .nav-links a:after {
@@ -179,14 +191,14 @@ body {
 .theme-toggle {
   background: none;
   border: none;
-  color: var(--dark);
+  color: var(--color-text);
   cursor: pointer;
   font-size: 20px;
   transition: var(--transition);
 }
 
 .dark-mode .theme-toggle {
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .btn {
@@ -225,13 +237,13 @@ body {
 .menu-toggle span {
   width: 25px;
   height: 3px;
-  background-color: var(--dark);
+  background-color: var(--color-text);
   border-radius: 2px;
   transition: var(--transition);
 }
 
 .dark-mode .menu-toggle span {
-  background-color: var(--dark);
+  background-color: var(--color-text);
 }
 
 .hero {
@@ -306,23 +318,23 @@ body {
 .hero-text h1 {
   font-size: 3.5rem;
   margin-bottom: 20px;
-  color: var(--dark);
+  color: var(--color-text);
   line-height: 1.2;
 }
 
 .dark-mode .hero-text h1 {
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .hero-text p {
   font-size: 1.2rem;
   margin-bottom: 40px;
-  color: var(--gray);
+  color: var(--color-text-muted);
   max-width: 90%;
 }
 
 .dark-mode .hero-text p {
-  color: var(--gray);
+  color: var(--color-text-muted);
 }
 
 .hero-buttons {
@@ -363,12 +375,12 @@ body {
 
 .stat-item p {
   font-size: 1rem;
-  color: var(--gray);
+  color: var(--color-text-muted);
   margin-bottom: 0;
 }
 
 .dark-mode .stat-item p {
-  color: var(--gray);
+  color: var(--color-text-muted);
 }
 
 .hero-image {
@@ -387,7 +399,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--color-surface);
   font-size: 1.5rem;
   font-weight: 600;
 }
@@ -407,7 +419,7 @@ body {
   align-items: center;
   justify-content: center;
   box-shadow: var(--shadow);
-  background-color: white;
+  background-color: var(--color-surface);
   animation: float 5s ease-in-out infinite;
 }
 
@@ -420,7 +432,7 @@ body {
   top: -20px;
   right: -20px;
   background-color: var(--accent);
-  color: white;
+  color: var(--color-surface);
   animation-delay: 0.5s;
 }
 
@@ -456,8 +468,8 @@ body {
   padding: 10px 20px;
   border-radius: 50px;
   border: 2px solid var(--primary);
-  background-color: white;
-  color: var(--dark);
+  background-color: var(--color-surface);
+  color: var(--color-text);
   font-weight: 500;
   cursor: pointer;
   outline: none;
@@ -466,13 +478,13 @@ body {
 
 .dark-mode .school-selector select {
   background-color: #2a2a2a;
-  color: white;
+  color: var(--color-surface);
   border-color: var(--primary);
 }
 
 .features {
   padding: 80px 0;
-  background-color: var(--light);
+  background-color: var(--color-bg);
 }
 
 .dark-mode .features {
@@ -483,7 +495,7 @@ body {
   text-align: center;
   font-size: 2.5rem;
   margin-bottom: 60px;
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .section-title-contacto {
@@ -491,15 +503,15 @@ body {
   font-size: 2.5rem;
   margin-top: 30px;
   margin-bottom: 60px;
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .dark-mode .section-title {
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .dark-mode .section-title-contacto {
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .features-grid {
@@ -509,7 +521,7 @@ body {
 }
 
 .feature-card {
-  background-color: white;
+  background-color: var(--color-surface);
   border-radius: var(--radius);
   padding: 30px;
   box-shadow: var(--shadow);
@@ -546,15 +558,15 @@ body {
 .feature-card h3 {
   font-size: 1.5rem;
   margin-bottom: 15px;
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .dark-mode .feature-card h3 {
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .feature-card p {
-  color: var(--gray);
+  color: var(--color-text-muted);
 }
 
 .programs {
@@ -573,7 +585,7 @@ body {
 }
 
 .program-card {
-  background-color: white;
+  background-color: var(--color-surface);
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--shadow);
@@ -595,7 +607,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--color-surface);
   font-size: 2rem;
 }
 
@@ -606,15 +618,15 @@ body {
 .program-content h3 {
   font-size: 1.4rem;
   margin-bottom: 15px;
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .dark-mode .program-content h3 {
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .program-content p {
-  color: var(--gray);
+  color: var(--color-text-muted);
   margin-bottom: 20px;
 }
 
@@ -625,7 +637,7 @@ body {
 
 .program-features li {
   margin-bottom: 8px;
-  color: var(--gray);
+  color: var(--color-text-muted);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -637,7 +649,7 @@ body {
 
 .testimonials {
   padding: 80px 0;
-  background-color: var(--light);
+  background-color: var(--color-bg);
 }
 
 .dark-mode .testimonials {
@@ -651,7 +663,7 @@ body {
 }
 
 .testimonial-card {
-  background-color: white;
+  background-color: var(--color-surface);
   border-radius: var(--radius);
   padding: 30px;
   box-shadow: var(--shadow);
@@ -675,7 +687,7 @@ body {
 
 .testimonial-content {
   margin-bottom: 20px;
-  color: var(--gray);
+  color: var(--color-text-muted);
   font-style: italic;
 }
 
@@ -693,21 +705,21 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--color-surface);
   font-weight: bold;
 }
 
 .author-info h4 {
-  color: var(--dark);
+  color: var(--color-text);
   margin-bottom: 5px;
 }
 
 .dark-mode .author-info h4 {
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .author-info p {
-  color: var(--gray);
+  color: var(--color-text-muted);
   font-size: 0.9rem;
 }
 
@@ -727,7 +739,7 @@ body {
 }
 
 .event-card {
-  background-color: white;
+  background-color: var(--color-surface);
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--shadow);
@@ -739,7 +751,7 @@ body {
 
 .event-date {
   background: linear-gradient(45deg, var(--primary), var(--accent));
-  color: white;
+  color: var(--color-surface);
   padding: 15px;
   text-align: center;
 }
@@ -762,15 +774,15 @@ body {
 .event-content h3 {
   font-size: 1.4rem;
   margin-bottom: 15px;
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .dark-mode .event-content h3 {
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .event-content p {
-  color: var(--gray);
+  color: var(--color-text-muted);
   margin-bottom: 20px;
 }
 
@@ -784,7 +796,7 @@ body {
   display: flex;
   align-items: center;
   gap: 5px;
-  color: var(--gray);
+  color: var(--color-text-muted);
   font-size: 0.9rem;
 }
 
@@ -795,7 +807,7 @@ body {
 .cta {
   padding: 100px 0;
   background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-  color: white;
+  color: var(--color-surface);
   text-align: center;
 }
 
@@ -821,7 +833,7 @@ body {
 }
 
 .btn-light {
-  background-color: white;
+  background-color: var(--color-surface);
   color: var(--primary);
   padding: 12px 25px;
   border-radius: 50px;
@@ -840,7 +852,7 @@ body {
 
 .student-crud {
   padding: 80px 0;
-  background-color: var(--light);
+  background-color: var(--color-bg);
 }
 
 .dark-mode .student-crud {
@@ -848,7 +860,7 @@ body {
 }
 
 .crud-container {
-  background-color: white;
+  background-color: var(--color-surface);
   border-radius: var(--radius);
   padding: 30px;
   box-shadow: var(--shadow);
@@ -874,11 +886,11 @@ body {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .dark-mode .form-group label {
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .form-group input,
@@ -888,8 +900,8 @@ body {
   padding: 12px 15px;
   border: 2px solid var(--secondary);
   border-radius: var(--radius);
-  background-color: var(--light);
-  color: var(--dark);
+  background-color: var(--color-bg);
+  color: var(--color-text);
   transition: var(--transition);
 }
 
@@ -897,7 +909,7 @@ body {
 .dark-mode .form-group select,
 .dark-mode .form-group textarea {
   background-color: #3a3a3a;
-  color: var(--dark);
+  color: var(--color-text);
   border-color: #555;
 }
 
@@ -955,13 +967,13 @@ body {
 
 .students-table th {
   background-color: var(--secondary);
-  color: var(--dark);
+  color: var(--color-text);
   font-weight: 600;
 }
 
 .dark-mode .students-table th {
   background-color: #333;
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .students-table tr:hover {
@@ -1002,7 +1014,7 @@ body {
 /* Footer */
 .footer {
   background-color: var(--primary-dark);
-  color: white;
+  color: var(--color-surface);
   padding: 60px 0 30px;
 }
 
@@ -1031,7 +1043,7 @@ body {
   left: 0;
   width: 50px;
   height: 2px;
-  background-color: white;
+  background-color: var(--color-surface);
 }
 
 .footer-column p {
@@ -1048,7 +1060,7 @@ body {
 }
 
 .footer-links a {
-  color: white;
+  color: var(--color-surface);
   text-decoration: none;
   opacity: 0.9;
   transition: var(--transition);
@@ -1073,7 +1085,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--color-surface);
   text-decoration: none;
   transition: var(--transition);
 }
@@ -1100,7 +1112,7 @@ body {
 }
 
 @media (max-width: 768px) {
-  .navbar {
+  .main-navbar {
     padding: 15px 0;
   }
 
@@ -1110,7 +1122,7 @@ body {
     left: -100%;
     width: 100%;
     height: calc(100vh - 80px);
-    background-color: var(--light);
+    background-color: var(--color-bg);
     flex-direction: column;
     gap: 0;
     padding: 40px 20px;
@@ -1119,7 +1131,7 @@ body {
   }
 
   .dark-mode .nav-links {
-    background-color: var(--light);
+    background-color: var(--color-bg);
   }
 
   .nav-links.active {
@@ -1135,12 +1147,12 @@ body {
     display: block;
     padding: 15px 10px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    color: var(--dark);
+    color: var(--color-text);
   }
 
   .dark-mode .nav-links a {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--dark);
+    color: var(--color-text);
   }
 
   #nosotros,
@@ -1245,7 +1257,7 @@ body {
 ======================= */
 .quick-stats {
   padding: 60px 0;
-  background-color: var(--light);
+  background-color: var(--color-bg);
   text-align: center;
 }
 
@@ -1279,15 +1291,15 @@ body {
 
 .stat-box h3 {
   font-size: 2rem;
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .dark-mode .stat-box h3 {
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .stat-box p {
-  color: var(--gray);
+  color: var(--color-text-muted);
 }
 
 /* =======================
@@ -1315,7 +1327,7 @@ body {
 ======================= */
 .contact-cta {
   padding: 80px 0;
-  background: var(--light);
+  background: var(--color-bg);
   text-align: center;
 }
 
@@ -1326,7 +1338,7 @@ body {
 .contact-cta h2 {
   font-size: 2rem;
   margin-bottom: 30px;
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 .contact-form {
@@ -1343,8 +1355,8 @@ body {
   padding: 15px;
   border: 2px solid var(--secondary);
   border-radius: var(--radius);
-  background-color: var(--light);
-  color: var(--dark);
+  background-color: var(--color-bg);
+  color: var(--color-text);
   transition: var(--transition);
   font-size: 1rem;
 }
@@ -1352,7 +1364,7 @@ body {
 .dark-mode .contact-form input,
 .dark-mode .contact-form textarea {
   background-color: #2a2a2a;
-  color: var(--dark);
+  color: var(--color-text);
   border-color: #555;
 }
 
@@ -1370,7 +1382,7 @@ body {
   bottom: 20px;
   right: 20px;
   background-color: #25d366;
-  color: white;
+  color: var(--color-surface);
   font-size: 28px;
   width: 55px;
   height: 55px;
@@ -1397,7 +1409,7 @@ body {
   justify-content: center; /* centro horizontal */
   padding-top: 80px; /* espacio para el navbar fijo */
   padding-bottom: 60px; /* espacio para el footer */
-  background-color: var(--light);
+  background-color: var(--color-bg);
 }
 
 .dark-mode .login-section {
@@ -1405,7 +1417,7 @@ body {
 }
 
 .login-box {
-  background: #fff;
+  background: var(--color-surface);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 40px;
@@ -1420,7 +1432,7 @@ body {
 .login-box .section-title {
   text-align: center;
   margin-bottom: 25px;
-  color: var(--dark);
+  color: var(--color-text);
   font-size: 1.8rem;
 }
 
@@ -1439,8 +1451,8 @@ body {
   padding: 12px 15px;
   border: 2px solid var(--secondary);
   border-radius: var(--radius);
-  background-color: var(--light);
-  color: var(--dark);
+  background-color: var(--color-bg);
+  color: var(--color-text);
   transition: var(--transition);
 }
 
@@ -1464,7 +1476,7 @@ body {
 ======================= */
 .scholarships {
   padding: 80px 0;
-  background-color: var(--light);
+  background-color: var(--color-bg);
 }
 
 /* Grid de cards */
@@ -1477,7 +1489,7 @@ body {
 
 /* Card */
 .scholarship-card {
-  background: #fff;
+  background: var(--color-surface);
   border-radius: var(--radius);
   padding: 25px;
   padding-top: 70px; /* espacio para el ícono */
@@ -1500,7 +1512,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   background: var(--primary);
-  color: white;
+  color: var(--color-surface);
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -1517,7 +1529,7 @@ body {
   top: 15px;
   right: 15px;
   background: var(--primary);
-  color: white;
+  color: var(--color-surface);
   border: none;
   border-radius: 50%;
   width: 32px;
@@ -1540,7 +1552,7 @@ body {
   margin-bottom: 10px;
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--dark);
+  color: var(--color-text);
 }
 
 /* =======================
@@ -1557,7 +1569,7 @@ body {
   text-align: center;
 }
 .step {
-  background: #fff;
+  background: var(--color-surface);
   border-radius: var(--radius);
   padding: 25px;
   box-shadow: var(--shadow);
@@ -1580,7 +1592,7 @@ body {
 .news {
   padding: 120px 0 80px; /* más espacio arriba y abajo */
   margin-top: 20px;
-  background: var(--light);
+  background: var(--color-bg);
 }
 
 .news .section-title {
@@ -1590,7 +1602,7 @@ body {
 
 /* Card */
 .news-card {
-  background: #fff;
+  background: var(--color-surface);
   border-radius: var(--radius);
   padding: 30px;
   box-shadow: var(--shadow);
@@ -1601,38 +1613,42 @@ body {
   justify-content: center;
 }
 
-/* Estilos base de los botones */
+/* Ocultar flechas por defecto de Swiper */
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  display: none !important;
+  content: "" !important;
+}
+
+/* Botones base */
 .swiper-button-next,
 .swiper-button-prev {
-  background: #fff;
+  background: var(--color-surface);
   border-radius: 50%;
-  width: 40px; /* más pequeño */
+  width: 40px;
   height: 40px;
   box-shadow: var(--shadow);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 20; /* que quede arriba */
 }
 
-/* Quitar el contenido por defecto */
-.swiper-button-next::after,
-.swiper-button-prev::after {
-  display: none;
-}
-
-/* Insertar iconos de Font Awesome */
+/* Iconos FontAwesome */
 .swiper-button-next i,
 .swiper-button-prev i {
-  font-size: 18px; /* tamaño ajustado al círculo */
+  font-size: 20px; /* ajusta tamaño */
   color: var(--primary);
+  line-height: 1; /* evitar desajuste vertical */
+  display: inline-block;
 }
 
+/* Reubicar a los lados */
 .swiper-button-prev {
-  left: -60px; /* mover fuera del slider */
+  left: -60px;
 }
-
 .swiper-button-next {
-  right: -60px; /* mover fuera del slider */
+  right: -60px;
 }
 
 /* Paginación (los puntitos) */
@@ -1653,7 +1669,7 @@ body {
   gap: 30px;
 }
 .contact-card {
-  background: #fff;
+  background: var(--color-surface);
   border-radius: var(--radius);
   padding: 25px;
   box-shadow: var(--shadow);
@@ -1668,7 +1684,7 @@ body {
 ======================= */
 .faq {
   padding: 80px 0;
-  background: var(--light);
+  background: var(--color-bg);
 }
 .faq-item {
   margin-bottom: 15px;
@@ -1677,21 +1693,31 @@ body {
   font-weight: 600;
   cursor: pointer;
   padding: 15px;
-  background: #fff;
+  background: var(--color-surface);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  list-style: none;
 }
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
 .faq-item p {
-  padding: 15px;
   margin: 0;
+  padding: 0 15px;
   background: var(--secondary);
   border-radius: 0 0 var(--radius) var(--radius);
+  overflow: hidden;
+
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
 }
 
 /* Sección Nosotros */
 .features {
   padding: 80px 0;
-  background-color: var(--light);
+  background-color: var(--color-bg);
 }
 .dark-mode .features {
   background-color: #1a1a1a;
@@ -1700,7 +1726,7 @@ body {
 /* Sección Programas */
 .programs {
   padding: 80px 0;
-  background-color: var(--light); /* alterna */
+  background-color: var(--color-bg); /* alterna */
 }
 .dark-mode .programs {
   background-color: #1a1a1a;
@@ -1709,7 +1735,7 @@ body {
 /* Sección Testimonios */
 .testimonials {
   padding: 80px 0;
-  background-color: var(--light); /* alterna */
+  background-color: var(--color-bg); /* alterna */
 }
 .dark-mode .testimonials {
   background-color: #1a1a1a;
@@ -1745,7 +1771,7 @@ body {
 /* Sección Noticias */
 .news {
   padding: 80px 0;
-  background-color: var(--light); /* alterna */
+  background-color: var(--color-bg); /* alterna */
 }
 .dark-mode .news {
   background-color: #1a1a1a;
@@ -1754,7 +1780,7 @@ body {
 /* Sección Directorio */
 .directory {
   padding: 80px 0;
-  background-color: var(--light); /* alterna */
+  background-color: var(--color-bg); /* alterna */
 }
 .dark-mode .directory {
   background-color: #1a1a1a;
@@ -1767,4 +1793,249 @@ body {
 }
 .dark-mode .faq {
   background-color: #2a2a2a;
+}
+
+/* =======================
+   DETALLE CARRERA
+======================= */
+
+/* Fondo general */
+.program-detail {
+  background: var(--color-bg);
+  min-height: 100vh;
+  padding: 60px 0;
+  background-image: radial-gradient(
+      circle at 20% 20%,
+      var(--secondary) 0%,
+      transparent 25%
+    ),
+    radial-gradient(circle at 80% 80%, var(--accent) 0%, transparent 30%);
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+/* Cards de info rápida */
+.info-card {
+  background: var(--color-bg);
+  border-radius: var(--radius);
+  transition: var(--transition);
+}
+
+.info-card:hover {
+  background: var(--secondary);
+  transform: translateY(-5px);
+  box-shadow: var(--shadow);
+}
+
+/* Acordeones */
+.ciclo-card .accordion-button {
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: var(--color-bg);
+  color: var(--color-text);
+  transition: var(--transition);
+}
+
+.ciclo-card .accordion-button:not(.collapsed) {
+  background: var(--primary);
+  color: #fff;
+}
+
+.ciclo-card .accordion-body.scrollable {
+  max-height: 220px; /* Altura fija */
+  overflow-y: auto; /* Scroll interno */
+  padding-right: 8px;
+}
+
+/* Badges */
+.badge.bg-primary {
+  background-color: var(--primary) !important;
+  font-size: 0.75rem;
+  margin-left: 6px;
+}
+
+/* ====== DARK MODE ====== */
+body.dark-mode .program-detail {
+  background: var(--color-bg); /* en dark mode, var(--color-bg) es oscuro */
+  background-image: radial-gradient(
+      circle at 20% 20%,
+      var(--primary-dark) 0%,
+      transparent 25%
+    ),
+    radial-gradient(circle at 80% 80%, var(--accent) 0%, transparent 30%);
+}
+
+body.dark-mode .info-card {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+
+body.dark-mode .accordion-button {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+
+body.dark-mode .accordion-button:not(.collapsed) {
+  background: var(--primary-dark);
+  color: #fff;
+}
+
+body.dark-mode .accordion-body.scrollable {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius);
+}
+
+/* ====== DARK MODE FIX ====== */
+body.dark-mode .info-card {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+
+body.dark-mode .info-card {
+  background: var(--color-text) !important;
+  color: var(--color-bg) !important;
+}
+
+body.dark-mode .info-card h5,
+body.dark-mode .info-card p,
+body.dark-mode .info-card i {
+  color: var(--color-bg) !important;
+}
+
+body.dark-mode .accordion-button:not(.collapsed) {
+  background: var(--primary-dark);
+  color: #fff;
+}
+
+body.dark-mode .accordion-body {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-bg);
+}
+
+.program-detail {
+  background: var(--color-bg);
+  min-height: 100vh;
+  padding: 40px 0; /* reducimos un poco */
+  margin-top: 0; /* aseguramos que no se separe del nav */
+}
+
+/* Si el header está fijo (fixed-top), añade espacio automático */
+body:not(.dark-mode) .program-detail {
+  padding-top: 100px; /* ajusta al alto del navbar */
+}
+
+/* =======================
+   FIX TEXTO EN DARK MODE
+======================= */
+
+body.dark-mode .program-detail,
+body.dark-mode .program-detail h1,
+body.dark-mode .program-detail h2,
+body.dark-mode .program-detail h3,
+body.dark-mode .program-detail h4,
+body.dark-mode .program-detail h5,
+body.dark-mode .program-detail h6,
+body.dark-mode .program-detail p,
+body.dark-mode .program-detail li,
+body.dark-mode .program-detail span,
+body.dark-mode .program-detail small {
+  color: var(
+    --color-text
+  ) !important; /* recuerda: en dark-mode --dark = blanco */
+}
+
+body.dark-mode .program-detail .text-muted {
+  color: var(--color-text-muted) !important;
+}
+
+/* Encabezados en las cards */
+body.dark-mode .info-card h5,
+body.dark-mode .info-card p,
+body.dark-mode .info-card i {
+  color: var(--color-bg) !important;
+}
+
+/* Accordion */
+body.dark-mode .accordion-button {
+  background: var(--color-text);
+  color: var(--color-bg) !important;
+}
+body.dark-mode .accordion-body {
+  color: var(--color-bg) !important;
+}
+
+/* =======================
+   FIX DARK MODE CARDS (Plan de estudios)
+======================= */
+body.dark-mode .accordion-item {
+  background-color: #2a2a2a !important;
+  border: 1px solid #444 !important;
+  color: var(--light) !important;
+}
+
+body.dark-mode .accordion-button {
+  background-color: #2a2a2a !important;
+  color: var(--light) !important;
+}
+
+body.dark-mode .accordion-button:not(.collapsed) {
+  background-color: var(--primary-dark) !important;
+  color: #fff !important;
+}
+
+body.dark-mode .accordion-body {
+  background-color: #1e1e1e !important;
+  color: var(--light) !important;
+}
+
+/* =======================
+   FIX DARK MODE INFO CARDS
+======================= */
+body.dark-mode .info-card {
+  background-color: #1e1e1e !important; /* fondo oscuro */
+  color: #f1f1f1 !important; /* texto claro */
+  border: 1px solid #333 !important; /* borde sutil */
+}
+
+/* Iconos en dark mode */
+body.dark-mode .info-card i {
+  color: #ff6600 !important; /* tu color acento */
+}
+
+/* Títulos y párrafos */
+body.dark-mode .info-card h5,
+body.dark-mode .info-card p {
+  color: #f1f1f1 !important;
+}
+
+/* =======================
+   FIX DROPDOWN DARK MODE
+======================= */
+body.dark-mode .dropdown-menu {
+  background-color: #2a2a2a !important; /* fondo oscuro */
+  border: 1px solid #444 !important;
+}
+
+body.dark-mode .dropdown-menu li a {
+  color: var(--light) !important;
+}
+
+body.dark-mode .dropdown-menu li a:hover {
+  background-color: var(--primary) !important;
+  color: #fff !important;
+}
+
+/* Dropdown en modo oscuro */
+body.dark-mode .dropdown-menu {
+  background-color: #2a2a2a !important; /* Fondo oscuro */
+  border: 1px solid #444; /* Borde tenue */
+}
+
+body.dark-mode .dropdown-menu li a {
+  color: #fff !important; /* Texto blanco */
+}
+
+body.dark-mode .dropdown-menu li a:hover {
+  background-color: var(--primary) !important; /* Resaltar al pasar el mouse */
+  color: #fff !important;
 }

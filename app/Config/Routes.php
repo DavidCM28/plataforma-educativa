@@ -12,3 +12,4 @@ $routes->post('contacto/enviar', 'Contacto::enviar');
 $routes->get('auth/login', 'Auth::login');
 $routes->post('auth/login', 'Auth::doLogin');
 $routes->get('auth/logout', 'Auth::logout');
+$routes->get('carrera/(:segment)', 'Home::carrera/$1');
