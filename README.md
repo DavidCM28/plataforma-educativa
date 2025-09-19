@@ -69,7 +69,7 @@ git init
 ### 3. Conectar con el repositorio remoto en GitHub
 
 ```bash
-git remote add origin https://github.com/TU_USUARIO/plataforma-educativa.git
+git remote add origin https://github.com/DavidCM28/plataforma-educativa
 git branch -M main
 git push -u origin main
 ```
@@ -81,7 +81,7 @@ git push -u origin main
 Si ya existe el repo en GitHub:
 
 ```bash
-git clone https://github.com/TU_USUARIO/plataforma-educativa.git
+git clone https://github.com/DavidCM28/plataforma-educativa
 cd plataforma-educativa
 composer install
 ```
