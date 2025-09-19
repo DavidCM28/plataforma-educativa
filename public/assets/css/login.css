@@ -1,0 +1,278 @@
+:root {
+  /* Paleta clara */
+  --primary: #ff9e64;
+  --primary-dark: #e07b3e;
+  --text-main: #2b2b2b;
+  --text-muted: #777;
+  --surface: #fff;
+  --background: #faf9f6;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --radius: 14px;
+  --transition: 0.3s ease;
+}
+
+/* Modo oscuro */
+body.dark-mode {
+  --primary: #ffac7a;
+  --primary-dark: #ff9e64;
+  --text-main: #ffffff;
+  --text-muted: #b8b8b8;
+  --surface: #2a2a2a;
+  --background: #1a1a1a;
+  --secondary: #ffd1b8;
+  --accent: #ff9157;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Fondo */
+body {
+  font-family: "Segoe UI", Roboto, "Inter", sans-serif;
+  background: var(--background);
+  min-height: 100vh;
+  margin: 0;
+
+  display: flex;
+  flex-direction: column; /* mantiene footer abajo */
+  transition: background var(--transition), color var(--transition);
+}
+
+/* Contenedor principal */
+.login-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Card */
+.soft-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 40px 35px;
+  box-shadow: var(--shadow);
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  animation: fadeIn 0.6s ease;
+  transition: background var(--transition), box-shadow var(--transition);
+}
+
+/* Logo */
+.gentle-logo {
+  margin-bottom: 15px;
+}
+.logo-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: rgba(255, 158, 100, 0.15);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.comfort-icon svg {
+  color: var(--primary-dark);
+  width: 35px;
+  height: 35px;
+}
+.gentle-glow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(255, 158, 100, 0.5);
+  animation: pulse 2s infinite alternate;
+}
+
+/* Encabezado */
+.comfort-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 10px 0 5px;
+}
+.gentle-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 25px;
+}
+
+/* Campos */
+.field-container {
+  position: relative;
+  margin-bottom: 20px;
+  border: 1.5px solid var(--text-muted);
+  border-radius: var(--radius);
+  background: var(--surface);
+  transition: var(--transition);
+}
+.field-container:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(255, 158, 100, 0.2);
+}
+.field-container input {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  outline: none;
+  color: var(--text-main);
+}
+.field-container label {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 14px;
+  pointer-events: none;
+  transition: 0.3s;
+}
+.field-container input:focus + label,
+.field-container input:not(:placeholder-shown) + label {
+  top: 8px;
+  font-size: 12px;
+  color: var(--primary-dark);
+}
+
+/* Botón toggle password */
+.gentle-toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: var(--transition);
+}
+.gentle-toggle:hover {
+  color: var(--primary);
+}
+
+/* Opciones */
+.comfort-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.gentle-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-main);
+}
+.gentle-checkbox input {
+  display: none;
+}
+.checkbox-soft {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--primary-dark);
+  border-radius: 5px;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gentle-checkbox input:checked + .checkbox-soft {
+  background: var(--primary-dark);
+}
+.comfort-link {
+  font-size: 14px;
+  color: var(--primary-dark);
+  text-decoration: none;
+}
+.comfort-link:hover {
+  text-decoration: underline;
+}
+
+/* Botón */
+.comfort-button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.comfort-button:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+/* Errores */
+.gentle-error {
+  display: block;
+  color: #d63031;
+  font-size: 13px;
+  margin-top: -10px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+/* Footer */
+.footer {
+  background-color: var(--primary-dark);
+  color: var(--surface);
+  padding: 60px 0 30px;
+}
+.footer a {
+  color: var(--surface);
+  opacity: 0.9;
+}
+.footer a:hover {
+  opacity: 1;
+}
+
+/* Por defecto, muestra solo el "ojo abierto" */
+.toggle-icon .eye-open {
+  display: block;
+}
+.toggle-icon .eye-closed {
+  display: none;
+}
+
+/* Cuando está activo (password visible) */
+.gentle-toggle.toggle-active .eye-open {
+  display: none;
+}
+.gentle-toggle.toggle-active .eye-closed {
+  display: block;
+}
+
+.gentle-toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%); /* mantiene centrado */
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: var(--transition);
+  display: flex; /* <-- alinear íconos */
+  align-items: center;
+  justify-content: center;
+  width: 24px; /* mismo ancho fijo */
+  height: 24px; /* mismo alto fijo */
+}
+
+.gentle-toggle svg {
+  width: 20px; /* tamaño fijo */
+  height: 20px; /* tamaño fijo */
+}

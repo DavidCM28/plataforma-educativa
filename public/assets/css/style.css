@@ -88,7 +88,6 @@ body {
 
 /* Submenú */
 .dropdown-menu {
-  display: none;
   position: absolute;
   top: 100%;
   left: 0;
@@ -113,11 +112,6 @@ body {
 .dropdown-menu li a:hover {
   background: var(--primary);
   color: #fff;
-}
-
-/* Mostrar al pasar el mouse */
-.dropdown:hover .dropdown-menu {
-  display: block;
 }
 
 .logo {
@@ -1585,22 +1579,9 @@ body {
   font-weight: bold;
   margin-bottom: 15px;
 }
-
 /* ====================
    Noticias Section
 ==================== */
-.news {
-  padding: 120px 0 80px; /* más espacio arriba y abajo */
-  margin-top: 20px;
-  background: var(--color-bg);
-}
-
-.news .section-title {
-  margin-bottom: 40px; /* separa el título del carrusel */
-  text-align: center;
-}
-
-/* Card */
 .news-card {
   background: var(--color-surface);
   border-radius: var(--radius);
@@ -1611,49 +1592,56 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  max-width: 600px;
+  margin: auto; /* centra la card */
 }
 
-/* Ocultar flechas por defecto de Swiper */
-.swiper-button-next::after,
-.swiper-button-prev::after {
+/* Quitar los íconos SVG por defecto de Bootstrap */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
   display: none !important;
-  content: "" !important;
 }
 
 /* Botones base */
-.swiper-button-next,
-.swiper-button-prev {
+.carousel-control-prev,
+.carousel-control-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
   background: var(--color-surface);
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   box-shadow: var(--shadow);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 20; /* que quede arriba */
+  z-index: 20;
+  opacity: 1;
 }
 
-/* Iconos FontAwesome */
-.swiper-button-next i,
-.swiper-button-prev i {
-  font-size: 20px; /* ajusta tamaño */
+/* Íconos FontAwesome */
+.carousel-control-prev i,
+.carousel-control-next i {
+  font-size: 22px;
   color: var(--primary);
-  line-height: 1; /* evitar desajuste vertical */
-  display: inline-block;
+  line-height: 1;
 }
 
-/* Reubicar a los lados */
-.swiper-button-prev {
+/* Reubicar en lados */
+.carousel-control-prev {
   left: -60px;
 }
-.swiper-button-next {
+.carousel-control-next {
   right: -60px;
 }
 
-/* Paginación (los puntitos) */
-.swiper-pagination {
-  margin-top: 20px;
+/* Forzar altura y visibilidad en los slides */
+.carousel-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px; /* altura fija para evitar colapsar */
 }
 
 /* =======================
@@ -2038,4 +2026,150 @@ body.dark-mode .dropdown-menu li a {
 body.dark-mode .dropdown-menu li a:hover {
   background-color: var(--primary) !important; /* Resaltar al pasar el mouse */
   color: #fff !important;
+}
+
+/* Mostrar SOLO el menú principal (primer nivel) */
+.nav-links > .dropdown:hover > .dropdown-menu {
+  display: block;
+}
+
+/* Submenús ocultos por defecto */
+.dropdown-submenu .dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 100%;
+  margin-top: 0;
+  margin-left: 5px;
+}
+
+/* Mostrar el submenú SOLO cuando pasas sobre el padre */
+.dropdown-submenu:hover > .dropdown-menu {
+  display: block;
+}
+
+/* Menú principal */
+.nav-links > .dropdown > .dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 200px;
+}
+
+/* Mostrar menú principal al pasar el mouse */
+.nav-links > .dropdown:hover > .dropdown-menu {
+  display: block;
+}
+
+/* Submenús (Oferta Educativa) */
+.dropdown-submenu {
+  position: relative;
+  padding-right: 15px; /* extiende el área interactiva */
+}
+
+.dropdown-submenu > .dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 100%; /* pegado al costado derecho */
+  margin: 0; /* quita el hueco */
+  min-width: 220px;
+}
+
+/* Mostrar SOLO cuando el padre tiene hover */
+.dropdown-submenu:hover > .dropdown-menu {
+  display: block;
+}
+
+/* =====================
+   MENÚ PRINCIPAL (1er nivel)
+===================== */
+.nav-links > .dropdown > .dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 200px;
+}
+
+.nav-links > .dropdown:hover > .dropdown-menu {
+  display: block;
+}
+
+/* =====================
+   SUBMENÚ (2do nivel)
+===================== */
+.dropdown-submenu {
+  position: relative;
+}
+
+.dropdown-submenu > .dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 100%; /* pegado al costado derecho */
+  margin: 0; /* quita el hueco */
+  min-width: 220px;
+}
+
+/* Mostrar SOLO cuando pasas sobre Oferta Educativa */
+.dropdown-submenu:hover > .dropdown-menu {
+  display: block;
+}
+
+.dropdown-submenu {
+  position: relative;
+  padding-right: 10px; /* "extiende" el área para que el hover no se pierda */
+}
+
+.dropdown-menu {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+}
+
+.dropdown:hover > .dropdown-menu,
+.dropdown-submenu:hover > .dropdown-menu {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+}
+
+.dropdown-menu {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease;
+}
+
+.dropdown:hover > .dropdown-menu,
+.dropdown-submenu:hover > .dropdown-menu {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+}
+
+.gentle-toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: var(--transition);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px; /* ancho fijo */
+  height: 28px; /* alto fijo */
+  padding: 0; /* quita espacios extra */
+}
+
+.gentle-toggle svg {
+  width: 20px; /* tamaño consistente */
+  height: 20px;
+  flex-shrink: 0; /* evita que se deforme */
 }

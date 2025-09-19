@@ -17,8 +17,7 @@
             ".scholarships-grid .scholarship-card",
             ".directory-grid .contact-card",
             ".faq .faq-item",
-            ".steps .step",
-            ".news .news-card"
+            ".steps .step"
         ];
 
         groups.forEach(selector => {
@@ -32,47 +31,57 @@
 
 
 <!-- ====================
-     NOTICIAS
+     NOTICIAS (Bootstrap)
 ==================== -->
-<section id="noticias" class="news" data-aos="fade-up">
+<section id="noticias" class="news py-5">
     <div class="container">
-        <h2 class="section-title" data-aos="fade-down">Noticias y Avisos</h2>
-        <div class="swiper news-slider" data-aos="zoom-in" data-aos-delay="150">
-            <div class="swiper-wrapper">
-                <div class="swiper-slide">
-                    <div class="news-card" data-aos="fade-up" data-aos-delay="200">
+        <h2 class="section-title text-center mb-4">Noticias y Avisos</h2>
+
+        <div id="newsCarousel" class="carousel slide" data-bs-ride="carousel">
+
+            <!-- Paginación (puntitos) -->
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#newsCarousel" data-bs-slide-to="0" class="active"
+                    aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#newsCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            </div>
+
+            <!-- Slides -->
+            <div class="carousel-inner">
+
+                <!-- Slide 1 -->
+                <div class="carousel-item active">
+                    <div class="news-card p-4 text-center">
                         <h3>Convocatoria de Becas 2025</h3>
                         <p>Ya está disponible la convocatoria para solicitar becas este semestre.</p>
                     </div>
                 </div>
-                <div class="swiper-slide">
-                    <div class="news-card" data-aos="fade-up" data-aos-delay="300">
+
+                <!-- Slide 2 -->
+                <div class="carousel-item">
+                    <div class="news-card p-4 text-center">
                         <h3>Semana de Ciencia y Tecnología</h3>
                         <p>Del 15 al 20 de octubre, conferencias y talleres abiertos a todo público.</p>
                     </div>
                 </div>
+
             </div>
-            <div class="swiper-button-prev"><i class="fas fa-caret-left"></i></div>
-            <div class="swiper-button-next"><i class="fas fa-caret-right"></i></div>
-            <div class="swiper-pagination"></div>
+
+            <!-- Controles (flechas con FontAwesome) -->
+            <button class="carousel-control-prev" type="button" data-bs-target="#newsCarousel" data-bs-slide="prev">
+                <i class="fas fa-chevron-left"></i>
+                <span class="visually-hidden">Anterior</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#newsCarousel" data-bs-slide="next">
+                <i class="fas fa-chevron-right"></i>
+                <span class="visually-hidden">Siguiente</span>
+            </button>
+
         </div>
     </div>
 </section>
 
-<!-- SwiperJS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
-<script>
-    new Swiper(".news-slider", {
-        loop: true,
-        pagination: { el: ".swiper-pagination", clickable: true },
-        autoplay: { delay: 5000 },
-        navigation: {
-            nextEl: ".swiper-button-next",
-            prevEl: ".swiper-button-prev",
-        },
-    });
-</script>
+
 
 <!-- ====================
      INICIO / HERO

@@ -33,7 +33,7 @@
                 <div class="logo-img">
                     <img src="<?= base_url('assets/img/logo.jpg') ?>" alt="UTSC Logo">
                 </div>
-                <span id="schoolName">UTSC</span>
+                <span id="schoolName">Ctrl+Shift Learning</span>
             </a>
 
             <ul class="nav-links">
@@ -46,14 +46,32 @@
                     <a href="#">Académico <i class="fas fa-chevron-down"></i></a>
                     <ul class="dropdown-menu">
                         <li><a href="<?= base_url() ?>#admisiones">Admisiones</a></li>
-                        <li><a href="<?= base_url() ?>#oferta-educativa">Oferta Educativa</a></li>
+
+                        <!-- Submenú Oferta Educativa -->
+                        <li class="dropdown-submenu pull-left">
+                            <a href="#">Oferta Educativa <i class="fas fa-chevron-right"></i></a>
+                            <ul class="dropdown-menu submenu">
+                                <?php if (!empty($carrerasNavbar)): ?>
+                                    <?php foreach ($carrerasNavbar as $c): ?>
+                                        <li>
+                                            <a href="<?= base_url('carrera/' . $c['slug']) ?>">
+                                                <?= esc($c['nombre']) ?>
+                                            </a>
+                                        </li>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <li><span class="text-muted">No hay carreras</span></li>
+                                <?php endif; ?>
+                            </ul>
+                        </li>
+
                         <li><a href="<?= base_url() ?>#becas">Becas</a></li>
                     </ul>
                 </li>
 
                 <!-- Dropdown Más -->
                 <li class="dropdown">
-                    <a href="#">Más <i class="fas fa-chevron-down"></i></a>
+                    <a href="#">Más <i class="fas fa-chevron-down "></i></a>
                     <ul class="dropdown-menu">
                         <li><a href="<?= base_url() ?>#directorio">Directorio</a></li>
                         <li><a href="<?= base_url() ?>#faq">FAQ</a></li>
@@ -79,23 +97,21 @@
         </div>
     </nav>
 
-
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const navbarHeight = document.querySelector(".navbar").offsetHeight;
+            const navbarHeight = document.querySelector(".navbar")?.offsetHeight || 0;
             const baseUrl = "<?= base_url() ?>";
 
+            // Scroll suave solo en Home
             document.querySelectorAll('.nav-links a').forEach(anchor => {
                 anchor.addEventListener("click", function (e) {
                     const href = this.getAttribute("href");
 
-                    // 👉 Caso enlaces internos (#secciones)
                     if (href.startsWith(baseUrl + "#")) {
                         const targetId = href.split("#")[1];
                         const targetElement = document.getElementById(targetId);
 
                         if (window.location.pathname === "<?= parse_url(base_url(), PHP_URL_PATH) ?>") {
-                            // Estamos en home → scroll suave
                             if (targetElement) {
                                 e.preventDefault();
                                 const elementPosition = targetElement.offsetTop - navbarHeight;
@@ -106,9 +122,19 @@
                                 });
                             }
                         } else {
-                            // No estamos en home → redirige con #
                             window.location.href = href;
                         }
+                    }
+                });
+            });
+
+            // Soporte submenu en móviles
+            document.querySelectorAll(".dropdown-submenu > a").forEach(el => {
+                el.addEventListener("click", function (e) {
+                    if (window.innerWidth < 992) { // solo en móvil
+                        e.preventDefault();
+                        const submenu = this.nextElementSibling;
+                        submenu.classList.toggle("show");
                     }
                 });
             });
