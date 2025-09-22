@@ -4,7 +4,7 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreatePlanMateriasTable extends Migration
+class CreatePlanMateriasPublicasTable extends Migration
 {
     public function up()
     {
@@ -25,7 +25,7 @@ class CreatePlanMateriasTable extends Migration
                 'constraint' => 11,
                 'unsigned' => true,
             ],
-            'ciclo' => [ // Ej: "1", "2", "3"... (cuatrimestre o semestre)
+            'ciclo' => [
                 'type' => 'TINYINT',
                 'constraint' => 2,
             ],
@@ -39,13 +39,13 @@ class CreatePlanMateriasTable extends Migration
             ]
         ]);
         $this->forge->addKey('id', true);
-        $this->forge->addForeignKey('plan_id', 'planes_estudio', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('materia_id', 'materias', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->createTable('plan_materias');
+        $this->forge->addForeignKey('plan_id', 'planes_estudio_publicos', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('materia_id', 'materias_publicas', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->createTable('plan_materias_publicas');
     }
 
     public function down()
     {
-        $this->forge->dropTable('plan_materias');
+        $this->forge->dropTable('plan_materias_publicas');
     }
 }

@@ -4,7 +4,7 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreateMateriasTable extends Migration
+class CreatePlanesEstudioPublicosTable extends Migration
 {
     public function up()
     {
@@ -15,6 +15,11 @@ class CreateMateriasTable extends Migration
                 'unsigned' => true,
                 'auto_increment' => true,
             ],
+            'carrera_id' => [
+                'type' => 'INT',
+                'constraint' => 11,
+                'unsigned' => true,
+            ],
             'nombre' => [
                 'type' => 'VARCHAR',
                 'constraint' => '255',
@@ -23,9 +28,8 @@ class CreateMateriasTable extends Migration
                 'type' => 'TEXT',
                 'null' => true,
             ],
-            'creditos' => [
-                'type' => 'INT',
-                'constraint' => 3,
+            'anio' => [
+                'type' => 'YEAR',
                 'null' => true,
             ],
             'created_at' => [
@@ -38,11 +42,12 @@ class CreateMateriasTable extends Migration
             ]
         ]);
         $this->forge->addKey('id', true);
-        $this->forge->createTable('materias');
+        $this->forge->addForeignKey('carrera_id', 'carreras_publicas', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->createTable('planes_estudio_publicos');
     }
 
     public function down()
     {
-        $this->forge->dropTable('materias');
+        $this->forge->dropTable('planes_estudio_publicos');
     }
 }

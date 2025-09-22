@@ -4,7 +4,7 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreateCarrerasTable extends Migration
+class CreateCarrerasPublicasTable extends Migration
 {
     public function up()
     {
@@ -19,12 +19,12 @@ class CreateCarrerasTable extends Migration
                 'type' => 'VARCHAR',
                 'constraint' => '255',
             ],
-            'slug' => [ // ejemplo: ingenieria-tecnologias-de-la-informacion
+            'slug' => [
                 'type' => 'VARCHAR',
                 'constraint' => '255',
                 'unique' => true,
             ],
-            'nivel' => [ // TSU, Ingeniería, Licenciatura
+            'nivel' => [
                 'type' => 'ENUM',
                 'constraint' => ['TSU', 'Ingeniería', 'Licenciatura'],
                 'default' => 'TSU',
@@ -65,11 +65,11 @@ class CreateCarrerasTable extends Migration
             ]
         ]);
         $this->forge->addKey('id', true);
-        $this->forge->createTable('carreras');
+        $this->forge->createTable('carreras_publicas');
     }
 
     public function down()
     {
-        $this->forge->dropTable('carreras');
+        $this->forge->dropTable('carreras_publicas');
     }
 }
