@@ -7,6 +7,7 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 $routes->get('contacto', 'Home::contacto');
+$routes->get('dashboard', 'Home::dashboard');
 $routes->post('api/contacto/guardar', 'Contacto::guardar');
 $routes->post('contacto/enviar', 'Contacto::enviar');
 $routes->get('auth/login', 'Auth::login');
