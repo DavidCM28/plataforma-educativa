@@ -44,6 +44,64 @@ body {
   font-family: "Segoe UI", sans-serif;
   background: var(--color-bg);
   color: var(--color-text);
+  line-height: 1.7;
+  overflow-x: hidden;
+  transition: var(--transition);
+  animation: pageEntrance 1s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+}
+
+/* Fondo con formas geométricas animadas */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(255, 158, 100, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 85% 30%, rgba(255, 127, 63, 0.04) 0%, transparent 50%),
+    linear-gradient(45deg, transparent 49%, rgba(255, 191, 160, 0.02) 50%, transparent 51%),
+    linear-gradient(-45deg, transparent 49%, rgba(255, 191, 160, 0.02) 50%, transparent 51%);
+  background-size: 
+    400px 400px,
+    300px 300px,
+    60px 60px,
+    60px 60px;
+  animation: backgroundShift 20s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes backgroundShift {
+  0%, 100% {
+    background-position: 
+      0% 0%,
+      100% 100%,
+      0 0,
+      0 0;
+  }
+  50% {
+    background-position: 
+      100% 100%,
+      0% 0%,
+      30px 30px,
+      30px 30px;
+  }
+}
+
+@keyframes pageEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+    filter: blur(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
 }
 
 /* === Navbar === */
@@ -61,11 +119,61 @@ body {
   padding: 0 1.5rem;
   box-shadow: var(--shadow);
   z-index: 1000;
+  transition: var(--transition);
+  animation: navbarSlideDown 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navbar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: navbarShine 3s infinite;
+}
+
+@keyframes navbarShine {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+@keyframes navbarSlideDown {
+  0% {
+    transform: translateY(-100%) scaleY(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scaleY(1);
+    opacity: 1;
+  }
 }
 
 .navbar-left {
   display: flex;
   align-items: center;
+  gap: 15px;
+}
+
+.logo-icon {
+  font-size: 2rem;
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.3));
+  animation: logoFloat 4s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  33% {
+    transform: translateY(-5px) rotate(2deg) scale(1.05);
+  }
+  66% {
+    transform: translateY(3px) rotate(-1deg) scale(0.98);
+  }
 }
 
 .navbar-title {
@@ -82,12 +190,44 @@ body {
 .nav-item {
   position: relative;
   cursor: pointer;
+  transition: var(--transition);
+}
+
+.nav-item:hover {
+  transform: translateY(-3px) scale(1.05);
 }
 
 .nav-item img {
   width: 35px;
   height: 35px;
   border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  transition: var(--transition);
+  box-shadow: 
+    0 5px 15px rgba(0, 0, 0, 0.2),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+  animation: profilePulse 6s ease-in-out infinite;
+}
+
+@keyframes profilePulse {
+  0%, 100% { 
+    box-shadow: 
+      0 5px 15px rgba(0, 0, 0, 0.2),
+      inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+  }
+  50% { 
+    box-shadow: 
+      0 8px 25px rgba(0, 0, 0, 0.3),
+      inset 0 0 0 3px rgba(255, 255, 255, 0.2);
+  }
+}
+
+.nav-item img:hover {
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 3px rgba(255, 255, 255, 0.3);
+  transform: scale(1.1) rotate(5deg);
 }
 
 .badge {
@@ -129,6 +269,34 @@ body {
   padding: 1rem 0;
   overflow-y: auto;
   transition: var(--transition);
+  z-index: 999;
+  animation: sidebarSlideIn 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+@keyframes sidebarSlideIn {
+  0% {
+    transform: translateX(-100%) skewX(-5deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0) skewX(0deg);
+    opacity: 1;
+  }
 }
 
 .sidebar-header {
@@ -137,6 +305,27 @@ body {
   font-weight: bold;
   font-size: 1.1rem;
   color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  position: relative;
+  display: inline-block;
+  padding-bottom: 8px;
+}
+
+.sidebar-header h3::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #fff, transparent);
+  border-radius: 2px;
+  animation: headerLine 3s ease-in-out infinite;
+}
+
+@keyframes headerLine {
+  0%, 100% { opacity: 0.5; transform: scaleX(0.8); }
+  50% { opacity: 1; transform: scaleX(1); }
 }
 
 .sidebar-menu {
@@ -156,10 +345,35 @@ body {
   text-decoration: none;
   border-radius: var(--radius);
   transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-menu a::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.sidebar-menu a:hover::before {
+  left: 100%;
 }
 
 .sidebar-menu a:hover {
   background: rgba(255, 255, 255, 0.15);
+  transform: translateX(8px) scale(1.02);
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .sidebar-menu a.active {
@@ -201,6 +415,31 @@ body {
   padding: 2rem;
   min-height: calc(100vh - 60px);
   background: var(--color-bg);
+  transition: var(--transition);
+  animation: contentReveal 1s cubic-bezier(0.23, 1, 0.32, 1) 0.3s both;
+  position: relative;
+}
+
+.content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255, 158, 100, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+@keyframes contentReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .content h1 {
@@ -210,6 +449,26 @@ body {
 
 .content p {
   color: var(--color-text-muted);
+  font-size: 1.1rem;
+  line-height: 1.8;
+  max-width: 600px;
+  animation: textReveal 1s cubic-bezier(0.23, 1, 0.32, 1) 0.7s both;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  border-left: 4px solid var(--accent-solid);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+@keyframes textReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Sidebar colapsado */
