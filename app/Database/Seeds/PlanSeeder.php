@@ -51,6 +51,6 @@ class PlanSeeder extends Seeder
             ],
         ];
 
-        $this->db->table('planes_estudio')->insertBatch($data);
+        $this->db->table('planes_estudio_publicos')->insertBatch($data);
     }
 }

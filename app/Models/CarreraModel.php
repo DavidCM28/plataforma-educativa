@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class CarreraModel extends Model
 {
-    protected $table = 'carreras';
+    protected $table = 'carreras_publicas';
     protected $primaryKey = 'id';
     protected $allowedFields = [
         'nombre',

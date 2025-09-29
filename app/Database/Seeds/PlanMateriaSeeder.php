@@ -75,7 +75,7 @@ class PlanMateriaSeeder extends Seeder
             // Tronco común
             foreach ($troncoComun as $ciclo => $materias) {
                 foreach ($materias as $nombreMateria) {
-                    $materia = $this->db->table('materias')->where('nombre', $nombreMateria)->get()->getRow();
+                    $materia = $this->db->table('materias_publicas')->where('nombre', $nombreMateria)->get()->getRow();
                     if ($materia) {
                         $data[] = [
                             'plan_id' => $planId,
@@ -90,7 +90,7 @@ class PlanMateriaSeeder extends Seeder
             // Especialidad
             foreach ($especialidades[$clave] as $ciclo => $materias) {
                 foreach ($materias as $nombreMateria) {
-                    $materia = $this->db->table('materias')->where('nombre', $nombreMateria)->get()->getRow();
+                    $materia = $this->db->table('materias_publicas')->where('nombre', $nombreMateria)->get()->getRow();
                     if ($materia) {
                         $data[] = [
                             'plan_id' => $planId,
@@ -105,6 +105,6 @@ class PlanMateriaSeeder extends Seeder
         }
 
         // Insertar
-        $this->db->table('plan_materias')->insertBatch($data);
+        $this->db->table('plan_materias_publicas')->insertBatch($data);
     }
 }

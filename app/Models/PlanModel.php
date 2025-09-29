@@ -11,11 +11,11 @@ class PlanModel extends Model
 
     public function getMateriasByCarreraSlug($slug)
     {
-        return $this->db->table('materias m')
+        return $this->db->table('materias_publicas m')
             ->select('m.nombre, m.descripcion, m.creditos, pm.ciclo') // 👈 Agregamos ciclo
-            ->join('plan_materias pm', 'pm.materia_id = m.id')
-            ->join('planes_estudio pe', 'pe.id = pm.plan_id')
-            ->join('carreras c', 'c.id = pe.carrera_id')
+            ->join('plan_materias_publicas pm', 'pm.materia_id = m.id')
+            ->join('planes_estudio_publicos pe', 'pe.id = pm.plan_id')
+            ->join('carreras_publicas c', 'c.id = pe.carrera_id')
             ->where('c.slug', $slug)
             ->orderBy('pm.ciclo ASC') // 👈 Ordenamos por ciclo
             ->get()
