@@ -11,9 +11,22 @@
   --secondary: #ffbfa0;
   --accent: #ff7f3f;
 
+  /* Colores para roles */
+  --alumno-color: #4ECDC4;
+  --maestro-color: #FF6B6B;
+  --tutor-color: #45B7D1;
+
+  /* Colores de estado */
+  --success: #4CAF50;
+  --warning: #FF9800;
+  --error: #f44336;
+  --info: #2196F3;
+
   /* Extras */
   --radius: 12px;
+  --radius-sm: 8px;
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.15);
   --transition: all 0.3s ease;
 }
 
@@ -31,6 +44,7 @@ body.dark-mode {
   --accent: #ff9157;
 
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
 /* === Reset general === */
