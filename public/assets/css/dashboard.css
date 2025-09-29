@@ -10,6 +10,7 @@
   --primary-dark: #e58c53;
   --secondary: #ffbfa0;
   --accent: #ff7f3f;
+  --accent-solid: #ff7f3f; /* Añadido para consistencia */
 
   /* Colores para roles */
   --alumno-color: #4ECDC4;
@@ -28,6 +29,7 @@
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.15);
   --transition: all 0.3s ease;
+  --transition-fast: all 0.2s ease;
 }
 
 body.dark-mode {
@@ -86,6 +88,7 @@ body::before {
   animation: backgroundShift 20s ease-in-out infinite;
   pointer-events: none;
   z-index: -1;
+  will-change: background-position; /* Mejora de rendimiento */
 }
 
 @keyframes backgroundShift {
@@ -193,6 +196,7 @@ body::before {
 .navbar-title {
   font-weight: bold;
   margin-left: 10px;
+  font-size: 1.2rem;
 }
 
 .navbar-right {
@@ -253,6 +257,9 @@ body::before {
   border-radius: 50%;
   font-size: 11px;
   padding: 2px 6px;
+  font-weight: bold;
+  min-width: 18px;
+  text-align: center;
 }
 
 /* === Botón hamburguesa === */
@@ -266,6 +273,7 @@ body::before {
 }
 
 .btn-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
   transform: scale(1.1);
   color: var(--accent);
 }
@@ -323,6 +331,13 @@ body::before {
   position: relative;
   display: inline-block;
   padding-bottom: 8px;
+  width: 100%;
+}
+
+.sidebar-header h3 {
+  position: relative;
+  display: inline-block;
+  padding: 0 10px;
 }
 
 .sidebar-header h3::after {
@@ -397,6 +412,8 @@ body::before {
 
 .sidebar-menu i {
   margin-right: 10px;
+  width: 20px;
+  text-align: center;
 }
 
 /* Sidebar colapsado */
@@ -459,6 +476,8 @@ body::before {
 .content h1 {
   font-size: 2rem;
   margin-bottom: 1rem;
+  color: var(--color-text);
+  font-weight: 600;
 }
 
 .content p {
@@ -510,4 +529,97 @@ body::before {
 /* Ajustar el contenido cuando sidebar esté colapsado */
 .content.collapsed {
   margin-left: 70px;
+}
+
+/* === Responsive Design === */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    width: 250px;
+  }
+  
+  .sidebar.active {
+    transform: translateX(0);
+  }
+  
+  .content {
+    margin-left: 0;
+  }
+  
+  .content.collapsed {
+    margin-left: 0;
+  }
+  
+  .navbar-title {
+    font-size: 1rem;
+  }
+  
+  .content {
+    padding: 1.5rem;
+  }
+  
+  .content h1 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0 1rem;
+  }
+  
+  .navbar-right {
+    gap: 10px;
+  }
+  
+  .content {
+    padding: 1rem;
+  }
+  
+  .content h1 {
+    font-size: 1.3rem;
+  }
+  
+  .content p {
+    font-size: 1rem;
+    padding: 1rem;
+  }
+}
+
+/* === Scrollbar personalizado === */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* === Mejoras de accesibilidad === */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* === Estados de enfoque para accesibilidad === */
+.btn-toggle:focus,
+.nav-item:focus,
+.sidebar-menu a:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
