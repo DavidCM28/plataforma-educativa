@@ -242,3 +242,116 @@ body {
     transform: translateX(0);
   }
 }
+
+/* === Sección de bienvenida === */
+.dashboard-welcome {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 2rem 1rem;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.dashboard-welcome h1 {
+  font-size: 1.8rem;
+  color: var(--primary-dark);
+  margin-bottom: 10px;
+}
+
+.dashboard-welcome p {
+  color: var(--color-text);
+  margin-bottom: 6px;
+  font-size: 1rem;
+}
+
+/* === Sección de permisos === */
+.dashboard-permisos {
+  background: var(--color-surface);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+  text-align: center;
+  transition: var(--transition);
+}
+
+.dashboard-permisos h2 {
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.permiso-lista {
+  list-style: none;
+  padding: 0;
+  display: inline-block;
+  text-align: left;
+}
+
+.permiso-lista li {
+  color: var(--color-text);
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+}
+
+.permiso-lista i {
+  color: var(--primary-dark);
+  margin-right: 8px;
+  font-size: 1rem;
+}
+
+.no-permisos {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* === Botón de Cerrar Sesión === */
+.dashboard-acciones {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.logout-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.logout-btn i {
+  font-size: 1rem;
+}
+
+/* === Compatibilidad con modo oscuro === */
+body.dark-mode .dashboard-welcome,
+body.dark-mode .dashboard-permisos {
+  background: var(--color-surface);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .permiso-lista i {
+  color: var(--primary);
+}
+
+body.dark-mode .logout-btn {
+  background: var(--primary-dark);
+}
+
+body.dark-mode .logout-btn:hover {
+  background: var(--primary);
+}

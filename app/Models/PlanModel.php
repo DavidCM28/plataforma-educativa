@@ -5,7 +5,7 @@ use CodeIgniter\Model;
 
 class PlanModel extends Model
 {
-    protected $table = 'planes_estudio';
+    protected $table = 'planes_estudio_publicos';
     protected $primaryKey = 'id';
     protected $allowedFields = ['carrera_id', 'nombre', 'descripcion', 'anio', 'created_at', 'updated_at'];
 

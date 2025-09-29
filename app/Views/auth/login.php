@@ -32,22 +32,36 @@
                 <h1 class="comfort-title">¡Bienvenido, Usuario!</h1>
                 <p class="gentle-subtitle">Accede a la plataforma</p>
             </div>
+            <?php if (session()->has('error')): ?>
+                <div class="alert alert-danger" style="margin-bottom: 15px;">
+                    <?= session('error') ?>
+                </div>
+            <?php endif; ?>
 
-            <form class="comfort-form" id="loginForm" novalidate>
+            <?php if (session()->has('mensaje')): ?>
+                <div class="alert alert-success" style="margin-bottom: 15px;">
+                    <?= session('mensaje') ?>
+                </div>
+            <?php endif; ?>
+
+
+            <form class="comfort-form" id="loginForm" method="post" action="<?= base_url('/auth/login') ?>" novalidate>
                 <div class="soft-field">
                     <div class="field-container">
-                        <input type="text" id="matricula" name="matricula" required autocomplete="email">
-                        <label for="email">Matricula</label>
+                        <input type="text" id="usuario" name="matricula" required autocomplete="off">
+                        <label for="matricula">Matrícula o No. de Empleado</label>
                         <div class="field-accent"></div>
                     </div>
+                    <span class="gentle-error" id="matriculaError"></span>
                 </div>
 
                 <div class="soft-field">
                     <div class="field-container">
                         <input type="password" id="password" name="password" required autocomplete="current-password">
                         <label for="password">Contraseña</label>
+
                         <button type="button" class="gentle-toggle" id="passwordToggle"
-                            aria-label="Toggle password visibility">
+                            aria-label="Mostrar/ocultar contraseña">
                             <div class="toggle-icon">
                                 <!-- Ojo abierto -->
                                 <svg class="eye-open" width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -64,44 +78,20 @@
                                         stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
                                         stroke-linejoin="round" />
                                 </svg>
-
                             </div>
                         </button>
-                        <div class="field-accent"></div>
                     </div>
                     <span class="gentle-error" id="passwordError"></span>
                 </div>
 
-                <div class="comfort-options">
-                    <label class="gentle-checkbox">
-                        <input type="checkbox" id="remember" name="remember">
-                        <span class="checkbox-soft">
-                            <div class="check-circle"></div>
-                            <svg class="check-mark" width="12" height="10" viewBox="0 0 12 10" fill="none">
-                                <path d="M1 5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                            </svg>
-                        </span>
-                        <span class="checkbox-text">Recuerdame</span>
-                    </label>
-                    <a href="#" class="comfort-link">Olvidaste la contraseña?</a>
-                </div>
-
                 <button type="submit" class="comfort-button">
-                    <div class="button-background"></div>
                     <span class="button-text">Acceder</span>
-                    <div class="button-loader">
-                        <div class="gentle-spinner">
-                            <div class="spinner-circle"></div>
-                        </div>
-                    </div>
-                    <div class="button-glow"></div>
                 </button>
             </form>
+
         </div>
     </div>
 
-    <script src="../../shared/js/form-utils.js"></script>
     <script src="<?= base_url('assets/js/login.js') ?>"></script>
 
     <?= $this->include('layouts/footer') ?>

@@ -5,12 +5,41 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
+
 $routes->get('/', 'Home::index');
 $routes->get('contacto', 'Home::contacto');
-$routes->get('dashboard', 'Home::dashboard');
+$routes->get('carrera/(:segment)', 'Home::carrera/$1');
+$routes->get('test', 'Home::test');
+
+// API contacto
 $routes->post('api/contacto/guardar', 'Contacto::guardar');
 $routes->post('contacto/enviar', 'Contacto::enviar');
+
+// Login / Logout
 $routes->get('auth/login', 'Auth::login');
 $routes->post('auth/login', 'Auth::doLogin');
 $routes->get('auth/logout', 'Auth::logout');
-$routes->get('carrera/(:segment)', 'Home::carrera/$1');
+
+// Alias cortos (recomendado)
+$routes->get('login', 'Auth::login');
+$routes->post('login', 'Auth::doLogin');
+$routes->get('logout', 'Auth::logout');
+
+// Dashboard general
+$routes->get('dashboard', 'Dashboard::index');
+
+// Módulo de administración (solo superusuario)
+$routes->group('admin', function ($routes) {
+    $routes->get('usuarios', 'Admin\Usuarios::index');   // Listado de usuarios
+    $routes->get('usuarios/detalle/(:num)', 'Admin\Usuarios::detalle/$1');
+    $routes->get('usuarios/nuevo', 'Admin\Usuarios::create');
+    $routes->post('usuarios/guardar', 'Admin\Usuarios::store');
+    $routes->get('usuarios/editar/(:num)', 'Admin\Usuarios::edit/$1');
+    $routes->post('usuarios/actualizar/(:num)', 'Admin\Usuarios::update/$1');
+    $routes->get('usuarios/eliminar/(:num)', 'Admin\Usuarios::delete/$1');
+    $routes->get('usuarios/plantilla', 'Admin\Usuarios::plantilla');
+    $routes->post('usuarios/importar', 'Admin\Usuarios::importar');
+    $routes->get('usuarios/descargar-credenciales', 'Admin\Usuarios::descargarCredenciales');
+
+});
+
