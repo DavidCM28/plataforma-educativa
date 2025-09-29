@@ -1,9 +1,9 @@
 :root {
-  /* Colores claros (modo normal) */
-  --color-bg: #fff5eb; /* Fondo general */
-  --color-surface: #ffffff; /* Superficies como cards, navbar */
-  --color-text: #2a2a2a; /* Texto principal */
-  --color-text-muted: #8b7d6b; /* Texto secundario */
+  /* Colores claros */
+  --color-bg: #f4f5f9;
+  --color-surface: #ffffff;
+  --color-text: #2a2a2a;
+  --color-text-muted: #666;
 
   /* Paleta */
   --primary: #ff9e64;
@@ -12,28 +12,26 @@
   --accent: #ff7f3f;
 
   /* Extras */
-  --radius: 12px;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --radius: 14px;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   --transition: all 0.3s ease;
 }
 
 body.dark-mode {
-  /* Colores oscuros */
   --color-bg: #1a1a1a;
   --color-surface: #2a2a2a;
   --color-text: #ffffff;
-  --color-text-muted: #b8b8b8;
+  --color-text-muted: #aaa;
 
-  /* Paleta adaptada */
   --primary: #ffac7a;
   --primary-dark: #ff9e64;
   --secondary: #ffd1b8;
   --accent: #ff9157;
 
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  --shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
 }
 
-/* === Reset general === */
+/* Reset */
 * {
   margin: 0;
   padding: 0;
@@ -44,6 +42,7 @@ body {
   font-family: "Segoe UI", sans-serif;
   background: var(--color-bg);
   color: var(--color-text);
+  transition: var(--transition);
 }
 
 /* === Navbar === */
@@ -51,15 +50,22 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  height: 60px;
   width: 100%;
+  height: 60px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--primary);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 158, 100, 0.85),
+    rgba(255, 127, 63, 0.85)
+  );
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
   color: #fff;
   padding: 0 1.5rem;
-  box-shadow: var(--shadow);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
   z-index: 1000;
 }
 
@@ -69,8 +75,10 @@ body {
 }
 
 .navbar-title {
-  font-weight: bold;
+  font-weight: 600;
   margin-left: 10px;
+  font-size: 1.15rem;
+  letter-spacing: 0.5px;
 }
 
 .navbar-right {
@@ -82,12 +90,18 @@ body {
 .nav-item {
   position: relative;
   cursor: pointer;
+  transition: var(--transition);
+}
+
+.nav-item:hover {
+  transform: scale(1.1);
 }
 
 .nav-item img {
-  width: 35px;
-  height: 35px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.5);
 }
 
 .badge {
@@ -99,6 +113,7 @@ body {
   border-radius: 50%;
   font-size: 11px;
   padding: 2px 6px;
+  box-shadow: var(--shadow);
 }
 
 /* === Botón hamburguesa === */
@@ -108,33 +123,35 @@ body {
   color: white;
   font-size: 20px;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform 0.25s ease;
 }
-
 .btn-toggle:hover {
-  transform: scale(1.1);
-  color: var(--accent);
+  transform: rotate(90deg);
+  color: var(--secondary);
 }
 
 /* === Sidebar === */
 .sidebar {
   position: fixed;
-  top: 60px; /* debajo del navbar */
+  top: 60px;
   left: 0;
-  width: 220px;
+  width: 230px;
   height: 100%;
-  background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+  background: rgba(255, 158, 100, 0.8);
+  backdrop-filter: blur(14px);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
   color: #fff;
-  box-shadow: var(--shadow);
   padding: 1rem 0;
   overflow-y: auto;
   transition: var(--transition);
+  box-shadow: var(--shadow);
+  animation: slideIn 0.4s ease;
 }
 
 .sidebar-header {
   text-align: center;
-  margin-bottom: 1rem;
-  font-weight: bold;
+  margin-bottom: 1.2rem;
+  font-weight: 600;
   font-size: 1.1rem;
   color: #fff;
 }
@@ -145,96 +162,83 @@ body {
 }
 
 .sidebar-menu li {
-  margin: 0.3rem 0;
+  margin: 0.4rem 0;
 }
 
 .sidebar-menu a {
   display: flex;
   align-items: center;
-  padding: 10px 15px;
+  padding: 12px 18px;
   color: #fff;
   text-decoration: none;
   border-radius: var(--radius);
   transition: var(--transition);
+  position: relative;
 }
 
 .sidebar-menu a:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateX(5px);
 }
 
 .sidebar-menu a.active {
-  background: var(--accent);
+  background: rgba(255, 255, 255, 0.25);
+  border-left: 4px solid var(--accent);
   font-weight: bold;
 }
 
 .sidebar-menu i {
-  margin-right: 10px;
+  margin-right: 12px;
+  font-size: 16px;
 }
 
 /* Sidebar colapsado */
 .sidebar.collapsed {
   width: 70px;
 }
-
-.sidebar.collapsed .sidebar-header h3 {
+.sidebar.collapsed .sidebar-header h3,
+.sidebar.collapsed a span {
   display: none;
 }
-
 .sidebar.collapsed a {
   justify-content: center;
   padding: 12px 0;
 }
-
 .sidebar.collapsed a i {
   margin-right: 0;
-  font-size: 18px;
-}
-
-.sidebar.collapsed a span {
-  display: none;
+  font-size: 20px;
 }
 
 /* === Contenido === */
 .content {
-  margin-left: 220px; /* ancho del sidebar */
-  margin-top: 60px; /* altura del navbar */
-  padding: 2rem;
+  margin-left: 230px;
+  margin-top: 60px;
+  padding: 2.5rem;
   min-height: calc(100vh - 60px);
   background: var(--color-bg);
+  transition: var(--transition);
+}
+
+.content.collapsed {
+  margin-left: 70px;
 }
 
 .content h1 {
   font-size: 2rem;
   margin-bottom: 1rem;
+  color: var(--primary-dark);
 }
 
 .content p {
   color: var(--color-text-muted);
 }
 
-/* Sidebar colapsado */
-.sidebar.collapsed {
-  width: 70px; /* ancho reducido */
-}
-
-.sidebar.collapsed .sidebar-header h3 {
-  display: none;
-}
-
-.sidebar.collapsed a {
-  justify-content: center;
-}
-
-.sidebar.collapsed a i {
-  margin-right: 0; /* centramos íconos */
-  font-size: 18px;
-}
-
-.sidebar.collapsed a span {
-  display: none; /* ocultamos el texto */
-}
-
-/* Ajustar el contenido cuando sidebar esté colapsado */
-.content.collapsed {
-  margin-left: 70px;
+/* === Animación === */
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
