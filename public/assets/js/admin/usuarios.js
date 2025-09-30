@@ -2,11 +2,19 @@ document.addEventListener("DOMContentLoaded", function () {
   // === Sidebar toggle ===
   const toggleBtn = document.getElementById("sidebarToggle");
   const sidebar = document.getElementById("sidebar");
-  const content = document.querySelector(".content");
+  const content = document.querySelector(".content-dark");
   if (toggleBtn && sidebar && content) {
+    // 🔹 Inicia colapsado
+    sidebar.classList.add("collapsed");
+    content.classList.add("collapsed");
+
+    // 🔹 Estado del botón (para que muestre el ícono correcto)
+    toggleBtn.classList.remove("active");
+
     toggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("collapsed");
-      content.classList.toggle("collapsed");
+      const isCollapsed = sidebar.classList.toggle("collapsed");
+      content.classList.toggle("collapsed", isCollapsed);
+      toggleBtn.classList.toggle("active", !isCollapsed);
     });
   }
 
@@ -15,68 +23,82 @@ document.addEventListener("DOMContentLoaded", function () {
   const closeDetalle = modalDetalle.querySelector(".close-btn");
 
   document.querySelectorAll(".btn-view").forEach((btn) => {
-    btn.addEventListener("click", function (e) {
-      e.preventDefault(); // evita saltar a "#"
+    btn.addEventListener("click", async function (e) {
+      e.preventDefault();
+
       const id = this.dataset.id;
+      const url = `${baseUrl}/admin/usuarios/detalle/${id}`;
+      console.log("📡 Solicitando:", url);
 
-      fetch(`${baseUrl}/admin/usuarios/detalle/${id}`)
-        .then((res) => {
-          if (!res.ok) throw new Error("Error HTTP");
-          return res.json();
-        })
-        .then((data) => {
-          if (!data) return;
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Error HTTP: " + res.status);
 
-          document.getElementById("modal-nombre").innerText = data.nombre || "";
-          document.getElementById("modal-apellido-pat").innerText =
-            data.apellido_paterno || "";
-          document.getElementById("modal-apellido-mat").innerText =
-            data.apellido_materno || "";
-          document.getElementById("modal-email").innerText = data.email || "";
-          document.getElementById("modal-matricula").innerText =
-            data.matricula || "";
-          document.getElementById("modal-num_empleado").innerText =
-            data.num_empleado || "";
-          document.getElementById("modal-rol").innerText = data.rol || "";
-          document.getElementById("modal-activo").innerText =
-            data.activo == 1 ? "Sí" : "No";
-          document.getElementById("modal-verificado").innerText =
-            data.verificado == 1 ? "Sí" : "No";
-          document.getElementById("modal-ultimo_login").innerText =
-            data.ultimo_login || "Nunca";
-          document.getElementById("modal-created_at").innerText =
-            data.created_at || "-";
-          document.getElementById("modal-updated_at").innerText =
-            data.updated_at || "-";
-          document.getElementById("modal-deleted_at").innerText =
-            data.deleted_at || "No eliminado";
-          document.getElementById("modal-foto").src = data.foto
+        const data = await res.json();
+        console.log("✅ Datos obtenidos:", data);
+
+        // 🧠 Asignar datos solo si el elemento existe
+        const safeSet = (id, value) => {
+          const el = document.getElementById(id);
+          if (el) el.innerText = value ?? "-";
+        };
+
+        // Campos visibles en el modal
+        safeSet(
+          "modal-nombre",
+          `${data.nombre || ""} ${data.apellido_paterno || ""} ${
+            data.apellido_materno || ""
+          }`
+        );
+        safeSet("modal-email", data.email);
+        safeSet("modal-matricula", data.matricula);
+        safeSet("modal-num_empleado", data.num_empleado);
+        safeSet("modal-rol", data.rol);
+        safeSet("modal-verificado", data.verificado == 1 ? "Sí" : "No");
+        safeSet("modal-activo", data.activo == 1 ? "Activo" : "Inactivo");
+        safeSet("modal-ultimo_login", data.ultimo_login ?? "Nunca");
+        safeSet("modal-created_at", data.created_at);
+        safeSet("modal-updated_at", data.updated_at);
+        safeSet("modal-deleted_at", data.deleted_at ?? "No eliminado");
+
+        // Imagen de perfil
+        const foto = document.getElementById("modal-foto");
+        if (foto) {
+          foto.src = data.foto
             ? `${baseUrl}/uploads/usuarios/${data.foto}`
-            : `${baseUrl}/assets/img/default-user.png`;
+            : `${baseUrl}/assets/img/user-default.jpg`;
+        }
 
-          // Mostrar solo campos relevantes
-          const detalleMatricula = document.getElementById("detalleMatricula");
-          const detalleEmpleado = document.getElementById("detalleEmpleado");
+        // Mostrar solo campos relevantes
+        const detalleMatricula = document.getElementById("detalleMatricula");
+        const detalleEmpleado = document.getElementById("detalleEmpleado");
 
-          if (data.rol && data.rol.toLowerCase().includes("alumno")) {
-            detalleMatricula.style.display = "block";
-            detalleEmpleado.style.display = "none";
-          } else {
-            detalleMatricula.style.display = "none";
-            detalleEmpleado.style.display = "block";
-          }
+        if (data.rol && data.rol.toLowerCase().includes("alumno")) {
+          detalleMatricula.style.display = "block";
+          detalleEmpleado.style.display = "none";
+        } else {
+          detalleMatricula.style.display = "none";
+          detalleEmpleado.style.display = "block";
+        }
 
-          modalDetalle.style.display = "flex";
-        })
-        .catch((err) => {
-          console.error("Error al obtener usuario:", err);
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "No se pudo cargar la información del usuario.",
-          });
+        modalDetalle.style.display = "flex";
+      } catch (err) {
+        console.error("❌ Error al cargar usuario:", err);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No se pudo cargar la información del usuario. Revisa la consola para más detalles.",
         });
+      }
     });
+  });
+
+  closeDetalle.addEventListener("click", () => {
+    modalDetalle.style.display = "none";
+  });
+
+  window.addEventListener("click", (e) => {
+    if (e.target === modalDetalle) modalDetalle.style.display = "none";
   });
 
   closeDetalle.addEventListener("click", () => {

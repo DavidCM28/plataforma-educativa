@@ -1,24 +1,26 @@
-(function waitForSidebarToggle() {
+document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.getElementById("sidebarToggle");
   const sidebar = document.getElementById("sidebar");
-  const content = document.querySelector(".content");
+  const content = document.querySelector(".content-dark");
 
-  // 🟡 Si aún no existe el botón, intenta otra vez en 100 ms
-  if (!toggleBtn || !sidebar || !content) {
-    console.warn("⏳ Esperando a que cargue el sidebar o el botón...");
-    setTimeout(waitForSidebarToggle, 100);
-    return;
-  }
+  if (!toggleBtn || !sidebar || !content) return;
 
-  console.log("✅ Sidebar inicializado correctamente");
+  // Estado inicial: sidebar colapsado
+  let isCollapsed = true;
 
-  // 🔹 Colapsado por defecto
+  // 🔹 Aplica el estado inicial
   sidebar.classList.add("collapsed");
   content.classList.add("collapsed");
+  toggleBtn.classList.remove("active"); // inicia como ☰
 
-  // 🔹 Alternar al hacer clic
   toggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("collapsed");
-    content.classList.toggle("collapsed");
+    isCollapsed = !isCollapsed;
+
+    // 🔸 Alterna clases según el estado
+    sidebar.classList.toggle("collapsed", isCollapsed);
+    content.classList.toggle("collapsed", isCollapsed);
+
+    // 🔸 Cambia animación del botón
+    toggleBtn.classList.toggle("active", !isCollapsed);
   });
-})();
+});
