@@ -137,28 +137,30 @@ body {
   left: 0;
   width: 230px;
   height: 100%;
-  background: rgba(255, 158, 100, 0.8);
+  background: rgba(255, 158, 100, 0.9);
   backdrop-filter: blur(14px);
   border-right: 1px solid rgba(255, 255, 255, 0.2);
   color: #fff;
   padding: 1rem 0;
   overflow-y: auto;
-  transition: var(--transition);
+  transition: all 0.3s ease;
   box-shadow: var(--shadow);
-  animation: slideIn 0.4s ease;
 }
 
+/* === Encabezado === */
 .sidebar-header {
   text-align: center;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1rem;
   font-weight: 600;
   font-size: 1.1rem;
   color: #fff;
 }
 
+/* === Enlaces === */
 .sidebar-menu {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .sidebar-menu li {
@@ -168,45 +170,52 @@ body {
 .sidebar-menu a {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   padding: 12px 18px;
   color: #fff;
   text-decoration: none;
   border-radius: var(--radius);
-  transition: var(--transition);
-  position: relative;
+  transition: all 0.3s ease;
+}
+
+.sidebar-menu a i {
+  font-size: 18px;
+  margin-right: 12px;
+  min-width: 24px; /* Asegura alineación */
+  text-align: center;
+}
+
+.sidebar-menu a span {
+  white-space: nowrap;
+  transition: opacity 0.3s ease;
 }
 
 .sidebar-menu a:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.2);
   transform: translateX(5px);
 }
 
-.sidebar-menu a.active {
-  background: rgba(255, 255, 255, 0.25);
-  border-left: 4px solid var(--accent);
-  font-weight: bold;
-}
-
-.sidebar-menu i {
-  margin-right: 12px;
-  font-size: 16px;
-}
-
-/* Sidebar colapsado */
+/* === Sidebar colapsado === */
 .sidebar.collapsed {
-  width: 70px;
+  width: 70px; /* más estrecho */
+  padding: 1rem 0.3rem;
 }
-.sidebar.collapsed .sidebar-header h3,
-.sidebar.collapsed a span {
+
+.sidebar.collapsed .sidebar-header h3 {
   display: none;
 }
-.sidebar.collapsed a {
+
+.sidebar.collapsed .sidebar-menu a {
   justify-content: center;
   padding: 12px 0;
 }
-.sidebar.collapsed a i {
-  margin-right: 0;
-  font-size: 20px;
+
+.sidebar.collapsed .sidebar-menu a i {
+  margin: 0;
+}
+
+.sidebar.collapsed .sidebar-menu a span {
+  display: none;
 }
 
 /* === Contenido === */
@@ -214,23 +223,13 @@ body {
   margin-left: 230px;
   margin-top: 60px;
   padding: 2.5rem;
-  min-height: calc(100vh - 60px);
   background: var(--color-bg);
-  transition: var(--transition);
+  transition: margin-left 0.3s ease;
+  min-height: calc(100vh - 60px);
 }
 
 .content.collapsed {
-  margin-left: 70px;
-}
-
-.content h1 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  color: var(--primary-dark);
-}
-
-.content p {
-  color: var(--color-text-muted);
+  margin-left: 70px; /* se ajusta al menú estrecho */
 }
 
 /* === Animación === */

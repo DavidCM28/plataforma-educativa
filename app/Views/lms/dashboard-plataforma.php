@@ -17,7 +17,8 @@
         <section class="dashboard-welcome">
             <h1>👋 Bienvenido, <?= esc(session('nombre')) ?>!</h1>
             <p>Este es tu panel principal. Desde aquí puedes acceder a las secciones disponibles según tu rol:
-                <strong><?= esc(session('rol')) ?></strong>.</p>
+                <strong><?= esc(session('rol')) ?></strong>.
+            </p>
         </section>
 
         <section class="acciones-inicio">
@@ -25,19 +26,7 @@
         </section>
     </main>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const toggleBtn = document.getElementById("sidebarToggle");
-            const sidebar = document.getElementById("sidebar");
-            const content = document.querySelector(".content");
-            if (toggleBtn && sidebar && content) {
-                toggleBtn.addEventListener("click", () => {
-                    sidebar.classList.toggle("collapsed");
-                    content.classList.toggle("collapsed");
-                });
-            }
-        });
-    </script>
+    <script src="<?= base_url('assets/js/sidebar.js') ?>"></script>
 </body>
 
 </html>

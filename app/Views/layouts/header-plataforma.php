@@ -1,6 +1,7 @@
 <header class="navbar">
     <div class="navbar-left">
         <button id="sidebarToggle" class="btn-toggle"><i class="fas fa-bars"></i></button>
+
         <span class="navbar-title">Plataforma Educativa</span>
     </div>
 

@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="<?= base_url('assets/css/dashboard.css') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/css/admin/usuarios.css') ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 </head>
 
@@ -28,12 +28,10 @@
                 <i class="fa fa-file-import"></i> Importar desde Excel
             </button>
 
-
-            <br>
-
-            <a href="<?= base_url('admin/usuarios/plantilla') ?>" class="btn-importar">
+            <a href="<?= base_url('admin/usuarios/plantilla') ?>" class="btn-excel">
                 <i class="fa fa-file-excel"></i> Descargar plantilla (Formulario)
             </a>
+
 
             <?php
             // Agrupar usuarios por tipo de rol
@@ -326,6 +324,7 @@
     <?php endif; ?>
 
 
+
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const tabs = document.querySelectorAll(".tab-item");
@@ -361,7 +360,7 @@
             const closeBtns = document.querySelectorAll(".close-btn");
 
             btnImportar.addEventListener("click", () => {
-                modalImportar.style.display = "block";
+                modalImportar.style.display = "flex"; // ✅ centrado correctamente
             });
 
             closeBtns.forEach(btn =>
@@ -377,8 +376,41 @@
             });
         });
 
+
     </script>
     <script src="<?= base_url('assets/js/admin/usuarios.js') ?>"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="<?= base_url('assets/js/sidebar.js') ?>"></script>
+    <script>
+        (function initSidebar() {
+            // Espera hasta que existan los nodos
+            const btn = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            const content = document.querySelector('.content');
+
+            if (!btn || !sidebar || !content) {
+                requestAnimationFrame(initSidebar);
+                return;
+            }
+
+            // Colapsado por defecto
+            sidebar.classList.add('collapsed');
+            content.classList.add('collapsed');
+
+            // Delegación en captura: gana a otros listeners que bloquean el click
+            document.addEventListener('click', function (e) {
+                const hit = e.target.closest('#sidebarToggle');
+                if (!hit) return;
+
+                e.preventDefault();
+                // e.stopPropagation(); // opcional
+
+                sidebar.classList.toggle('collapsed');
+                content.classList.toggle('collapsed');
+            }, true); // 👈 captura
+        })();
+    </script>
+
 </body>
 
 </html>
