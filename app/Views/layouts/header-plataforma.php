@@ -30,7 +30,7 @@
                 </div>
                 <hr>
                 <ul>
-                    <li><a href="#"><i class="fas fa-user"></i> Mi Perfil</a></li>
+                    <li><a href="<?= base_url('perfil') ?>"><i class="fas fa-user"></i> Mi Perfil</a></li>
                     <li><a href="#"><i class="fas fa-cog"></i> Configuración</a></li>
                     <li><a href="<?= base_url('logout') ?>"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
                 </ul>

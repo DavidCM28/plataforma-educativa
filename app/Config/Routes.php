@@ -27,6 +27,7 @@ $routes->get('logout', 'Auth::logout');
 
 // Dashboard general
 $routes->get('dashboard', 'Dashboard::index');
+$routes->get('perfil', 'Perfil::index');
 
 // Módulo de administración (solo superusuario)
 $routes->group('admin', function ($routes) {

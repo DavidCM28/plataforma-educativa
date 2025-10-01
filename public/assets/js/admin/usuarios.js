@@ -74,11 +74,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const detalleEmpleado = document.getElementById("detalleEmpleado");
 
         if (data.rol && data.rol.toLowerCase().includes("alumno")) {
-          detalleMatricula.style.display = "block";
+          detalleMatricula.style.display = "flex";
           detalleEmpleado.style.display = "none";
         } else {
           detalleMatricula.style.display = "none";
-          detalleEmpleado.style.display = "block";
+          detalleEmpleado.style.display = "flex";
         }
 
         modalDetalle.style.display = "flex";
