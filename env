@@ -48,3 +48,11 @@ email.toName = "Administración"
 
 # session.driver = 'CodeIgniter\Session\Handlers\FileHandler'
 # session.savePath = writable/session
+
+#--------------------------------------------------------------------
+# 🌩️ Cloudinary credentials
+#--------------------------------------------------------------------
+
+# 🌩️ Cloudinary credentials
+CLOUDINARY_URL=cloudinary://653319182536276:ijhWz9MUKJAX7cgLaLMCbTdu9ok@dgxwfohv4
+

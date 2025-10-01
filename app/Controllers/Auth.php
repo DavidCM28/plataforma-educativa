@@ -69,6 +69,7 @@ class Auth extends BaseController
             'num_empleado' => $usuario['num_empleado'],
             'rol' => $rol['nombre'] ?? 'Sin rol',
             'permisos' => $listaPermisos,
+            'foto' => $usuario['foto'],
             'isLoggedIn' => true,
         ]);
 

@@ -27,7 +27,11 @@ $routes->get('logout', 'Auth::logout');
 
 // Dashboard general
 $routes->get('dashboard', 'Dashboard::index');
+
+//Perfil
 $routes->get('perfil', 'Perfil::index');
+$routes->post('perfil/subirFotoCloud', 'Perfil::subirFotoCloud');
+
 
 // Módulo de administración (solo superusuario)
 $routes->group('admin', function ($routes) {

@@ -16,13 +16,20 @@
             <i class="fas fa-envelope"></i>
             <span class="badge">5</span>
         </div>
+
+        <!-- 👤 Avatar del usuario -->
         <div class="nav-profile">
-            <img src="<?= base_url('assets/img/user-default.jpg') ?>" alt="Perfil" id="profileAvatar">
+            <?php
+            $fotoPerfil = session('foto') && !empty(session('foto'))
+                ? session('foto')
+                : base_url('assets/img/user-default.jpg');
+            ?>
+            <img src="<?= esc($fotoPerfil) ?>" alt="Perfil" id="profileAvatar" class="avatar-header">
 
             <!-- 🔽 Menú desplegable -->
             <div class="profile-menu" id="profileMenu">
                 <div class="profile-info">
-                    <img src="<?= base_url('assets/img/user-default.jpg') ?>" alt="Perfil">
+                    <img src="<?= esc($fotoPerfil) ?>" alt="Perfil" class="avatar-menu">
                     <div>
                         <strong><?= esc(session('nombre')) ?></strong><br>
                         <small><?= esc(session('rol')) ?></small>
@@ -36,9 +43,9 @@
                 </ul>
             </div>
         </div>
-
     </div>
 </header>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script src="<?= base_url('assets/js/header.js') ?>"></script>
