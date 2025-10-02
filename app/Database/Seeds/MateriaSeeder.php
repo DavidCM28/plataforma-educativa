@@ -103,6 +103,6 @@ class MateriaSeeder extends Seeder
         }, $data);
 
         // Insertar en la base de datos
-        $this->db->table('materias')->insertBatch($data);
+        $this->db->table('materias_publicas')->insertBatch($data);
     }
 }

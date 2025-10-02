@@ -33,7 +33,7 @@
                 <div class="logo-img">
                     <img src="<?= base_url('assets/img/logo.jpg') ?>" alt="UTSC Logo">
                 </div>
-                <span id="schoolName">Ctrl+Shift Learning</span>
+                <span id="schoolName">UTSC</span>
             </a>
 
             <ul class="nav-links">

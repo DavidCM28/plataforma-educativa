@@ -331,4 +331,92 @@
 
 
 
+<div id="chatbot-button">
+    💬
+</div>
+
+<!-- Ventana del Chatbot -->
+<div id="chatbot-window" class="hidden">
+    <div class="chatbot-header">
+        <span>🤖 Chat UT</span>
+        <div class="chatbot-controls">
+            <button id="minimize-chatbot">–</button>
+            <button id="close-chatbot">✖</button>
+        </div>
+    </div>
+    <div class="chatbot-body">
+        <p><b>Bot:</b> ¡Hola! 👋 Soy tu asistente virtual de la Universidad Tecnológica de Montemorelos.  
+        Selecciona una opción para continuar:</p>
+    </div>
+    <div class="chat-options">
+        <button>📍 Ubicación</button>
+        <button>📚 Carreras disponibles</button>
+        <button>💵 Costos</button>
+        <button>📝 Requisitos de inscripción</button>
+        <button>⏰ Horarios de atención</button>
+        <button>📞 Contacto</button>
+    </div>
+</div>
+
+<!-- Script del Chatbot -->
+<script>
+    const chatbotBtn = document.getElementById('chatbot-button');
+    const chatbotWindow = document.getElementById('chatbot-window');
+    const minimizeChatbot = document.getElementById('minimize-chatbot');
+    const closeChatbot = document.getElementById('close-chatbot');
+    const chatBody = document.querySelector('.chatbot-body');
+
+    // Abrir chatbot
+    chatbotBtn.addEventListener('click', () => {
+        chatbotWindow.classList.remove('hidden');
+        chatbotBtn.style.display = "none"; // ocultar burbuja
+    });
+
+    // Minimizar chatbot → vuelve al botón redondo
+    minimizeChatbot.addEventListener('click', () => {
+        chatbotWindow.classList.add('hidden');
+        chatbotBtn.style.display = "flex"; // mostrar burbuja
+    });
+
+    // Cerrar chatbot → vuelve al botón redondo
+    closeChatbot.addEventListener('click', () => {
+        chatbotWindow.classList.add('hidden');
+        chatbotBtn.style.display = "flex"; // mostrar burbuja
+    });
+
+    // Respuestas predefinidas
+    const respuestas = {
+        "📍 Ubicación": "📍 Camino a las Adjuntas S/N, Col. Bugambilias, Montemorelos, México.",
+        "📚 Carreras disponibles": "🎓 Carreras:<br>- Ing. en Mantenimiento Industrial<br>- Lic. en Negocios y Mercadotecnia<br>- Ing. en TI e Innovación Digital<br>- Ing. Industrial<br>- Ing. en Mecatrónica",
+        "💵 Costos": "💵 Costos:<br>- Inscripción anual: $550<br>- Mensualidad: $450<br>- Contamos con becas internas 🎓",
+        "📝 Requisitos de inscripción": "📝 Requisitos:<br>- Llenar Solicitud<br>- Certificado de Bachillerato<br>- CURP<br>- Acta de Nacimiento<br>- 9 fotos infantiles a color<br>- Original y 3 copias de cada documento",
+        "⏰ Horarios de atención": "🕗 Lunes a Viernes de 8:00 am a 5:00 pm",
+        "📞 Contacto": "📞 Tel: 826-688-35-42<br>📲 WhatsApp: 811-674-1923"
+    };
+
+    // Detectar clic en botones
+    document.querySelectorAll('.chat-options button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const pregunta = btn.innerText;
+            const respuesta = respuestas[pregunta];
+
+            // Mensaje del usuario
+            chatBody.innerHTML += `<p><b>Tú:</b> ${pregunta}</p>`;
+
+            // Bot escribiendo...
+            const typingEl = document.createElement('p');
+            typingEl.innerHTML = `<b>Bot:</b> <span class="dot-animation"></span>`;
+            chatBody.appendChild(typingEl);
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            // Reemplazar con respuesta
+            setTimeout(() => {
+                typingEl.innerHTML = `<b>Bot:</b> ${respuesta}`;
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }, 1200);
+        });
+    });
+</script>
+
+
 <?= $this->include('layouts/footer') ?>

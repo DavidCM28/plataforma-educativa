@@ -1,0 +1,352 @@
+/* ======================================================
+   🎨 Estilos específicos - Gestión de Usuarios
+   ====================================================== */
+
+.crud-container {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  margin-top: 1rem;
+  animation: fadeIn 0.4s ease;
+}
+
+.crud-container h2 {
+  color: var(--primary-dark);
+  font-size: 1.6rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 3px solid var(--primary);
+  display: inline-block;
+  padding-bottom: 4px;
+}
+
+/* === Botón Nuevo === */
+.btn-nuevo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--primary);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  transition: var(--transition);
+  box-shadow: var(--shadow);
+}
+
+.btn-nuevo:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+/* === Tabla CRUD === */
+.tabla-crud {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.tabla-crud thead {
+  background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+  color: #fff;
+}
+
+.tabla-crud th,
+.tabla-crud td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.tabla-crud tbody tr:hover {
+  background-color: rgba(255, 158, 100, 0.08);
+  transition: var(--transition);
+}
+
+/* === Botones Editar / Eliminar === */
+.btn-edit,
+.btn-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: #fff;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.btn-edit {
+  background-color: #4caf50;
+}
+.btn-edit:hover {
+  background-color: #3d8c40;
+}
+
+.btn-delete {
+  background-color: #e74c3c;
+}
+.btn-delete:hover {
+  background-color: #c0392b;
+}
+
+/* === Animación ligera === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  .crud-container {
+    padding: 1rem;
+  }
+
+  .tabla-crud th,
+  .tabla-crud td {
+    font-size: 0.9rem;
+    padding: 0.8rem;
+  }
+
+  .btn-nuevo {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* === Modal === */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  padding: 2rem;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: var(--shadow);
+  color: var(--color-text);
+  animation: slideUp 0.3s ease;
+}
+
+.close-btn {
+  float: right;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: var(--transition);
+}
+
+.close-btn:hover {
+  color: var(--primary);
+}
+
+.modal-body {
+  margin-top: 1.2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem 1rem;
+}
+
+.info-item {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.8rem;
+  font-size: 0.95rem;
+}
+
+.foto-usuario {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-top: 0.6rem;
+  box-shadow: var(--shadow);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* === Modal Crear Usuario === */
+.form-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.modal-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--primary-dark);
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.8rem;
+  background-color: rgba(255, 255, 255, 0.9);
+  transition: var(--transition);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(255, 158, 100, 0.3);
+}
+
+.modal-footer {
+  margin-top: 1.2rem;
+  text-align: center;
+}
+
+/* Contenedor de acciones */
+.acciones {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Estilo base para botones */
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  box-shadow: var(--shadow);
+  font-size: 1rem;
+}
+
+/* Ver detalles (azul suave) */
+.btn-view {
+  background: #4a90e2;
+}
+.btn-view:hover {
+  background: #357abd;
+  transform: translateY(-2px);
+}
+
+/* Editar (naranja/primario) */
+.btn-edit {
+  background: var(--primary);
+}
+.btn-edit:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+/* Eliminar (rojo) */
+.btn-delete {
+  background: #e74c3c;
+}
+.btn-delete:hover {
+  background: #c0392b;
+  transform: translateY(-2px);
+}
+/*TABS*/
+.tabs-container {
+  margin-top: 20px;
+  margin-bottom: 15px; /* 🔹 Espacio entre las pestañas y la tabla */
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  padding: 8px;
+  margin: 0;
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+}
+
+.tab-item {
+  padding: 10px 22px;
+  cursor: pointer;
+  background: var(--color-bg);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font-weight: 600;
+  transition: var(--transition);
+  border: 2px solid transparent;
+}
+
+.tab-item:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.tab-item.active {
+  background: var(--primary-dark);
+  color: #fff;
+  border-color: var(--primary-dark);
+  box-shadow: 0 4px 12px rgba(255, 126, 63, 0.4);
+}
+
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease-in-out;
+  margin-top: 15px; /* 🔹 Espacio entre tabs y tabla */
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

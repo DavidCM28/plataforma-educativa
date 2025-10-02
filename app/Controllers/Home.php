@@ -32,6 +32,10 @@ class Home extends BaseController
         return view('lms/dashboard-plataforma', ['title' => 'Dashboard Plataforma']);
     }
 
+    public function test()
+    {
+        return view('test', ['title' => 'test']);
+    }
 
     public function carrera($slug)
     {

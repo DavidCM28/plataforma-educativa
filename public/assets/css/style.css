@@ -2173,3 +2173,104 @@ body.dark-mode .dropdown-menu li a:hover {
   height: 20px;
   flex-shrink: 0; /* evita que se deforme */
 }
+
+
+
+/* Botón flotante del chatbot */
+#chatbot-button {
+    position: fixed;
+    bottom: 90px; /* más arriba para no tapar WhatsApp */
+    right: 20px;
+    background: #0078ff;
+    color: white;
+    border-radius: 50%;
+    width: 55px;
+    height: 55px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 26px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    cursor: pointer;
+    z-index: 9999;
+}
+
+/* Ventana del chatbot */
+#chatbot-window {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 320px;
+    height: 420px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    z-index: 10000;
+}
+
+#chatbot-window.hidden {
+    display: none;
+}
+
+.chatbot-header {
+    background: #0078ff;
+    color: white;
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chatbot-controls button {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.chatbot-body {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    font-size: 14px;
+}
+
+.chat-options {
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    border-top: 1px solid #ddd;
+}
+
+.chat-options button {
+    flex: 1 1 45%;
+    padding: 6px;
+    background: #f1f1f1;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Animación de puntos suspensivos */
+.dot-animation {
+    display: inline-block;
+}
+.dot-animation::after {
+    content: " .";
+    animation: dots 1s steps(5, end) infinite;
+}
+@keyframes dots {
+    0% { opacity: 1; }
+    20% { content: " ."; }
+    40% { content: " .."; }
+    60% { content: " ..."; }
+    80% { opacity: 1; }
+    100% { opacity: 1; }
+}

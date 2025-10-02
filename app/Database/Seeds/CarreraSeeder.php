@@ -78,6 +78,6 @@ class CarreraSeeder extends Seeder
             ],
         ];
 
-        $this->db->table('carreras')->insertBatch($data);
+        $this->db->table('carreras_publicas')->insertBatch($data);
     }
 }
