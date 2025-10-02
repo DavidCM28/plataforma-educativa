@@ -1854,8 +1854,8 @@ body.dark-mode .program-detail {
 }
 
 body.dark-mode .info-card {
-  background: var(--color-text);
-  color: var(--color-bg);
+  background: #2a2a2a;
+  color: var(--color-text);
 }
 
 body.dark-mode .accordion-button {
@@ -2172,4 +2172,35 @@ body.dark-mode .dropdown-menu li a:hover {
   width: 20px; /* tamaño consistente */
   height: 20px;
   flex-shrink: 0; /* evita que se deforme */
+}
+
+body.dark-mode,
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6,
+body.dark-mode p,
+body.dark-mode span,
+body.dark-mode li,
+body.dark-mode a,
+body.dark-mode strong,
+body.dark-mode summary,
+body.dark-mode details {
+  color: var(--color-text) !important;
+}
+
+body.dark-mode .news-card,
+body.dark-mode .scholarship-card,
+body.dark-mode .program-card,
+body.dark-mode .contact-card,
+body.dark-mode .faq-item summary {
+  background-color: #2a2a2a !important;
+  color: var(--color-text) !important;
+}
+
+body.dark-mode {
+  --color-surface: #2a2a2a;
+  --secondary: #333333; /* o un gris intermedio */
 }

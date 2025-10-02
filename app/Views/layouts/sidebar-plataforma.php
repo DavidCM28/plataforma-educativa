@@ -6,6 +6,8 @@
         <?php $rol = session('rol'); ?>
         <?php if ($rol === 'Superusuario'): ?>
             <li><a href="<?= base_url('admin/usuarios') ?>"><i class="fas fa-users-cog"></i><span>Usuarios</span></a></li>
+            <li><a href="<?= base_url('usuarios-detalles') ?>"><i class="fas fa-id-card"></i><span>Datos
+                        Personales</span></a></li>
             <li><a href="#"><i class="fas fa-book"></i><span>Materias</span></a></li>
             <li><a href="#"><i class="fas fa-university"></i><span>Carreras</span></a></li>
             <li><a href="#"><i class="fas fa-layer-group"></i><span>Grupos</span></a></li>

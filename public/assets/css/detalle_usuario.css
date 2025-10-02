@@ -1,0 +1,281 @@
+/* === Contenedor Principal === */
+.crud-container {
+  background: var(--surface);
+  padding: 2.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  width: 90%;
+  max-width: 900px;
+  margin: 2rem auto;
+  animation: fadeIn 0.5s ease;
+}
+
+/* === Encabezados === */
+.crud-container h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 1.6rem;
+}
+
+.crud-container p {
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+/* === Formularios === */
+#formularioDetalles {
+  margin-top: 2rem;
+}
+
+.form-section {
+  margin-bottom: 2.5rem;
+}
+
+.form-section h3 {
+  grid-column: 1 / -1;
+  margin-bottom: 1rem;
+  color: var(--accent);
+  font-size: 1.25rem;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 184, 76, 0.25);
+  padding-bottom: 0.6rem;
+}
+
+/* === Grids internos === */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.4rem 2rem;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* === Inputs y labels === */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 158, 100, 0.3);
+  background: #2b2d35;
+  color: var(--text);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 8px rgba(255, 158, 100, 0.35);
+}
+
+/* === Checkboxes agrupados === */
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  padding-top: 0.5rem;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+}
+
+.checkbox-group input[type="checkbox"] {
+  accent-color: var(--primary);
+  transform: scale(1.15);
+}
+
+/* === Botón Guardar === */
+.btn-nuevo {
+  grid-column: 1 / -1;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  justify-self: end;
+  box-shadow: 0 4px 12px rgba(255, 158, 100, 0.25);
+}
+
+.btn-nuevo:hover {
+  background: var(--accent);
+  box-shadow: 0 5px 16px rgba(255, 158, 100, 0.4);
+  transform: translateY(-2px);
+}
+
+/* === Animación === */
+.fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === Personalización del SELECT (lista desplegable) === */
+.form-group select {
+  appearance: none; /* 🔹 Quita el estilo por defecto del navegador */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  position: relative;
+  background-color: #2b2d35;
+  background-image: linear-gradient(45deg, transparent 50%, var(--primary) 50%),
+    linear-gradient(135deg, var(--primary) 50%, transparent 50%);
+  background-position: calc(100% - 20px) center, calc(100% - 15px) center;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 2.5rem; /* espacio para la flecha */
+  cursor: pointer;
+}
+
+/* 🔸 Cambia color de la flecha al enfocar */
+.form-group select:focus {
+  background-image: linear-gradient(45deg, transparent 50%, var(--accent) 50%),
+    linear-gradient(135deg, var(--accent) 50%, transparent 50%);
+  outline: none;
+}
+
+/* 🔸 Opciones del desplegable */
+.form-group select option {
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* 🔸 Para que en modo oscuro no se vea blanco en Chrome */
+select::-ms-expand {
+  display: none; /* 🔹 Oculta la flecha en IE/Edge */
+}
+
+/* === Lista de sugerencias para la búsqueda de usuario === */
+.sugerencias-lista {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #2b2d35; /* 🔹 Fondo oscuro */
+  border: 1px solid rgba(255, 158, 100, 0.25);
+  border-radius: 10px;
+  margin-top: 6px;
+  padding: 0;
+  list-style: none; /* 🔹 Quita las viñetas */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+/* 🔹 Elementos individuales */
+.sugerencias-lista li {
+  padding: 12px 16px;
+  color: var(--text);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+/* 🔸 Hover elegante */
+.sugerencias-lista li:hover {
+  background: rgba(255, 158, 100, 0.15);
+}
+
+/* 🔹 Texto secundario (rol del usuario) */
+.sugerencias-lista li small {
+  color: var(--primary);
+  font-size: 0.8rem;
+  margin-left: 6px;
+}
+
+/* 🔹 Scroll personalizado */
+.sugerencias-lista::-webkit-scrollbar {
+  width: 6px;
+}
+.sugerencias-lista::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 158, 100, 0.3);
+  border-radius: 4px;
+}
+.sugerencias-lista::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 158, 100, 0.5);
+}
+
+/* 🔧 Corrige visibilidad y estilo del campo de autocompletado Geoapify */
+#autocomplete {
+  position: relative;
+  width: 100%;
+}
+
+.geoapify-autocomplete {
+  width: 100%;
+  display: block;
+}
+
+.geoapify-autocomplete input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid rgba(255, 158, 100, 0.3);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.3s ease;
+}
+
+.geoapify-autocomplete input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 8px rgba(255, 158, 100, 0.2);
+}
+
+/* 🔽 Lista desplegable de sugerencias */
+.geoapify-autocomplete .geoapify-autocomplete-items {
+  background: var(--surface);
+  border: 1px solid rgba(255, 158, 100, 0.2);
+  border-radius: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 9999;
+}
+
+.geoapify-autocomplete .geoapify-autocomplete-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  color: var(--text);
+  transition: background 0.2s ease;
+}
+
+.geoapify-autocomplete .geoapify-autocomplete-item:hover {
+  background: rgba(255, 158, 100, 0.15);
+}
