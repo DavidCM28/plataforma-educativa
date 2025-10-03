@@ -4,29 +4,31 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\UsuarioModel;
-use Cloudinary\Configuration\Configuration;
 use Cloudinary\Cloudinary;
+use App\Models\UsuarioDetalleModel;
 
 class Perfil extends BaseController
 {
     public function index()
     {
         $session = session();
-
-        // 🚫 Si no hay sesión, redirige al login
         if (!$session->get('isLoggedIn')) {
             return redirect()->to(base_url('login'))->with('error', 'Debes iniciar sesión primero.');
         }
-        $usuarioModel = new UsuarioModel();
-        $usuario = $usuarioModel->find(session('id')); // ID desde sesión
 
-        if (!$usuario) {
-            return redirect()->to('/')->with('error', 'Usuario no encontrado.');
-        }
+        $usuarioModel = new UsuarioModel();
+        $usuarioDetalleModel = new UsuarioDetalleModel();
+
+        $usuario = $usuarioModel->find(session('id'));
+        $detalles = $usuarioDetalleModel
+            ->where('usuario_id', session('id'))
+            ->asArray() // 👈 asegura que devuelva array
+            ->first();
 
         return view('lms/perfil/index', [
             'title' => 'Mi Perfil',
             'usuario' => $usuario,
+            'detalles' => $detalles ?? [] // ✅ pasar detalles a la vista
         ]);
     }
 
@@ -130,4 +132,61 @@ class Perfil extends BaseController
 
         return redirect()->back()->with('success', 'Contraseña actualizada correctamente.');
     }
+
+    public function guardarDetalles()
+    {
+        $usuarioDetalleModel = new UsuarioDetalleModel();
+        $usuarioId = session('id');
+
+        $data = $this->request->getPost([
+            'sexo',
+            'fecha_nacimiento',
+            'estado_civil',
+            'curp',
+            'rfc',
+            'pais_origen',
+            'peso',
+            'estatura',
+            'tipo_sangre',
+            'antecedente_diabetico',
+            'antecedente_hipertenso',
+            'antecedente_cardiaco',
+            'estado',
+            'municipio',
+            'colonia',
+            'calle',
+            'numero_exterior',
+            'numero_interior',
+            'telefono',
+            'correo_alternativo',
+            'telefono_trabajo',
+            'grado_academico',
+            'descripcion_grado',
+            'cedula_profesional'
+        ]);
+
+        // Normalizar checkboxes
+        $data['antecedente_diabetico'] = $this->request->getPost('antecedente_diabetico') ? 1 : 0;
+        $data['antecedente_hipertenso'] = $this->request->getPost('antecedente_hipertenso') ? 1 : 0;
+        $data['antecedente_cardiaco'] = $this->request->getPost('antecedente_cardiaco') ? 1 : 0;
+        $data['usuario_id'] = $usuarioId;
+
+        if ($usuarioDetalleModel->existeDetalle($usuarioId)) {
+            $usuarioDetalleModel->where('usuario_id', $usuarioId)->set($data)->update();
+        } else {
+            $usuarioDetalleModel->insert($data);
+        }
+
+        // ✅ Devuelve JSON si es petición AJAX
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Información personal actualizada correctamente.'
+            ]);
+        }
+
+        // Fallback si es POST tradicional
+        return redirect()->back()->with('success', 'Información personal actualizada correctamente.');
+    }
+
 }

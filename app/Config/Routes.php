@@ -29,8 +29,19 @@ $routes->get('logout', 'Auth::logout');
 $routes->get('dashboard', 'Dashboard::index');
 
 //Perfil
-$routes->get('perfil', 'Perfil::index');
-$routes->post('perfil/subirFotoCloud', 'Perfil::subirFotoCloud');
+$routes->group('perfil', ['filter' => 'auth'], function ($routes) {
+    $routes->get('/', 'Perfil::index');
+    $routes->post('actualizarFoto', 'Perfil::actualizarFoto');
+    $routes->post('subirFotoCloud', 'Perfil::subirFotoCloud');
+    $routes->post('actualizarPassword', 'Perfil::actualizarPassword');
+    $routes->post('guardarDetalles', 'Perfil::guardarDetalles'); // ✅ nueva ruta
+});
+
+
+//Datos Personales
+$routes->get('usuarios-detalles', 'Admin\UsuariosDetalles::index');
+$routes->get('usuarios-detalles/buscar', 'Admin\UsuariosDetalles::buscarUsuario');
+
 
 
 // Módulo de administración (solo superusuario)
@@ -45,6 +56,7 @@ $routes->group('admin', function ($routes) {
     $routes->get('usuarios/plantilla', 'Admin\Usuarios::plantilla');
     $routes->post('usuarios/importar', 'Admin\Usuarios::importar');
     $routes->get('usuarios/descargar-credenciales', 'Admin\Usuarios::descargarCredenciales');
-
+    $routes->get('usuarios-detalles/ver/(:num)', 'Admin\UsuariosDetalles::ver/$1');
+    $routes->post('usuarios-detalles/guardar', 'Admin\UsuariosDetalles::guardar');
 });
 
