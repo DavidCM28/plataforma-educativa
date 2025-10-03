@@ -13,31 +13,35 @@
     <?= $this->include('layouts/header-plataforma') ?>
     <?= $this->include('layouts/sidebar-plataforma') ?>
 
-    <main class="content">
-        <section class="dashboard-welcome">
+    <main class="content-dark">
+        <section class="welcome-card">
             <h1>👋 Bienvenido, <?= esc(session('nombre')) ?>!</h1>
-            <p>Este es tu panel principal. Desde aquí puedes acceder a las secciones disponibles según tu rol:
-                <strong><?= esc(session('rol')) ?></strong>.</p>
+            <p>Rol actual: <strong><?= esc(session('rol')) ?></strong></p>
         </section>
 
-        <section class="acciones-inicio">
-            <p>Selecciona una opción del menú lateral para comenzar.</p>
+        <section class="cards-grid">
+            <div class="card-metric">
+                <i class="fas fa-users"></i>
+                <h2>Usuarios</h2>
+                <p>+24 nuevos</p>
+            </div>
+
+            <div class="card-metric">
+                <i class="fas fa-graduation-cap"></i>
+                <h2>Materias</h2>
+                <p>12 activas</p>
+            </div>
+
+            <div class="card-metric">
+                <i class="fas fa-tasks"></i>
+                <h2>Tareas</h2>
+                <p>6 pendientes</p>
+            </div>
         </section>
     </main>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const toggleBtn = document.getElementById("sidebarToggle");
-            const sidebar = document.getElementById("sidebar");
-            const content = document.querySelector(".content");
-            if (toggleBtn && sidebar && content) {
-                toggleBtn.addEventListener("click", () => {
-                    sidebar.classList.toggle("collapsed");
-                    content.classList.toggle("collapsed");
-                });
-            }
-        });
-    </script>
+
+    <script src="<?= base_url('assets/js/sidebar.js') ?>"></script>
 </body>
 
 </html>

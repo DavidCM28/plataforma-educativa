@@ -53,6 +53,17 @@ require FCPATH . '../app/Config/Paths.php';
 
 $paths = new Paths();
 
+// ---------------------------------------------------------------
+// 🌩️ Cloudinary Environment Fix
+// ---------------------------------------------------------------
+
+// Si existe la variable CLOUDINARY_URL en el entorno (.env),
+// la pasamos al superglobal $_SERVER para que Cloudinary la detecte.
+if (getenv('CLOUDINARY_URL') && !isset($_SERVER['CLOUDINARY_URL'])) {
+    $_SERVER['CLOUDINARY_URL'] = getenv('CLOUDINARY_URL');
+}
+
+
 // LOAD THE FRAMEWORK BOOTSTRAP FILE
 require $paths->systemDirectory . '/Boot.php';
 

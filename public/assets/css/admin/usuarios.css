@@ -1,18 +1,19 @@
 /* ======================================================
-   🎨 Estilos específicos - Gestión de Usuarios
+   🎨 Estilos específicos - Gestión de Usuarios (Unificado)
    ====================================================== */
 
 .crud-container {
-  background: var(--color-surface);
+  background: var(--surface);
+  color: var(--text);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  box-shadow: none;
   padding: 2rem;
   margin-top: 1rem;
   animation: fadeIn 0.4s ease;
 }
 
 .crud-container h2 {
-  color: var(--primary-dark);
+  color: var(--text);
   font-size: 1.6rem;
   margin-bottom: 1.5rem;
   border-bottom: 3px solid var(--primary);
@@ -20,25 +21,84 @@
   padding-bottom: 4px;
 }
 
-/* === Botón Nuevo === */
-.btn-nuevo {
+/* === Estilo base global de botones === */
+button,
+a[class^="btn-"],
+.tab-item {
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1;
+  font-weight: 600;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.25s ease;
+  text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  background-color: var(--primary);
-  color: #fff;
-  padding: 0.6rem 1.2rem;
-  border-radius: var(--radius);
-  text-decoration: none;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
-  transition: var(--transition);
-  box-shadow: var(--shadow);
+  justify-content: center;
+  gap: 6px;
+  padding: 0.5rem 1rem;
+  height: 36px; /* 🔹 tamaño más compacto */
+  box-shadow: none;
 }
 
-.btn-nuevo:hover {
-  background-color: var(--primary-dark);
+/* 🟧 Botón principal (Nuevo, Editar) */
+.btn-nuevo,
+.btn-edit {
+  background: var(--primary);
+  color: #000;
+}
+.btn-nuevo:hover,
+.btn-edit:hover {
+  background: var(--accent);
   transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+/* 🟦 Botón azul (Importar) */
+.btn-importar {
+  background: #357abd;
+  color: #fff;
+}
+.btn-importar:hover {
+  background: #4a90e2;
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+/* 🟩 Botón verde (Excel) */
+.btn-excel {
+  background: #1d8f3f;
+  color: #fff;
+}
+.btn-excel:hover {
+  background: #28a745;
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+/* 🔴 Eliminar */
+.btn-delete {
+  background: #e74c3c;
+  color: #fff;
+}
+.btn-delete:hover {
+  background: #ff6655;
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+/* 🔵 Ver detalles */
+.btn-view {
+  background: #4a90e2;
+  color: #fff;
+}
+.btn-view:hover {
+  background: #5fa3f0;
+  transform: translateY(-2px);
+  filter: brightness(1.1);
 }
 
 /* === Tabla CRUD === */
@@ -48,7 +108,7 @@
   background: var(--color-surface);
   border-radius: var(--radius);
   overflow: hidden;
-  box-shadow: var(--shadow);
+  box-shadow: none;
 }
 
 .tabla-crud thead {
@@ -66,34 +126,6 @@
 .tabla-crud tbody tr:hover {
   background-color: rgba(255, 158, 100, 0.08);
   transition: var(--transition);
-}
-
-/* === Botones Editar / Eliminar === */
-.btn-edit,
-.btn-delete {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  color: #fff;
-  text-decoration: none;
-  transition: var(--transition);
-}
-
-.btn-edit {
-  background-color: #4caf50;
-}
-.btn-edit:hover {
-  background-color: #3d8c40;
-}
-
-.btn-delete {
-  background-color: #e74c3c;
-}
-.btn-delete:hover {
-  background-color: #c0392b;
 }
 
 /* === Animación ligera === */
@@ -126,6 +158,23 @@
   }
 }
 
+/* === Botones de acción en tabla (más pequeños) === */
+.btn-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+}
+
+.btn-action i {
+  font-size: 0.9rem;
+}
+
 /* === Modal === */
 .modal {
   display: none;
@@ -139,14 +188,55 @@
 }
 
 .modal-content {
-  background: var(--color-surface);
+  background: rgba(33, 36, 43, 0.95);
+  backdrop-filter: blur(6px);
   border-radius: var(--radius);
   padding: 2rem;
   max-width: 600px;
   width: 90%;
-  box-shadow: var(--shadow);
-  color: var(--color-text);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  color: var(--text);
   animation: slideUp 0.3s ease;
+  border: 1px solid rgba(255, 158, 100, 0.1);
+}
+
+#userModal .modal-content {
+  background: rgba(33, 36, 43, 0.97);
+}
+#modalCrearUsuario .modal-content {
+  background: rgba(33, 36, 43, 0.96);
+}
+#modalImportar .modal-content {
+  background: rgba(25, 28, 33, 0.97);
+}
+
+/* === Forzar el modal por encima del dashboard, header y sidebar === */
+.modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 9999 !important; /* ⬅️ eleva la prioridad absoluta */
+  display: none;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 3rem;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Capa de fondo con efecto más oscuro y profundo */
+.modal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.8));
+  z-index: -1;
+}
+
+/* Asegura que el contenido esté sobre el fondo */
+.modal-content {
+  position: relative;
+  z-index: 10000;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
 }
 
 .close-btn {
@@ -156,7 +246,6 @@
   color: var(--color-text-muted);
   transition: var(--transition);
 }
-
 .close-btn:hover {
   color: var(--primary);
 }
@@ -195,6 +284,151 @@
   }
 }
 
+/* === Tarjeta de Detalles del Usuario === */
+.user-detail-card {
+  width: 90%;
+  max-width: 620px; /* 🔹 Más ancho para mostrar todo el contenido */
+  max-height: 85vh; /* 🔹 Evita que se salga de la pantalla */
+  overflow-y: auto; /* 🔹 Scroll interno si es muy largo */
+  text-align: center;
+  background: linear-gradient(
+    180deg,
+    rgba(28, 30, 36, 0.96) 0%,
+    rgba(38, 40, 47, 0.98) 100%
+  );
+  border: 1px solid rgba(255, 158, 100, 0.15);
+  padding: 2rem 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.45);
+  animation: fadeIn 0.4s ease;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) rgba(255, 255, 255, 0.05);
+}
+
+/* === Scrollbar (para navegadores WebKit) === */
+.user-detail-card::-webkit-scrollbar {
+  width: 8px;
+}
+.user-detail-card::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+.user-detail-card::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 8px;
+}
+.user-detail-card::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}
+
+/* === Encabezado === */
+.user-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.6rem;
+}
+
+.foto-usuario {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--primary);
+  box-shadow: 0 0 15px rgba(255, 158, 100, 0.3);
+}
+
+.user-name {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.user-role {
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.user-status {
+  display: inline-block;
+  background: rgba(0, 200, 100, 0.2);
+  color: #00ff9c;
+  padding: 0.35rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 0 8px rgba(0, 255, 150, 0.2);
+}
+
+/* === Bloques de información === */
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.9rem 1rem;
+  border-radius: 10px;
+  text-align: left;
+  border: 1px solid rgba(255, 158, 100, 0.08);
+  transition: background 0.3s ease;
+}
+
+.info-row:hover {
+  background: rgba(255, 158, 100, 0.1);
+}
+
+.info-row i {
+  color: var(--primary);
+  font-size: 1.1rem;
+  margin-top: 2px;
+}
+
+.info-row strong {
+  font-weight: 600;
+  color: var(--primary);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.info-row p {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+/* === Animación === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === Adaptación para pantallas pequeñas === */
+@media (max-width: 600px) {
+  .user-detail-card {
+    padding: 1.5rem;
+    max-width: 95%;
+    max-height: 80vh;
+  }
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 /* === Modal Crear Usuario === */
 .form-modal {
   display: flex;
@@ -228,7 +462,6 @@
   background-color: rgba(255, 255, 255, 0.9);
   transition: var(--transition);
 }
-
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
@@ -236,66 +469,10 @@
   box-shadow: 0 0 0 3px rgba(255, 158, 100, 0.3);
 }
 
-.modal-footer {
-  margin-top: 1.2rem;
-  text-align: center;
-}
-
-/* Contenedor de acciones */
-.acciones {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Estilo base para botones */
-.btn-action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  color: #fff;
-  text-decoration: none;
-  transition: all 0.25s ease;
-  box-shadow: var(--shadow);
-  font-size: 1rem;
-}
-
-/* Ver detalles (azul suave) */
-.btn-view {
-  background: #4a90e2;
-}
-.btn-view:hover {
-  background: #357abd;
-  transform: translateY(-2px);
-}
-
-/* Editar (naranja/primario) */
-.btn-edit {
-  background: var(--primary);
-}
-.btn-edit:hover {
-  background: var(--primary-dark);
-  transform: translateY(-2px);
-}
-
-/* Eliminar (rojo) */
-.btn-delete {
-  background: #e74c3c;
-}
-.btn-delete:hover {
-  background: #c0392b;
-  transform: translateY(-2px);
-}
-/*TABS*/
+/* === Tabs Unificados === */
 .tabs-container {
-  margin-top: 20px;
-  margin-bottom: 15px; /* 🔹 Espacio entre las pestañas y la tabla */
+  margin: 20px 0 15px;
 }
-
 .tabs {
   display: flex;
   gap: 8px;
@@ -303,50 +480,32 @@
   padding: 8px;
   margin: 0;
   border-radius: var(--radius);
-  background: var(--color-surface);
+  background: var(--surface);
   box-shadow: var(--shadow);
 }
-
 .tab-item {
-  padding: 10px 22px;
-  cursor: pointer;
-  background: var(--color-bg);
-  border-radius: var(--radius);
-  color: var(--color-text);
-  font-weight: 600;
-  transition: var(--transition);
-  border: 2px solid transparent;
+  background: var(--bg-dark);
+  color: var(--text);
+  border: 1px solid rgba(255, 158, 100, 0.1);
 }
-
 .tab-item:hover {
   background: var(--primary);
-  color: #fff;
+  color: #000;
+  transform: translateY(-2px);
 }
-
 .tab-item.active {
-  background: var(--primary-dark);
-  color: #fff;
-  border-color: var(--primary-dark);
-  box-shadow: 0 4px 12px rgba(255, 126, 63, 0.4);
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+  box-shadow: 0 0 12px rgba(255, 158, 100, 0.2);
 }
 
+/* === Tab contenido === */
 .tab-content {
   display: none;
   animation: fadeIn 0.3s ease-in-out;
-  margin-top: 15px; /* 🔹 Espacio entre tabs y tabla */
+  margin-top: 15px;
 }
-
 .tab-content.active {
   display: block;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }

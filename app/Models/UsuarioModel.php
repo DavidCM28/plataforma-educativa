@@ -27,5 +27,6 @@ class UsuarioModel extends Model
     ];
 
     protected $useTimestamps = true;
-    protected $useSoftDeletes = true;
+    protected $useSoftDeletes = false;
+
 }

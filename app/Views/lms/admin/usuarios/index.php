@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="<?= base_url('assets/css/dashboard.css') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/css/admin/usuarios.css') ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 </head>
 
@@ -16,7 +16,7 @@
     <?= $this->include('layouts/header-plataforma') ?>
     <?= $this->include('layouts/sidebar-plataforma') ?>
 
-    <main class="content">
+    <main class="content-dark">
         <div class="crud-container">
             <h2>Gestión de Usuarios</h2>
             <br>
@@ -28,12 +28,10 @@
                 <i class="fa fa-file-import"></i> Importar desde Excel
             </button>
 
-
-            <br>
-
-            <a href="<?= base_url('admin/usuarios/plantilla') ?>" class="btn-importar">
+            <a href="<?= base_url('admin/usuarios/plantilla') ?>" class="btn-excel">
                 <i class="fa fa-file-excel"></i> Descargar plantilla (Formulario)
             </a>
+
 
             <?php
             // Agrupar usuarios por tipo de rol
@@ -123,41 +121,84 @@
 
     <!-- Modal Detalle de Usuario -->
     <div id="userModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content user-detail-card">
             <span class="close-btn">&times;</span>
-            <h3>Detalles del Usuario</h3>
-            <div class="modal-body">
-                <div class="info-item"><strong>Nombre:</strong> <span id="modal-nombre"></span></div>
-                <div class="info-item"><strong>Apellido Paterno:</strong> <span id="modal-apellido-pat"></span></div>
-                <div class="info-item"><strong>Apellido Materno:</strong> <span id="modal-apellido-mat"></span></div>
-                <div class="info-item"><strong>Email:</strong> <span id="modal-email"></span></div>
 
-                <!-- Solo para alumnos -->
-                <div class="info-item" id="detalleMatricula">
-                    <strong>Matrícula:</strong> <span id="modal-matricula"></span>
+            <div class="user-header">
+                <img id="modal-foto" src="" alt="Foto del usuario" class="foto-usuario">
+                <h3 id="modal-nombre" class="user-name">Nombre del Usuario</h3>
+                <span id="modal-activo" class="user-status">Activo</span>
+                <p id="modal-rol" class="user-role">Rol: Admin</p>
+            </div>
+
+            <div class="user-info">
+                <div class="info-row">
+                    <i class="fa fa-envelope"></i>
+                    <div>
+                        <strong>Correo:</strong>
+                        <p id="modal-email"></p>
+                    </div>
                 </div>
 
-                <!-- Solo para empleados -->
-                <div class="info-item" id="detalleEmpleado">
-                    <strong>Número de Empleado:</strong> <span id="modal-num_empleado"></span>
+                <div class="info-row" id="detalleMatricula">
+                    <i class="fa fa-id-card"></i>
+                    <div>
+                        <strong>Matrícula:</strong>
+                        <p id="modal-matricula"></p>
+                    </div>
                 </div>
 
-                <div class="info-item"><strong>Rol:</strong> <span id="modal-rol"></span></div>
-                <div class="info-item"><strong>Activo:</strong> <span id="modal-activo"></span></div>
-                <div class="info-item"><strong>Verificado:</strong> <span id="modal-verificado"></span></div>
-                <div class="info-item"><strong>Último Login:</strong> <span id="modal-ultimo_login"></span></div>
-                <div class="info-item"><strong>Fecha de Creación:</strong> <span id="modal-created_at"></span></div>
-                <div class="info-item"><strong>Última Actualización:</strong> <span id="modal-updated_at"></span></div>
-                <div class="info-item"><strong>Eliminado:</strong> <span id="modal-deleted_at"></span></div>
+                <div class="info-row" id="detalleEmpleado">
+                    <i class="fa fa-briefcase"></i>
+                    <div>
+                        <strong>Número de Empleado:</strong>
+                        <p id="modal-num_empleado"></p>
+                    </div>
+                </div>
 
+                <div class="info-row">
+                    <i class="fa fa-calendar-check"></i>
+                    <div>
+                        <strong>Último login:</strong>
+                        <p id="modal-ultimo_login"></p>
+                    </div>
+                </div>
 
-                <div class="info-item">
-                    <strong>Foto:</strong><br>
-                    <img id="modal-foto" src="" alt="Foto del usuario" class="foto-usuario">
+                <div class="info-row">
+                    <i class="fa fa-clock"></i>
+                    <div>
+                        <strong>Fecha de creación:</strong>
+                        <p id="modal-created_at"></p>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <i class="fa fa-refresh"></i>
+                    <div>
+                        <strong>Última actualización:</strong>
+                        <p id="modal-updated_at"></p>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <i class="fa fa-user-check"></i>
+                    <div>
+                        <strong>Verificado:</strong>
+                        <p id="modal-verificado"></p>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <i class="fa fa-trash"></i>
+                    <div>
+                        <strong>Eliminado:</strong>
+                        <p id="modal-deleted_at"></p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
 
     <!-- Modal Crear Usuario -->
     <div id="modalCrearUsuario" class="modal">
@@ -326,6 +367,7 @@
     <?php endif; ?>
 
 
+
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const tabs = document.querySelectorAll(".tab-item");
@@ -361,7 +403,7 @@
             const closeBtns = document.querySelectorAll(".close-btn");
 
             btnImportar.addEventListener("click", () => {
-                modalImportar.style.display = "block";
+                modalImportar.style.display = "flex"; // ✅ centrado correctamente
             });
 
             closeBtns.forEach(btn =>
@@ -377,8 +419,41 @@
             });
         });
 
+
     </script>
     <script src="<?= base_url('assets/js/admin/usuarios.js') ?>"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="<?= base_url('assets/js/sidebar.js') ?>"></script>
+    <script>
+        (function initSidebar() {
+            // Espera hasta que existan los nodos
+            const btn = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            const content = document.querySelector('.content');
+
+            if (!btn || !sidebar || !content) {
+                requestAnimationFrame(initSidebar);
+                return;
+            }
+
+            // Colapsado por defecto
+            sidebar.classList.add('collapsed');
+            content.classList.add('collapsed');
+
+            // Delegación en captura: gana a otros listeners que bloquean el click
+            document.addEventListener('click', function (e) {
+                const hit = e.target.closest('#sidebarToggle');
+                if (!hit) return;
+
+                e.preventDefault();
+                // e.stopPropagation(); // opcional
+
+                sidebar.classList.toggle('collapsed');
+                content.classList.toggle('collapsed');
+            }, true); // 👈 captura
+        })();
+    </script>
+
 </body>
 
 </html>
