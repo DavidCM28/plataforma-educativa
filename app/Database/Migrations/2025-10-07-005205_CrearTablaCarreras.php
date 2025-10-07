@@ -4,29 +4,31 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CrearTablaMaterias extends Migration
+class CrearTablaCarreras extends Migration
 {
     public function up()
     {
-        if (!$this->db->tableExists('materias')) {
+        if (!$this->db->tableExists('carreras')) {
             $this->forge->addField([
-                'id' => ['type' => 'INT', 'unsigned' => true, 'auto_increment' => true],
-                'clave' => ['type' => 'VARCHAR', 'constraint' => 20, 'unique' => true],
+                'id' => [
+                    'type' => 'INT',
+                    'unsigned' => true,
+                    'auto_increment' => true,
+                ],
                 'nombre' => ['type' => 'VARCHAR', 'constraint' => 150],
                 'descripcion' => ['type' => 'TEXT', 'null' => true],
-                'creditos' => ['type' => 'INT', 'default' => 0],
-                'horas_semana' => ['type' => 'INT', 'default' => 0],
+                'duracion' => ['type' => 'INT', 'null' => true],
                 'activo' => ['type' => 'BOOLEAN', 'default' => true],
                 'created_at' => ['type' => 'DATETIME', 'null' => true],
                 'updated_at' => ['type' => 'DATETIME', 'null' => true],
             ]);
             $this->forge->addKey('id', true);
-            $this->forge->createTable('materias');
+            $this->forge->createTable('carreras');
         }
     }
 
     public function down()
     {
-        $this->forge->dropTable('materias', true);
+        $this->forge->dropTable('carreras', true);
     }
 }
