@@ -395,6 +395,92 @@ body {
   transform: translateX(4px);
 }
 
+.menu-section {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: #888;
+  margin: 1rem 0 0.25rem 1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.sidebar-menu li {
+  margin: 0.3rem 0;
+}
+
+/* === Submenús desplegables === */
+.menu-group {
+  width: 100%;
+}
+
+.menu-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.8rem 1.2rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-align: left;
+  border-radius: var(--radius);
+  transition: all 0.3s ease;
+}
+
+.menu-toggle:hover {
+  background: rgba(255, 158, 100, 0.1);
+  color: var(--accent);
+}
+
+.menu-toggle .arrow {
+  transition: transform 0.3s ease;
+}
+
+.menu-group.active .arrow {
+  transform: rotate(180deg);
+}
+
+.submenu {
+  display: none;
+  flex-direction: column;
+  margin: 0;
+  padding-left: 1rem;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.menu-group.active .submenu {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === Scroll mejorado === */
+.sidebar-dark {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+
+.sidebar-dark::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-dark::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 4px;
+}
+
 /* ======== Sidebar colapsado ======== */
 .sidebar-dark.collapsed {
   width: 70px;
@@ -437,6 +523,94 @@ body {
 .sidebar-dark,
 .sidebar-dark * {
   transition: all 0.3s ease;
+}
+
+/* ======== SIDEBAR COLAPSADO ======== */
+.sidebar-dark.collapsed {
+  width: 80px;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.sidebar-dark.collapsed .menu-group {
+  width: 100%;
+}
+
+.sidebar-dark.collapsed .menu-toggle {
+  justify-content: center;
+  padding: 0.9rem 0;
+}
+
+.sidebar-dark.collapsed .menu-toggle .arrow,
+.sidebar-dark.collapsed .menu-toggle span {
+  display: none;
+}
+
+/* === Evita mostrar submenú dentro del sidebar, pero permite el flotante === */
+.sidebar-dark.collapsed .menu-group:not(.hovered) .submenu {
+  display: none;
+}
+
+.sidebar-dark.collapsed .sidebar-menu a span {
+  display: none;
+}
+
+.sidebar-dark.collapsed .sidebar-menu a {
+  justify-content: center;
+  padding: 0.9rem 0;
+}
+
+.sidebar-dark.collapsed .sidebar-menu a i {
+  font-size: 1.4rem;
+  text-align: center;
+  width: 100%;
+}
+
+/* ======== Ajuste del contenido ======== */
+.content-dark.collapsed {
+  margin-left: 90px;
+}
+
+/* ======== SUBMENÚ FLOTANTE EN MODO COLAPSADO ======== */
+.sidebar-dark.collapsed .menu-group {
+  position: relative;
+}
+
+.sidebar-dark.collapsed .submenu {
+  position: absolute;
+  left: 80px;
+  top: 0;
+  background: rgba(33, 36, 43, 0.98);
+  border: 1px solid rgba(255, 158, 100, 0.15);
+  border-radius: 12px;
+  padding: 0.5rem 0;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  min-width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-10px);
+  transition: all 0.25s ease;
+  z-index: 1000;
+}
+
+.sidebar-dark.collapsed .menu-group.hovered .submenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+.sidebar-dark.collapsed .submenu li a {
+  padding: 0.7rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.sidebar-dark.collapsed .submenu li a:hover {
+  background: rgba(255, 158, 100, 0.1);
+  color: var(--accent);
 }
 
 /* ======== USER INFO ======== */
@@ -564,4 +738,33 @@ body {
 
 .welcome-card strong {
   color: var(--primary);
+}
+
+/* ======== SUBMENÚ FLOTANTE EN MODO COLAPSADO ======== */
+.sidebar-dark.collapsed .menu-group {
+  position: relative;
+}
+
+.sidebar-dark.collapsed .submenu {
+  position: absolute;
+  left: 80px;
+  top: 0;
+  background: rgba(33, 36, 43, 0.98);
+  border: 1px solid rgba(255, 158, 100, 0.15);
+  border-radius: 12px;
+  padding: 0.5rem 0;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  min-width: 210px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-10px);
+  transition: all 0.25s ease;
+  z-index: 1200; /* ✅ más alto para que se muestre sobre todo */
+}
+
+.sidebar-dark.collapsed .menu-group.hovered .submenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  display: block;
 }
