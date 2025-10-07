@@ -98,7 +98,8 @@ class InitSistemaSeeder extends Seeder
         // === 4️⃣ Superusuario de prueba ===
         $superuser = [
             'nombre' => 'Admin',
-            'apellido' => 'Principal',
+            'apellido_paterno' => 'Principal',
+            'apellido_materno' => 'Principal',
             'email' => 'admin@plataforma.edu',
             'password' => password_hash('Admin1234', PASSWORD_DEFAULT),
             'rol_id' => $rolesMap['Superusuario'],
@@ -108,7 +109,5 @@ class InitSistemaSeeder extends Seeder
         ];
 
         $this->db->table('usuarios')->insert($superuser);
-
-        echo "✅ Seeder completado: roles, permisos, asignaciones y superusuario creados.\n";
     }
 }

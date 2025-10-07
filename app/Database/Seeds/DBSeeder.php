@@ -13,8 +13,8 @@ class DBSeeder extends Seeder
         $this->call('CarreraSeeder');
         $this->call('InitSistemaSeeder');
         $this->call('MateriaSeeder');
-        $this->call('PlanMateriaSeeder');
         $this->call('PlanSeeder');
+        $this->call('PlanMateriaSeeder');
 
 
         echo "✅ Todos los seeders fueron ejecutados correctamente.\n";
