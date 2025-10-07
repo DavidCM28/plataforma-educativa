@@ -103,6 +103,7 @@ class InitSistemaSeeder extends Seeder
             'email' => 'admin@plataforma.edu',
             'password' => password_hash('Admin1234', PASSWORD_DEFAULT),
             'rol_id' => $rolesMap['Superusuario'],
+            'num_empleado' => '00000',
             'activo' => true,
             'verificado' => true,
             'created_at' => date('Y-m-d H:i:s'),

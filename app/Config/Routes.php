@@ -17,16 +17,17 @@ $routes->post('contacto/enviar', 'Contacto::enviar');
 
 // Login / Logout
 $routes->get('auth/login', 'Auth::login');
-$routes->post('auth/login', 'Auth::doLogin');
+$routes->post('auth/doLogin', 'Auth::doLogin'); // ✅ ruta que usa el fetch
 $routes->get('auth/logout', 'Auth::logout');
 
-// Alias cortos (recomendado)
+// Alias cortos (opcional)
 $routes->get('login', 'Auth::login');
 $routes->post('login', 'Auth::doLogin');
 $routes->get('logout', 'Auth::logout');
 
-// Dashboard general
+// Dashboard
 $routes->get('dashboard', 'Dashboard::index');
+
 
 //Perfil
 $routes->group('perfil', ['filter' => 'auth'], function ($routes) {

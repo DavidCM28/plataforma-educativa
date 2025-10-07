@@ -48,7 +48,7 @@
             <form class="comfort-form" id="loginForm" method="post" action="<?= base_url('/auth/login') ?>" novalidate>
                 <div class="soft-field">
                     <div class="field-container">
-                        <input type="text" id="usuario" name="matricula" required autocomplete="off">
+                        <input type="text" id="usuario" name="usuario" required autocomplete="off">
                         <label for="matricula">Matrícula o No. de Empleado</label>
                         <div class="field-accent"></div>
                     </div>
@@ -92,6 +92,8 @@
         </div>
     </div>
 
+    <!-- ✅ Inyectamos el baseUrl dinámico -->
+    <script>const baseUrl = "<?= base_url() ?>";</script>
     <script src="<?= base_url('assets/js/login.js') ?>"></script>
 
     <?= $this->include('layouts/footer') ?>

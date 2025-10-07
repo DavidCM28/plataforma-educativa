@@ -12,6 +12,9 @@ class Auth extends BaseController
 
     public function doLogin()
     {
+        // 🔍 Depuración temporal
+        // dd($this->request->getPost());
+
         $rules = [
             'usuario' => 'required',
             'password' => 'required|min_length[6]',
@@ -28,6 +31,7 @@ class Auth extends BaseController
 
         $usuarioModel = new UsuarioModel();
 
+        // 🔍 Buscar por matrícula o número de empleado
         $usuario = $usuarioModel
             ->groupStart()
             ->where('matricula', $usuarioInput)
@@ -49,7 +53,6 @@ class Auth extends BaseController
 
         // === Obtener rol y permisos ===
         $db = \Config\Database::connect();
-
         $rol = $db->table('roles')->where('id', $usuario['rol_id'])->get()->getRowArray();
 
         $permisos = $db->table('rol_permisos')
@@ -76,6 +79,7 @@ class Auth extends BaseController
         // ✅ Redirigir correctamente
         return redirect()->to(base_url('dashboard'));
     }
+
 
 
 

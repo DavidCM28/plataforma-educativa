@@ -2,7 +2,7 @@
 class SoftMinimalismLoginForm {
   constructor() {
     this.form = document.getElementById("loginForm");
-    this.usuarioInput = document.getElementById("usuario"); // 👈 antes era matriculaInput
+    this.usuarioInput = document.getElementById("usuario");
     this.passwordInput = document.getElementById("password");
     this.passwordToggle = document.getElementById("passwordToggle");
     this.submitButton = this.form.querySelector(".comfort-button");
@@ -162,28 +162,33 @@ class SoftMinimalismLoginForm {
     this.setLoading(true);
 
     try {
-      const response = await fetch(`${window.location.origin}/auth/login`, {
+      // ✅ CAMBIO 1: usar la ruta correcta "auth/doLogin"
+      const response = await fetch(`${baseUrl}auth/doLogin`, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        credentials: "same-origin",
         body: new URLSearchParams({
-          usuario: this.usuarioInput.value.trim(), // 👈 antes era matricula
+          usuario: this.usuarioInput.value.trim(),
           password: this.passwordInput.value.trim(),
         }),
       });
 
+      // ✅ Si CodeIgniter redirige, seguir la redirección
       if (response.redirected) {
         window.location.href = response.url;
         return;
       }
 
       const text = await response.text();
+
       if (text.includes("error")) {
         this.showError(
           "password",
           "Credenciales incorrectas o cuenta inactiva."
         );
       } else {
-        window.location.href = "/dashboard";
+        // ✅ CAMBIO 2: redirigir con baseUrl
+        window.location.href = `${baseUrl}dashboard`;
       }
     } catch (err) {
       this.showError("password", "Ocurrió un error. Intenta nuevamente.");
