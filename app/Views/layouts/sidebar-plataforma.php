@@ -76,4 +76,84 @@
             </li>
         <?php endif; ?>
     </ul>
+    <aside class="sidebar-dark">
+    <nav class="sidebar-menu">
+        <!-- Menú principal -->
+        <li>
+            <a href="<?= base_url('dashboard/alumno') ?>">
+                <i class="fas fa-home"></i>
+                <span>Inicio</span>
+            </a>
+        </li>
+        
+        <div class="menu-section">ACADÉMICO</div>
+        
+        <li>
+            <a href="#">
+                <i class="fas fa-book"></i>
+                <span>Mis Materias</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="#">
+                <i class="fas fa-tasks"></i>
+                <span>Tareas</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="#">
+                <i class="fas fa-chart-line"></i>
+                <span>Calificaciones</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="#">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Horario</span>
+            </a>
+        </li>
+        
+        <div class="menu-section">RECURSOS</div>
+        
+        <li>
+            <a href="#">
+                <i class="fas fa-folder"></i>
+                <span>Materiales</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="#">
+                <i class="fas fa-users"></i>
+                <span>Compañeros</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="#">
+                <i class="fas fa-comments"></i>
+                <span>Foros</span>
+            </a>
+        </li>
+        
+        <div class="menu-section">CUENTA</div>
+        
+        <li>
+            <a href="#">
+                <i class="fas fa-user-cog"></i>
+                <span>Perfil</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="<?= base_url('auth/logout') ?>" class="logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </li>
+    </nav>
+</aside>a
 </aside>
