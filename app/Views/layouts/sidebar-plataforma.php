@@ -36,10 +36,10 @@
                 <ul class="submenu">
                     <li><a href="<?= base_url('admin/carreras') ?>"><i
                                 class="fas fa-building-columns"></i><span>Carreras</span></a></li>
-                    <li><a href="<?= base_url('admin/planes') ?>"><i class="fas fa-scroll"></i><span>Planes de
-                                Estudio</span></a></li>
                     <li><a href="<?= base_url('admin/materias') ?>"><i class="fas fa-book"></i><span>Materias</span></a>
                     </li>
+                    <li><a href="<?= base_url('admin/planes-estudio') ?>"><i class="fas fa-scroll"></i><span>Planes de
+                                Estudio</span></a></li>
                     <li><a href="<?= base_url('admin/grupos') ?>"><i class="fas fa-layer-group"></i><span>Grupos</span></a>
                     </li>
                     <li><a href="<?= base_url('admin/asignaciones') ?>"><i

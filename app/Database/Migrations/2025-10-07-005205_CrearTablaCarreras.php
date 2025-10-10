@@ -16,7 +16,7 @@ class CrearTablaCarreras extends Migration
                     'auto_increment' => true,
                 ],
                 'nombre' => ['type' => 'VARCHAR', 'constraint' => 150],
-                'descripcion' => ['type' => 'TEXT', 'null' => true],
+                'siglas' => ['type' => 'VARCHAR', 'constraint' => 20],
                 'duracion' => ['type' => 'INT', 'null' => true],
                 'activo' => ['type' => 'BOOLEAN', 'default' => true],
                 'created_at' => ['type' => 'DATETIME', 'null' => true],

@@ -1,0 +1,227 @@
+/* ======================================================
+   📚 Estilos - Planes de Estudio
+   ====================================================== */
+
+.crud-container {
+  background: var(--surface);
+  color: var(--text);
+  border-radius: var(--radius);
+  padding: 2rem;
+  margin-top: 1rem;
+  animation: fadeIn 0.4s ease;
+}
+
+h2 {
+  color: var(--text);
+  font-size: 1.6rem;
+  border-bottom: 3px solid var(--primary);
+  display: inline-block;
+  padding-bottom: 4px;
+  margin-bottom: 1rem;
+}
+
+/* === Tabs === */
+.tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+  background: var(--primary);
+  color: #000;
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.tab-btn.active {
+  background: var(--accent);
+}
+
+.tab-content {
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* === Botones === */
+.btn-nuevo {
+  background: var(--primary);
+  color: #000;
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: var(--radius);
+  transition: 0.3s;
+  cursor: pointer;
+}
+.btn-nuevo:hover {
+  background: var(--accent);
+  transform: translateY(-2px);
+}
+
+.btn-action {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-edit {
+  background: var(--primary);
+  color: #000;
+}
+.btn-edit:hover {
+  background: var(--accent);
+}
+.btn-delete {
+  background: #e74c3c;
+  color: #fff;
+}
+.btn-delete:hover {
+  background: #ff6655;
+}
+
+/* === Tabla === */
+.tabla-crud {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.tabla-crud thead {
+  background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+  color: #fff;
+}
+.tabla-crud th,
+.tabla-crud td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.tabla-crud tbody tr:hover {
+  background-color: rgba(255, 158, 100, 0.08);
+}
+
+/* === Formularios === */
+.form-asignacion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+}
+.form-group {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.form-group label {
+  font-weight: 600;
+  color: var(--primary);
+}
+.form-group select,
+.form-group input {
+  padding: 0.6rem;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+/* === Modal === */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background: rgba(33, 36, 43, 0.96);
+  padding: 2rem;
+  border-radius: var(--radius);
+  max-width: 500px;
+  width: 90%;
+  color: var(--text);
+  animation: slideUp 0.3s ease;
+  border: 1px solid rgba(255, 158, 100, 0.15);
+}
+.close-btn {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+.close-btn:hover {
+  color: var(--primary);
+}
+.modal-footer {
+  text-align: right;
+  margin-top: 1rem;
+}
+
+/* === Animaciones === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* === Fix select en modo oscuro === */
+select {
+  background-color: #2a2d33 !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 2rem;
+  background-image: url("data:image/svg+xml,%3Csvg fill='%23ff9e64' height='12' width='12' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 12px;
+}
+
+select option {
+  background-color: #2a2d33;
+  color: #fff;
+}
+
+/* Para navegadores que forzan fondo blanco */
+select:focus,
+select:active {
+  outline: none;
+  background-color: #33383f !important;
+  color: #fff !important;
+}

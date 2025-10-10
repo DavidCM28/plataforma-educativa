@@ -1,7 +1,7 @@
 <?php
 namespace App\Controllers;
 
-use App\Models\CarreraModel;
+use App\Models\CarreraLPModel;
 use App\Models\PlanModel;
 use App\Models\BecaModel;
 
@@ -9,7 +9,7 @@ class Home extends BaseController
 {
     public function index()
     {
-        $carreraModel = new CarreraModel();
+        $carreraModel = new CarreraLPModel();
         $carreras = $carreraModel->findAll();
 
         $becaModel = new BecaModel();
@@ -39,7 +39,7 @@ class Home extends BaseController
 
     public function carrera($slug)
     {
-        $carreraModel = new CarreraModel();
+        $carreraModel = new CarreraLPModel();
         $planModel = new PlanModel();
 
         $carrera = $carreraModel->where('slug', $slug)->first();

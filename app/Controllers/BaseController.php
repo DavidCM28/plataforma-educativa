@@ -10,7 +10,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
 // 🔹 Importa tu modelo
-use App\Models\CarreraModel;
+use App\Models\CarreraLPModel;
 
 abstract class BaseController extends Controller
 {
@@ -41,7 +41,7 @@ abstract class BaseController extends Controller
         parent::initController($request, $response, $logger);
 
         // 🔹 Cargar el modelo de carreras
-        $carreraModel = new CarreraModel();
+        $carreraModel = new CarreraLPModel();
         $this->carrerasNavbar = $carreraModel->findAll();
 
         // 🔹 Pasar a todas las vistas automáticamente

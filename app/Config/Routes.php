@@ -61,3 +61,55 @@ $routes->group('admin', function ($routes) {
     $routes->post('usuarios-detalles/guardar', 'Admin\UsuariosDetalles::guardar');
 });
 
+// Módulo de gestión de Carreras
+$routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function ($routes) {
+    $routes->get('carreras', 'CarrerasController::index');
+    $routes->post('carreras/crear', 'CarrerasController::crear');
+    $routes->post('carreras/actualizar/(:num)', 'CarrerasController::actualizar/$1');
+    $routes->get('carreras/eliminar/(:num)', 'CarrerasController::eliminar/$1');
+});
+
+
+// Módulo de gestión de Materias
+$routes->group('admin', function ($routes) {
+    $routes->get('materias', 'Admin\MateriasController::index');
+    $routes->post('materias/crear', 'Admin\MateriasController::crear');
+    $routes->post('materias/actualizar/(:num)', 'Admin\MateriasController::actualizar/$1');
+    $routes->get('materias/eliminar/(:num)', 'Admin\MateriasController::eliminar/$1');
+    $routes->get('materias/verificar-clave', 'Admin\MateriasController::verificarClave');
+
+});
+
+// Módulo de gestión de Planes de Estudio
+$routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function ($routes) {
+    $routes->get('planes-estudio', 'PlanesEstudioController::index');
+    $routes->post('planes-estudio/crear', 'PlanesEstudioController::crear');
+    $routes->post('planes-estudio/actualizar/(:num)', 'PlanesEstudioController::actualizar/$1');
+    $routes->get('planes-estudio/eliminar/(:num)', 'PlanesEstudioController::eliminar/$1');
+    $routes->post('planes-estudio/agregarMateria', 'PlanesEstudioController::agregarMateria');
+    $routes->get('planes-estudio/eliminar-materia/(:num)', 'PlanesEstudioController::eliminarMateria/$1');
+    $routes->get('planes-estudio/materias-por-plan/(:num)', 'PlanesEstudioController::materiasPorPlan/$1');
+
+});
+
+// Módulo de Grupos
+$routes->group('admin/grupos', ['namespace' => 'App\Controllers\Admin'], function ($routes) {
+    $routes->get('/', 'GruposController::index');
+    $routes->post('crear', 'GruposController::crear');
+    $routes->get('eliminar/(:num)', 'GruposController::eliminar/$1');
+});
+
+// Módulo de Asignaciones
+$routes->group('admin/asignaciones', ['namespace' => 'App\Controllers\Admin'], static function ($routes) {
+    $routes->get('/', 'AsignacionesController::index');
+
+    // Profesores ↔ Grupo/Materia
+    $routes->post('asignar-profesor', 'AsignacionesController::asignarProfesor');
+    $routes->get('eliminar-profesor/(:num)', 'AsignacionesController::eliminarProfesor/$1');
+
+    // Alumnos ↔ Grupo
+    $routes->post('asignar-alumno', 'AsignacionesController::asignarAlumno');
+    $routes->get('eliminar-alumno/(:num)', 'AsignacionesController::eliminarAlumno/$1');
+});
+
+

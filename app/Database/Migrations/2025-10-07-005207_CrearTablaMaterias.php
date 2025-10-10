@@ -13,7 +13,6 @@ class CrearTablaMaterias extends Migration
                 'id' => ['type' => 'INT', 'unsigned' => true, 'auto_increment' => true],
                 'clave' => ['type' => 'VARCHAR', 'constraint' => 20, 'unique' => true],
                 'nombre' => ['type' => 'VARCHAR', 'constraint' => 150],
-                'descripcion' => ['type' => 'TEXT', 'null' => true],
                 'creditos' => ['type' => 'INT', 'default' => 0],
                 'horas_semana' => ['type' => 'INT', 'default' => 0],
                 'activo' => ['type' => 'BOOLEAN', 'default' => true],

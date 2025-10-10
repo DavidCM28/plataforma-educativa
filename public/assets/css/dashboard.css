@@ -92,9 +92,15 @@ body {
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* ======== Perfil ======== */
@@ -274,10 +280,18 @@ body {
   transform: translateY(10px);
 }
 
-.profile-menu li:nth-child(1) { animation-delay: 0.1s; }
-.profile-menu li:nth-child(2) { animation-delay: 0.15s; }
-.profile-menu li:nth-child(3) { animation-delay: 0.2s; }
-.profile-menu li:nth-child(4) { animation-delay: 0.25s; }
+.profile-menu li:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.profile-menu li:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.profile-menu li:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.profile-menu li:nth-child(4) {
+  animation-delay: 0.25s;
+}
 
 @keyframes fadeInUp {
   to {
@@ -306,7 +320,12 @@ body {
   top: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 158, 100, 0.1), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 158, 100, 0.1),
+    transparent
+  );
   transition: left 0.5s ease;
 }
 
@@ -362,11 +381,21 @@ body {
   transform: translateX(-20px);
 }
 
-.sidebar-menu li:nth-child(1) { animation-delay: 0.1s; }
-.sidebar-menu li:nth-child(2) { animation-delay: 0.15s; }
-.sidebar-menu li:nth-child(3) { animation-delay: 0.2s; }
-.sidebar-menu li:nth-child(4) { animation-delay: 0.25s; }
-.sidebar-menu li:nth-child(5) { animation-delay: 0.3s; }
+.sidebar-menu li:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.sidebar-menu li:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.sidebar-menu li:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.sidebar-menu li:nth-child(4) {
+  animation-delay: 0.25s;
+}
+.sidebar-menu li:nth-child(5) {
+  animation-delay: 0.3s;
+}
 
 @keyframes slideInLeft {
   to {
@@ -768,9 +797,15 @@ body {
   transform: translateY(30px);
 }
 
-.card-metric:nth-child(1) { animation-delay: 0.2s; }
-.card-metric:nth-child(2) { animation-delay: 0.3s; }
-.card-metric:nth-child(3) { animation-delay: 0.4s; }
+.card-metric:nth-child(1) {
+  animation-delay: 0.2s;
+}
+.card-metric:nth-child(2) {
+  animation-delay: 0.3s;
+}
+.card-metric:nth-child(3) {
+  animation-delay: 0.4s;
+}
 
 @keyframes cardPopIn {
   to {
@@ -786,7 +821,12 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 158, 100, 0.1), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 158, 100, 0.1),
+    transparent
+  );
   transition: left 0.6s ease;
 }
 
@@ -875,9 +915,15 @@ body {
   transform: translateY(20px);
 }
 
-.materia-card:nth-child(1) { animation-delay: 0.1s; }
-.materia-card:nth-child(2) { animation-delay: 0.2s; }
-.materia-card:nth-child(3) { animation-delay: 0.3s; }
+.materia-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.materia-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.materia-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
 
 .materia-card:hover {
   transform: translateY(-5px);
@@ -924,7 +970,9 @@ body {
   margin-top: 1.2rem;
 }
 
-.btn-materiales, .btn-tareas, .btn-entregar {
+.btn-materiales,
+.btn-tareas,
+.btn-entregar {
   padding: 0.6rem 1.2rem;
   border: none;
   border-radius: var(--radius);
@@ -952,7 +1000,8 @@ body {
   color: #000;
 }
 
-.btn-materiales:hover, .btn-tareas:hover {
+.btn-materiales:hover,
+.btn-tareas:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(255, 158, 100, 0.2);
 }
@@ -985,9 +1034,15 @@ body {
   transform: translateX(-20px);
 }
 
-.tarea-item:nth-child(1) { animation-delay: 0.1s; }
-.tarea-item:nth-child(2) { animation-delay: 0.2s; }
-.tarea-item:nth-child(3) { animation-delay: 0.3s; }
+.tarea-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.tarea-item:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.tarea-item:nth-child(3) {
+  animation-delay: 0.3s;
+}
 
 @keyframes slideInRight {
   to {
@@ -998,14 +1053,24 @@ body {
 
 .tarea-item.urgente {
   border-left-color: #ff6b6b;
-  background: linear-gradient(90deg, rgba(255, 107, 107, 0.1) 0%, var(--surface) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 107, 107, 0.1) 0%,
+    var(--surface) 100%
+  );
   animation: pulseUrgent 2s infinite;
 }
 
 @keyframes pulseUrgent {
-  0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 107, 107, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
+  }
 }
 
 .tarea-item:hover {
@@ -1075,9 +1140,15 @@ body {
   transform: scale(0.8);
 }
 
-.calificacion-card:nth-child(1) { animation-delay: 0.1s; }
-.calificacion-card:nth-child(2) { animation-delay: 0.2s; }
-.calificacion-card:nth-child(3) { animation-delay: 0.3s; }
+.calificacion-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.calificacion-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.calificacion-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
 
 @keyframes zoomIn {
   to {
@@ -1161,11 +1232,21 @@ body {
   transform: translateY(20px);
 }
 
-.horario-dia:nth-child(1) { animation-delay: 0.1s; }
-.horario-dia:nth-child(2) { animation-delay: 0.2s; }
-.horario-dia:nth-child(3) { animation-delay: 0.3s; }
-.horario-dia:nth-child(4) { animation-delay: 0.4s; }
-.horario-dia:nth-child(5) { animation-delay: 0.5s; }
+.horario-dia:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.horario-dia:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.horario-dia:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.horario-dia:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.horario-dia:nth-child(5) {
+  animation-delay: 0.5s;
+}
 
 .horario-dia h4 {
   color: var(--accent);
@@ -1184,10 +1265,21 @@ body {
 }
 
 @keyframes bounceIn {
-  0% { transform: scale(0.3); opacity: 0; }
-  50% { transform: scale(1.05); opacity: 1; }
-  70% { transform: scale(0.9); }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .horario-clase:hover {
@@ -1253,7 +1345,7 @@ body {
   .content-dark {
     margin-left: 0;
   }
-  
+
   .navbar-dark {
     padding: 0 1rem;
   }
@@ -1265,30 +1357,30 @@ body {
   .recursos-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .tarea-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .tarea-actions {
     width: 100%;
     justify-content: space-between;
   }
-  
+
   .horario-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .content-dark {
     padding: 2rem 1.5rem;
   }
-  
+
   .cards-grid {
     justify-content: center;
   }
-  
+
   .card-metric {
     width: 100%;
     max-width: 300px;
@@ -1336,8 +1428,12 @@ body {
 
 /* ======== ANIMACIONES GENERALES ======== */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideInDown {
@@ -1352,9 +1448,15 @@ body {
 }
 
 /* ======== UTILIDADES ======== */
-.text-primary { color: var(--primary); }
-.text-accent { color: var(--accent); }
-.bg-surface { background: var(--surface); }
+.text-primary {
+  color: var(--primary);
+}
+.text-accent {
+  color: var(--accent);
+}
+.bg-surface {
+  background: var(--surface);
+}
 
 /* Loading states */
 .loading {
@@ -1377,6 +1479,96 @@ body {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==============================
+   FIX SWEETALERT2 INTERACTIVIDAD
+   ============================== */
+
+/* 🔧 Asegura que los modales estén sobre todo */
+.swal2-container {
+  z-index: 99999 !important;
+  pointer-events: auto !important;
+}
+
+/* 🔧 Evita interferencias con overlays invisibles */
+.swal2-backdrop,
+.swal2-overlay {
+  z-index: 99998 !important;
+  pointer-events: auto !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* 🔧 Popup visible y clickeable */
+.swal2-popup {
+  z-index: 100000 !important;
+  pointer-events: auto !important;
+  background: #1e1f25 !important;
+  border: 1px solid rgba(255, 158, 100, 0.25) !important;
+  box-shadow: 0 0 25px rgba(255, 158, 100, 0.2) !important;
+  border-radius: 14px !important;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+/* 🔧 Texto y botones legibles */
+.swal2-title,
+.swal2-html-container {
+  color: var(--text) !important;
+}
+
+.swal2-confirm,
+.swal2-cancel {
+  pointer-events: auto !important;
+}
+
+/* 🔧 Evita que el layout bloquee el cierre */
+body.swal2-shown {
+  overflow: hidden !important;
+  pointer-events: auto !important;
+}
+
+.swal2-icon.swal2-success {
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+}
+
+.swal2-timer-progress-bar {
+  background: var(--primary) !important;
+}
+
+/* =========================================
+   FIX GLOBAL SWEETALERT2 (FUNCIONA EN TODAS LAS VISTAS)
+   ========================================= */
+body > .swal2-container {
+  position: fixed !important;
+  z-index: 999999 !important;
+  inset: 0 !important;
+  pointer-events: auto !important;
+}
+
+.swal2-container * {
+  pointer-events: auto !important;
+}
+
+.swal2-popup {
+  background: #1e1f25 !important;
+  border: 1px solid rgba(255, 158, 100, 0.3) !important;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.6) !important;
+  border-radius: 14px !important;
+  z-index: 1000000 !important;
+}
+
+.swal2-backdrop-show {
+  background: rgba(0, 0, 0, 0.6) !important;
+}
+
+.swal2-timer-progress-bar {
+  background: var(--primary) !important;
 }
