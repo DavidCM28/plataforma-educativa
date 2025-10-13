@@ -306,3 +306,19 @@ select option {
   font-size: 0.9rem;
   transition: 0.3s;
 }
+
+.form-row select[multiple] {
+  height: 100px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.5rem;
+}
+
+.form-row small {
+  display: block;
+  color: #aaa;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}

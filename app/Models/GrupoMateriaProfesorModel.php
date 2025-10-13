@@ -10,7 +10,7 @@ class GrupoMateriaProfesorModel extends Model
     protected $primaryKey = 'id';
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
-    protected $useTimestamps = false; // la tabla no tiene created_at/updated_at
+    protected $useTimestamps = false;
 
     protected $allowedFields = [
         'grupo_id',
@@ -31,13 +31,55 @@ class GrupoMateriaProfesorModel extends Model
         'horario' => 'permit_empty|string|max_length[100]',
     ];
 
-    // 🍬 Helper opcional para listar con joins (si prefieres usarlo desde el controlador)
+    // 🍬 Listar todas las asignaciones con joins
     public function obtenerAsignaciones()
     {
-        return $this->select('grupo_materia_profesor.*, grupos.nombre as grupo, materias.nombre as materia, usuarios.nombre as profesor')
+        return $this->select('
+                grupo_materia_profesor.*,
+                grupos.nombre AS grupo,
+                materias.nombre AS materia,
+                usuarios.nombre AS profesor
+            ')
             ->join('grupos', 'grupos.id = grupo_materia_profesor.grupo_id')
             ->join('materias', 'materias.id = grupo_materia_profesor.materia_id')
             ->join('usuarios', 'usuarios.id = grupo_materia_profesor.profesor_id')
             ->findAll();
+    }
+
+    // ✅ Asignaciones de un profesor específico
+    public function obtenerAsignacionesPorProfesor($profesorId)
+    {
+        return $this->select('
+                grupo_materia_profesor.*,
+                grupos.nombre AS grupo,
+                materias.nombre AS materia,
+                materias.clave AS clave_materia,
+                ciclos_academicos.nombre AS ciclo
+            ')
+            ->join('grupos', 'grupos.id = grupo_materia_profesor.grupo_id', 'left')
+            ->join('materias', 'materias.id = grupo_materia_profesor.materia_id', 'left')
+            ->join('ciclos_academicos', 'ciclos_academicos.id = grupo_materia_profesor.ciclo_id', 'left')
+            ->where('grupo_materia_profesor.profesor_id', $profesorId)
+            ->findAll();
+    }
+
+    // ✅ Totales rápidos para dashboard
+    public function obtenerTotalesPorProfesor($profesorId)
+    {
+        $asignaciones = $this->obtenerAsignacionesPorProfesor($profesorId);
+
+        $materias = [];
+        $grupos = [];
+
+        foreach ($asignaciones as $a) {
+            $materias[$a['materia_id']] = true;
+            $grupos[$a['grupo_id']] = true;
+        }
+
+        return [
+            'total_materias' => count($materias),
+            'total_grupos' => count($grupos),
+            'tareas_pendientes' => rand(3, 15) // ⚠️ Simulado por ahora
+        ];
     }
 }

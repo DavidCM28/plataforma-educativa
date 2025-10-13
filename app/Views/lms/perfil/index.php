@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="rol-usuario" content="<?= strtolower(session('rol')) ?>">
     <title><?= esc($title) ?></title>
 
     <!-- 🎨 Estilos -->
@@ -13,11 +14,11 @@
 </head>
 
 <body>
-    <meta name="rol-usuario" content="<?= strtolower(session('rol')) ?>">
+
     <?= $this->include('layouts/header-plataforma') ?>
     <?= $this->include('layouts/sidebar-plataforma') ?>
 
-    <main class="perfil-container">
+    <main class="content-dark perfil-container">
         <div class="perfil-card">
 
             <!-- 🖼️ FOTO -->
@@ -205,6 +206,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="<?= base_url('assets/js/perfil.js') ?>"></script>
+    <script src="<?= base_url('assets/js/sidebar.js') ?>"></script>
 </body>
 
 </html>

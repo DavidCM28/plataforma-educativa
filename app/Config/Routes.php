@@ -112,4 +112,35 @@ $routes->group('admin/asignaciones', ['namespace' => 'App\Controllers\Admin'], s
     $routes->get('eliminar-alumno/(:num)', 'AsignacionesController::eliminarAlumno/$1');
 });
 
+// Módulo de Configuración de Ciclos
+$routes->group('admin/ciclos', ['namespace' => 'App\Controllers\Admin'], static function ($routes) {
+    $routes->get('/', 'CiclosController::index');
+    $routes->post('crear', 'CiclosController::crear');
+    $routes->get('eliminar/(:num)', 'CiclosController::eliminar/$1');
+    $routes->get('estado/(:num)', 'CiclosController::cambiarEstado/$1');
+});
+
+// Módulo de Criterios
+$routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function ($routes) {
+    // Gestión de criterios
+    $routes->get('criterios', 'CriteriosController::index');
+    $routes->post('criterios/crear', 'CriteriosController::crear');
+    $routes->get('criterios/eliminar/(:num)', 'CriteriosController::eliminar/$1');
+    $routes->get('criterios/estado/(:num)', 'CriteriosController::cambiarEstado/$1');
+
+    // Ponderaciones
+    $routes->post('criterios/ponderaciones/guardar', 'CriteriosController::guardarPonderacion');
+    $routes->get('criterios/ponderaciones/eliminar/(:num)', 'CriteriosController::eliminarPonderacion/$1');
+    $routes->get('criterios/ponderaciones/total/(:num)/(:num)', 'CriteriosController::totalPonderacion/$1/$2');
+    $routes->get('criterios/ciclo-parciales/(:num)', 'CriteriosController::getParcialesPorCiclo/$1');
+    $routes->get('criterios/ponderaciones/listar/(:num)/(:num)', 'CriteriosController::listarPonderaciones/$1/$2');
+});
+
+// Módulo de Profesores
+$routes->group('profesor', ['filter' => 'auth'], function ($routes) {
+    $routes->get('dashboard', 'Profesor\Dashboard::index');
+});
+
+
+
 

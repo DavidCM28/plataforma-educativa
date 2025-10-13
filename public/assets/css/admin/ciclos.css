@@ -1,0 +1,243 @@
+.crud-container {
+  background: var(--surface);
+  color: var(--text);
+  border-radius: var(--radius);
+  padding: 2rem;
+  margin-top: 1rem;
+  animation: fadeIn 0.4s ease;
+}
+
+h2 {
+  color: var(--text);
+  border-bottom: 3px solid var(--primary);
+  display: inline-block;
+  padding-bottom: 4px;
+  margin-bottom: 1rem;
+}
+
+.btn-nuevo {
+  background: var(--primary);
+  color: #000;
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: 0.3s;
+}
+.btn-nuevo:hover {
+  background: var(--accent);
+}
+
+.tabla-crud {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.tabla-crud thead {
+  background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+  color: #fff;
+}
+.tabla-crud th,
+.tabla-crud td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.tabla-crud tbody tr:hover {
+  background: rgba(255, 158, 100, 0.08);
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  background: rgba(33, 36, 43, 0.96);
+  padding: 2rem;
+  border-radius: var(--radius);
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+  border: 1px solid rgba(255, 158, 100, 0.2);
+}
+
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 20px;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: var(--text-light);
+}
+.close-btn:hover {
+  color: var(--primary);
+}
+
+.form-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.form-modal input,
+.form-modal textarea {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius);
+  padding: 0.6rem;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.modal-footer {
+  text-align: right;
+  margin-top: 1rem;
+}
+
+/* ==== MODAL STYLING IMPROVEMENTS ==== */
+.modal-content h3 {
+  color: var(--primary);
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 6px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--primary);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.form-group select {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 0.6rem;
+  font-size: 0.95rem;
+  transition: 0.3s;
+  width: 100%;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg fill='%23ff9e64' height='12' width='12' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 12px;
+}
+
+.form-group select option {
+  background: #2a2d33;
+  color: #fff;
+}
+
+textarea {
+  resize: none;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.form-group-inline {
+  margin-top: 0.5rem;
+}
+
+input[type="checkbox"] {
+  accent-color: var(--primary);
+  transform: scale(1.2);
+}
+
+.modal-footer button {
+  margin-top: 0.5rem;
+}
+
+/* ===============================
+   🎛️ Botones de acción CRUD (Estilo Carreras)
+   =============================== */
+.acciones {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Botones principales */
+.btn-action {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  border: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* 🟠 Botón de editar/estado */
+.btn-status {
+  background: var(--primary);
+  color: #000;
+}
+.btn-status:hover {
+  background: var(--accent);
+  transform: scale(1.05);
+}
+
+/* 🔴 Botón de eliminar */
+.btn-delete {
+  background: var(--danger);
+  color: #fff;
+}
+.btn-delete:hover {
+  background: #ff6b6b;
+  transform: scale(1.05);
+}
+
+/* Iconos internos */
+.btn-action i {
+  pointer-events: none;
+}
+
+/* Animación al presionar */
+.btn-action:active {
+  transform: scale(0.93);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+/* Tooltips */
+.btn-action::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(33, 36, 43, 0.95);
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.2s ease;
+  white-space: nowrap;
+}
+.btn-action:hover::after {
+  opacity: 1;
+  bottom: -35px;
+}

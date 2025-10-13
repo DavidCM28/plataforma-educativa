@@ -67,10 +67,43 @@
                         </select>
                     </div>
 
+                    <div class="form-group">
+                        <label>Ciclo:</label>
+                        <select name="ciclo" required>
+                            <option value="">-- Selecciona --</option>
+                            <?php foreach ($ciclos as $c): ?>
+                                <option value="<?= esc($c['nombre']) ?>"><?= esc($c['nombre']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
                     <div class="form-row">
-                        <input type="text" name="ciclo" placeholder="Ciclo o periodo (Ej. 2025A)">
+                        <div>
+                            <label>Días:</label>
+                            <select name="dias[]" multiple required>
+                                <option value="L">Lunes</option>
+                                <option value="M">Martes</option>
+                                <option value="X">Miércoles</option>
+                                <option value="J">Jueves</option>
+                                <option value="V">Viernes</option>
+                                <option value="S">Sábado</option>
+                            </select>
+                            <small>Puedes seleccionar varios con Ctrl o Shift</small>
+                        </div>
+
+                        <div>
+                            <label>Hora inicio:</label>
+                            <input type="time" name="hora_inicio" required>
+                        </div>
+
+                        <div>
+                            <label>Hora fin:</label>
+                            <input type="time" name="hora_fin" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
                         <input type="text" name="aula" placeholder="Aula (opcional)">
-                        <input type="text" name="horario" placeholder="Horario (Ej. L-M 8:00-9:00)">
                     </div>
 
                     <button type="submit" class="btn-nuevo"><i class="fa fa-plus"></i> Asignar</button>
@@ -189,7 +222,7 @@
     </script>
 
     <script src="<?= base_url('assets/js/sidebar.js') ?>"></script>
-    <script src="<?= base_url('assets/js/alerts.js') ?>"></script>
+    <script src="<?= base_url('assets/js/alert.js') ?>"></script>
 </body>
 
 </html>

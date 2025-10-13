@@ -1,0 +1,200 @@
+/* =============================
+   DASHBOARD PROFESOR – ESTILO PLANO
+   ============================= */
+
+.dashboard-profesor {
+  padding: 2rem;
+  color: var(--text);
+}
+
+/* --- TARJETAS RESUMEN --- */
+.cards-grid.enhanced {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.card-metric {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  text-align: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.card-metric:hover {
+  background: #262a31;
+  transform: translateY(-2px);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+  color: var(--primary);
+}
+
+.card-value {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+}
+
+.card-btn {
+  background: var(--primary);
+  color: #181a20;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  margin-top: 0.8rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.card-btn:hover {
+  background: var(--accent);
+}
+
+/* --- LISTA DE ASIGNACIONES --- */
+.seccion-titulo {
+  margin-bottom: 1rem;
+  color: var(--primary);
+  font-size: 1.2rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.3rem;
+}
+
+.materias-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.materia-card {
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  color: var(--text);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.materia-card:hover {
+  background: #2a2e35;
+  transform: translateY(-3px);
+}
+
+.materia-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--primary);
+  margin-bottom: 0.6rem;
+}
+
+.materia-status.active {
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.materia-info p {
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.materia-info i {
+  color: var(--primary);
+  margin-right: 0.4rem;
+}
+
+/* --- BOTONES --- */
+.materia-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.materia-actions button {
+  background: var(--primary);
+  color: #181a20;
+  border: none;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.materia-actions button:hover {
+  background: var(--accent);
+}
+
+/* =============================
+   HORARIO SEMANAL
+   ============================= */
+
+.horario-semanal {
+  margin-top: 3rem;
+}
+
+.horario-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.horario-dia {
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.horario-dia h4 {
+  text-align: center;
+  margin-bottom: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.horario-item {
+  background: #2a2e35;
+  border-radius: 6px;
+  padding: 0.6rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.horario-item strong {
+  color: var(--text);
+}
+
+.horario-item span {
+  color: var(--text-muted);
+}
+
+.horario-item .aula {
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+
+.sin-clase {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 1rem 0;
+}

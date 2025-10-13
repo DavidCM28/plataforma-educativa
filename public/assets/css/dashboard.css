@@ -1493,21 +1493,21 @@ body {
 
 /* 🔧 Asegura que los modales estén sobre todo */
 .swal2-container {
-  z-index: 99999 !important;
+  z-index: 12000 !important;
   pointer-events: auto !important;
 }
 
 /* 🔧 Evita interferencias con overlays invisibles */
 .swal2-backdrop,
 .swal2-overlay {
-  z-index: 99998 !important;
-  pointer-events: auto !important;
+  z-index: 11999 !important;
+  pointer-events: none !important;
   background: rgba(0, 0, 0, 0.6) !important;
 }
 
 /* 🔧 Popup visible y clickeable */
 .swal2-popup {
-  z-index: 100000 !important;
+  z-index: 12010 !important;
   pointer-events: auto !important;
   background: #1e1f25 !important;
   border: 1px solid rgba(255, 158, 100, 0.25) !important;
@@ -1531,7 +1531,11 @@ body {
 /* 🔧 Evita que el layout bloquee el cierre */
 body.swal2-shown {
   overflow: hidden !important;
-  pointer-events: auto !important;
+  pointer-events: none !important; /* ⛔ el body no debe recibir clics durante el alert */
+}
+
+body:not(.swal2-shown) {
+  pointer-events: auto !important; /* ✅ se reactivan los clics al cerrarse */
 }
 
 .swal2-icon.swal2-success {
@@ -1548,7 +1552,7 @@ body.swal2-shown {
    ========================================= */
 body > .swal2-container {
   position: fixed !important;
-  z-index: 999999 !important;
+  z-index: 12000 !important;
   inset: 0 !important;
   pointer-events: auto !important;
 }
@@ -1562,7 +1566,7 @@ body > .swal2-container {
   border: 1px solid rgba(255, 158, 100, 0.3) !important;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.6) !important;
   border-radius: 14px !important;
-  z-index: 1000000 !important;
+  z-index: 12010 !important;
 }
 
 .swal2-backdrop-show {
@@ -1571,4 +1575,77 @@ body > .swal2-container {
 
 .swal2-timer-progress-bar {
   background: var(--primary) !important;
+}
+
+/* === Estilo uniforme para formularios dentro de pestañas === */
+.form-asignacion .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.form-asignacion .form-group label {
+  font-weight: 600;
+  color: var(--primary);
+  font-size: 0.95rem;
+}
+
+.form-asignacion .form-group input,
+.form-asignacion .form-group select {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 0.6rem;
+  font-size: 0.95rem;
+  transition: 0.3s;
+}
+
+.form-asignacion .form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.form-asignacion .form-group input:focus,
+.form-asignacion .form-group select:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.15);
+}
+.form-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.form-row input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 0.6rem;
+  font-size: 0.9rem;
+  transition: 0.3s;
+}
+/* === Campos de formulario (fix visual para selects) === */
+select,
+input[type="number"] {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 0.5rem 0.8rem;
+  outline: none;
+  appearance: none;
+}
+
+select:focus,
+input[type="number"]:focus {
+  border-color: var(--primary);
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+select option {
+  background-color: #1e1e1e;
+  color: #fff;
 }

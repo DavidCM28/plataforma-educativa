@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Models\GrupoMateriaProfesorModel;
+
 class Dashboard extends BaseController
 {
     public function index()
@@ -13,11 +15,26 @@ class Dashboard extends BaseController
             return redirect()->to(base_url('login'))->with('error', 'Debes iniciar sesión primero.');
         }
 
-        // ✅ Renderiza el dashboard con los datos del usuario
-        return view('lms/dashboard-plataforma', [
+        $rol = $session->get('rol');
+        $data = [
             'nombre' => $session->get('nombre'),
-            'rol' => $session->get('rol'),
+            'rol' => $rol,
             'permisos' => $session->get('permisos'),
-        ]);
+        ];
+
+        // ===============================
+        // 📘 CARGAR DATOS SEGÚN EL ROL
+        // ===============================
+        switch ($rol) {
+            case 'Profesor':
+                return redirect()->to(base_url('profesor/dashboard'));
+            case 'Alumno':
+                return view('lms/dashboard-plataforma', $data);
+            case 'Superusuario':
+                return view('lms/dashboard-plataforma', $data);
+            default:
+                return view('lms/dashboard-plataforma', $data);
+        }
+
     }
 }

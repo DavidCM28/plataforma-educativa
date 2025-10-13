@@ -8,6 +8,7 @@ use App\Models\MateriaModel;
 use App\Models\UsuarioModel;
 use App\Models\GrupoMateriaProfesorModel;
 use App\Models\GrupoAlumnoModel;
+use App\Models\CicloAcademicoModel;
 
 class AsignacionesController extends BaseController
 {
@@ -16,6 +17,7 @@ class AsignacionesController extends BaseController
     protected $usuarioModel;
     protected $grupoMateriaProfesorModel;
     protected $grupoAlumnoModel;
+    protected $cicloModel;
 
     public function __construct()
     {
@@ -24,6 +26,7 @@ class AsignacionesController extends BaseController
         $this->usuarioModel = new UsuarioModel();
         $this->grupoMateriaProfesorModel = new GrupoMateriaProfesorModel();
         $this->grupoAlumnoModel = new GrupoAlumnoModel();
+        $this->cicloModel = new CicloAcademicoModel();
     }
 
     public function index()
@@ -33,6 +36,7 @@ class AsignacionesController extends BaseController
             'materias' => $this->materiaModel->where('activo', 1)->findAll(),
             'profesores' => $this->usuarioModel->where('rol_id', 3)->findAll(),
             'alumnos' => $this->usuarioModel->where('rol_id', 4)->findAll(),
+            'ciclos' => $this->cicloModel->orderBy('id', 'ASC')->findAll(),
             'asignaciones' => $this->grupoMateriaProfesorModel
                 ->select('grupo_materia_profesor.*, grupos.nombre as grupo, materias.nombre as materia, usuarios.nombre as profesor')
                 ->join('grupos', 'grupos.id = grupo_materia_profesor.grupo_id')
@@ -52,13 +56,17 @@ class AsignacionesController extends BaseController
     // 🔹 Asignar profesor
     public function asignarProfesor()
     {
+        $horario = implode('-', $this->request->getPost('dias')) . ' ' .
+            $this->request->getPost('hora_inicio') . '-' .
+            $this->request->getPost('hora_fin');
+
         $this->grupoMateriaProfesorModel->insert([
             'grupo_id' => $this->request->getPost('grupo_id'),
             'materia_id' => $this->request->getPost('materia_id'),
             'profesor_id' => $this->request->getPost('profesor_id'),
             'ciclo' => $this->request->getPost('ciclo'),
             'aula' => $this->request->getPost('aula'),
-            'horario' => $this->request->getPost('horario'),
+            'horario' => $horario,
         ]);
 
         return redirect()->back()->with('msg', 'Profesor asignado correctamente');
