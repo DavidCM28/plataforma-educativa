@@ -140,7 +140,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Cuatrimestre:</label>
+                        <label>Ciclo:</label>
                         <input type="number" name="cuatrimestre" min="1" max="15" required>
                     </div>
 
