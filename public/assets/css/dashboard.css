@@ -1649,3 +1649,36 @@ select option {
   background-color: #1e1e1e;
   color: #fff;
 }
+/* Asegura que el layout no se quede "estático" al abrir/cerrar modals */
+html, body {
+  height: 100%;
+}
+body {
+  /* evita reflow brusco cuando aparecen overlays */
+  will-change: overflow;
+}
+
+/* Si usas contenedores fijos, evita que se superpongan al cerrar modal */
+.header-fixed, .navbar-fixed, .footer-fixed {
+  transform: translateZ(0);
+}
+
+/* Botones del modal y formularios con buen feedback visual */
+.modal .btn[disabled],
+.modal button[disabled] {
+  opacity: .7;
+  cursor: not-allowed;
+}
+
+/* Opcional: contenedor a refrescar (si usas data-refresh="#algo") */
+[data-refreshable="true"] {
+  position: relative;
+}
+[data-refreshable="true"].is-updating::after {
+  content: "Actualizando…";
+  position: absolute;
+  right: .75rem;
+  top: .5rem;
+  font-size: .85rem;
+  opacity: .7;
+}
