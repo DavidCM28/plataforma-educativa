@@ -15,10 +15,14 @@
             <div class="materias-grid">
                 <?php foreach ($asignaciones as $a): ?>
                     <div class="materia-card">
-                        <div class="materia-header">
-                            <h3><?= esc($a['materia']) ?> (<?= esc($a['clave_materia']) ?>)</h3>
-                            <span class="materia-status active">Activa</span>
+                        <div onclick="window.location='<?= base_url('profesor/grupos/ver/' . $a['id']) ?>'">
+                            <div class="materia-header">
+                                <h3><?= esc($a['materia']) ?> (<?= esc($a['clave_materia']) ?>)</h3>
+
+                                <span class="materia-status active">Activa</span>
+                            </div>
                         </div>
+
 
                         <div class="materia-info">
                             <p><i class="fas fa-users"></i> Grupo: <?= esc($a['grupo']) ?></p>

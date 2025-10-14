@@ -37,6 +37,8 @@
                 <form class="form-asignacion" action="<?= base_url('admin/asignaciones/asignar-profesor') ?>"
                     method="POST">
                     <h3>Asignar Profesor a Materia y Grupo</h3>
+                    <small>Los alumnos del grupo se vincularán automáticamente a esta materia.</small>
+
                     <div class="form-group">
                         <label>Grupo:</label>
                         <select name="grupo_id" required>
@@ -145,6 +147,8 @@
                 <form class="form-asignacion" action="<?= base_url('admin/asignaciones/asignar-alumno') ?>"
                     method="POST">
                     <h3>Asignar Alumno a Grupo</h3>
+                    <small>El alumno se vinculará automáticamente a todas las materias activas del grupo.</small>
+
                     <div class="form-group">
                         <label>Grupo:</label>
                         <select name="grupo_id" required>

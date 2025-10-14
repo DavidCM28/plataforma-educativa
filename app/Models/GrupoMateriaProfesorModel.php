@@ -50,18 +50,20 @@ class GrupoMateriaProfesorModel extends Model
     public function obtenerAsignacionesPorProfesor($profesorId)
     {
         return $this->select('
-                grupo_materia_profesor.*,
-                grupos.nombre AS grupo,
-                materias.nombre AS materia,
-                materias.clave AS clave_materia,
-                ciclos_academicos.nombre AS ciclo
-            ')
+            grupo_materia_profesor.*,
+            grupos.id AS id_grupo,                   
+            grupos.nombre AS grupo,
+            materias.nombre AS materia,
+            materias.clave AS clave_materia,
+            ciclos_academicos.nombre AS ciclo
+        ')
             ->join('grupos', 'grupos.id = grupo_materia_profesor.grupo_id', 'left')
             ->join('materias', 'materias.id = grupo_materia_profesor.materia_id', 'left')
             ->join('ciclos_academicos', 'ciclos_academicos.id = grupo_materia_profesor.ciclo_id', 'left')
             ->where('grupo_materia_profesor.profesor_id', $profesorId)
             ->findAll();
     }
+
 
     // ✅ Totales rápidos para dashboard
     public function obtenerTotalesPorProfesor($profesorId)
@@ -82,4 +84,29 @@ class GrupoMateriaProfesorModel extends Model
             'tareas_pendientes' => rand(3, 15) // ⚠️ Simulado por ahora
         ];
     }
+
+    // ✅ Obtener un grupo específico que pertenezca al profesor
+    public function obtenerGrupoPorIdYProfesor($asignacionId, $profesorId)
+    {
+        return $this->select('
+        grupo_materia_profesor.*,
+        grupos.id AS id_grupo,
+        grupos.nombre AS grupo,
+        grupos.periodo,
+        grupos.turno,
+        materias.id AS id_materia,
+        materias.nombre AS materia,
+        materias.clave AS clave_materia,
+        ciclos_academicos.nombre AS ciclo
+    ')
+            ->join('grupos', 'grupos.id = grupo_materia_profesor.grupo_id', 'left')
+            ->join('materias', 'materias.id = grupo_materia_profesor.materia_id', 'left')
+            ->join('ciclos_academicos', 'ciclos_academicos.id = grupo_materia_profesor.ciclo_id', 'left')
+            ->where('grupo_materia_profesor.profesor_id', $profesorId)
+            ->where('grupo_materia_profesor.id', $asignacionId)
+            ->first();
+    }
+
+
+
 }

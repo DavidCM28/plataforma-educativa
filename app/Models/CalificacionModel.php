@@ -1,51 +1,41 @@
 <?php
+
 namespace App\Models;
 
 use CodeIgniter\Model;
 
-class UsuarioModel extends Model
+class CalificacionModel extends Model
 {
-    protected $table = 'usuarios';
+    protected $table = 'calificaciones';
     protected $primaryKey = 'id';
-
     protected $allowedFields = [
-        'nombre',
-        'apellido_paterno',
-        'apellido_materno',
-        'email',
-        'password',
-        'foto',
-        'rol_id',
-        'matricula',
-        'num_empleado',
-        'activo',
-        'verificado',
-        'ultimo_login',
-        'created_at',
-        'updated_at',
-        'deleted_at'
+        'materia_grupo_alumno_id',
+        'parcial',
+        'calificacion',
+        'observaciones',
+        'fecha_registro'
     ];
 
-    protected $useTimestamps = true;
-    protected $useSoftDeletes = false;
+    protected $useTimestamps = false;
+    protected $returnType = 'array';
 
     /**
-     * ✅ Obtener alumnos inscritos en la asignación (materia-grupo-profesor)
+     * ✅ Obtener calificaciones por asignación (materia-grupo-profesor)
      */
     public function obtenerPorGrupo($asignacionId)
     {
         return $this->select('
-                usuarios.id,
+                calificaciones.*,
                 usuarios.nombre,
                 usuarios.apellido_paterno,
                 usuarios.apellido_materno,
                 usuarios.matricula,
                 grupos.nombre AS grupo,
-                grupo_materia_profesor.id AS asignacion_id,
                 materias.nombre AS materia
             ')
-            ->join('grupo_alumno', 'grupo_alumno.alumno_id = usuarios.id')
-            ->join('materia_grupo_alumno', 'materia_grupo_alumno.grupo_alumno_id = grupo_alumno.id')
+            ->join('materia_grupo_alumno', 'materia_grupo_alumno.id = calificaciones.materia_grupo_alumno_id')
+            ->join('grupo_alumno', 'grupo_alumno.id = materia_grupo_alumno.grupo_alumno_id')
+            ->join('usuarios', 'usuarios.id = grupo_alumno.alumno_id')
             ->join('grupo_materia_profesor', 'grupo_materia_profesor.id = materia_grupo_alumno.grupo_materia_profesor_id')
             ->join('grupos', 'grupos.id = grupo_materia_profesor.grupo_id', 'left')
             ->join('materias', 'materias.id = grupo_materia_profesor.materia_id', 'left')

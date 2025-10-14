@@ -141,6 +141,9 @@ $routes->group('profesor', ['filter' => 'auth'], function ($routes) {
     $routes->get('dashboard', 'Profesor\Dashboard::index');
 });
 
+$routes->group('profesor', ['namespace' => 'App\Controllers\Profesor'], function ($routes) {
+    $routes->get('grupos/ver/(:num)', 'Grupos::ver/$1');
+});
 
 
 
