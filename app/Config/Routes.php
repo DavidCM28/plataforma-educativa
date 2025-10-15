@@ -96,8 +96,10 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function ($rou
 $routes->group('admin/grupos', ['namespace' => 'App\Controllers\Admin'], function ($routes) {
     $routes->get('/', 'GruposController::index');
     $routes->post('crear', 'GruposController::crear');
+    $routes->post('actualizar/(:num)', 'GruposController::actualizar/$1'); // ✅ nueva ruta para editar
     $routes->get('eliminar/(:num)', 'GruposController::eliminar/$1');
 });
+
 
 // Módulo de Asignaciones
 $routes->group('admin/asignaciones', ['namespace' => 'App\Controllers\Admin'], static function ($routes) {

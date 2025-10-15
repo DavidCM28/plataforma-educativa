@@ -1,102 +1,80 @@
 /* ======================================================
-   🔔 SweetAlert2 Global - Versión Final
+   🔔 SISTEMA DE ALERTAS Y CONFIRMACIONES NATIVAS
    ====================================================== */
-const baseSwal = Swal.mixin({
-  background: "#1e1f25",
-  color: "#f9f9fb",
-  heightAuto: false,
-  allowOutsideClick: true,
-  allowEscapeKey: true,
-  customClass: { popup: "swal-custom" },
-});
 
-/* ======================================================
-   🧹 Limpieza global de SweetAlerts
-   ====================================================== */
-function forceCloseSwal() {
-  try { Swal.close(); } catch (e) {}
-  document.querySelectorAll(".swal2-container").forEach((c) => c.remove());
-  document.body.classList.remove("swal2-shown");
-  document.body.removeAttribute("style");
+/* 🔸 Mostrar alerta tipo toast */
+function mostrarAlerta(mensaje, tipo = "info", duracion = 3000) {
+  const contenedor = document.getElementById("alertContainer");
+  if (!contenedor) return;
+
+  const alerta = document.createElement("div");
+  alerta.className = `alert ${tipo}`;
+  const iconos = {
+    success: "fas fa-check-circle",
+    error: "fas fa-times-circle",
+    warning: "fas fa-exclamation-triangle",
+    info: "fas fa-info-circle",
+  };
+
+  alerta.innerHTML = `<i class="${
+    iconos[tipo] || iconos.info
+  }"></i> ${mensaje}`;
+  contenedor.appendChild(alerta);
+
+  // Desaparición automática
+  setTimeout(() => {
+    alerta.style.opacity = "0";
+    alerta.style.transform = "translateX(30px)";
+    setTimeout(() => alerta.remove(), 300);
+  }, duracion);
 }
 
-// Cerrar al hacer clic en botones del alert
-document.addEventListener("click", (ev) => {
-  if (ev.target.closest(".swal2-confirm, .swal2-cancel, .swal2-close")) {
-    forceCloseSwal();
-  }
-}, true);
+/* 🔸 Modal de confirmación */
+function mostrarConfirmacion(titulo, mensaje, onAceptar, onCancelar) {
+  const modal = document.getElementById("confirmModal");
+  if (!modal) return console.warn("No se encontró #confirmModal");
 
-/* ======================================================
-   🧰 Helper de alertas base
-   ====================================================== */
-function showAlert({ icon, title, html }) {
-  forceCloseSwal();
-  const p = Swal.fire({
-    icon, title, html,
-    showConfirmButton: true,
-    confirmButtonText: "Entendido",
-    confirmButtonColor: "#ff9e64",
-    timer: 5000,
-    timerProgressBar: true,
-    background: "#1e1f25",
-    color: "#f9f9fb",
-    heightAuto: false,
-    willClose: forceCloseSwal,
-  });
-  p.then(forceCloseSwal);
-  setTimeout(forceCloseSwal, 5200);
-}
+  document.getElementById("confirmTitle").textContent = titulo;
+  document.getElementById("confirmMessage").textContent = mensaje;
+  modal.classList.remove("hidden");
 
-/* ======================================================
-   ✅ API global
-   ====================================================== */
-window.Swal.fireSuccess = (msg = "Operación completada", title = "Éxito") =>
-  showAlert({ icon: "success", title, html: `<i class="fa fa-check-circle"></i> ${msg}` });
+  const btnAceptar = document.getElementById("btnAceptar");
+  const btnCancelar = document.getElementById("btnCancelar");
 
-window.Swal.fireInfo = (msg = "Acción completada", title = "Información") =>
-  showAlert({ icon: "info", title, html: `<i class="fa fa-info-circle"></i> ${msg}` });
+  const cerrar = () => modal.classList.add("hidden");
 
-window.Swal.fireWarning = (msg = "Revisa la información", title = "Aviso") =>
-  showAlert({ icon: "warning", title, html: `<i class="fa fa-exclamation-triangle"></i> ${msg}` });
+  btnAceptar.onclick = () => {
+    cerrar();
+    if (onAceptar) onAceptar();
+  };
 
-window.Swal.fireError = (msg = "Ocurrió un error", title = "Error") =>
-  showAlert({ icon: "error", title, html: `<i class="fa fa-times-circle"></i> ${msg}` });
-
-window.Swal.fireConfirm = async (title = "¿Estás seguro?", text = "No podrás revertirlo") => {
-  forceCloseSwal();
-  return await Swal.fire({
-    title, text, icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#ff9e64",
-    cancelButtonColor: "#666",
-    confirmButtonText: "Sí, continuar",
-    cancelButtonText: "Cancelar",
-    background: "#1e1f25",
-    color: "#f9f9fb",
-    heightAuto: false,
-    willClose: forceCloseSwal,
-  });
-};
-
-/* ======================================================
-   🧼 Cierre y limpieza de modales
-   ====================================================== */
-function closeAllModals() {
-  const hasBs = typeof bootstrap !== "undefined" && bootstrap?.Modal;
-  document.querySelectorAll(".modal.show, .modal[aria-modal='true']").forEach((m) => {
-    try {
-      if (hasBs) bootstrap.Modal.getOrCreateInstance(m).hide();
-      else { m.classList.remove("show"); m.setAttribute("aria-hidden", "true"); m.style.display = "none"; }
-    } catch (e) {}
-  });
-  document.querySelectorAll(".modal-backdrop").forEach((b) => b.remove());
-  document.body.classList.remove("modal-open", "swal2-shown");
-  document.body.style.removeProperty("overflow");
+  btnCancelar.onclick = () => {
+    cerrar();
+    if (onCancelar) onCancelar();
+  };
 }
 
 /* ======================================================
-   🚀 Formularios AJAX dentro de modales
+   🚪 Cerrar sesión de usuario
+   ====================================================== */
+function cerrarSesion() {
+  mostrarConfirmacion(
+    "Cerrar sesión",
+    "¿Deseas cerrar tu sesión actual?",
+    () => {
+      mostrarAlerta("Cerrando sesión...", "info");
+      setTimeout(() => {
+        localStorage.removeItem("usuario");
+        localStorage.removeItem("privateKey");
+        mostrarAlerta("Sesión cerrada correctamente", "success");
+        setTimeout(() => (window.location.href = "login.html"), 800);
+      }, 500);
+    }
+  );
+}
+
+/* ======================================================
+   📤 Envío AJAX de formularios dentro de modales
    ====================================================== */
 async function ajaxSubmitForm(form) {
   const action = form.getAttribute("action") || window.location.href;
@@ -106,38 +84,37 @@ async function ajaxSubmitForm(form) {
   btn?.setAttribute("disabled", "disabled");
 
   try {
-    const res = await fetch(action, { method, body: formData, headers: { "X-Requested-With": "XMLHttpRequest" } });
-    const ct = res.headers.get("Content-Type") || "";
+    const res = await fetch(action, {
+      method,
+      body: formData,
+      headers: { "X-Requested-With": "XMLHttpRequest" },
+    });
 
+    const ct = res.headers.get("Content-Type") || "";
     if (ct.includes("application/json")) {
       const json = await res.json();
-      const total = Number(json?.totalPonderacion || 0);
-      if (isNaN(total)) json.totalPonderacion = 0;
-
-      if (total >= 100) {
-        Swal.fireWarning("Ya alcanzaste el límite de ponderación (100%)");
-        return;
-      }
 
       if (!res.ok || json.ok === false) {
-        Swal.fireError(json?.message || "No se pudo guardar");
+        mostrarAlerta(json.message || "Error al guardar", "error");
         return;
       }
 
-      Swal.fireSuccess(json?.message || "Guardado correctamente");
+      mostrarAlerta(json.message || "Guardado correctamente", "success");
       form.reset();
-      closeAllModals();
+      cerrarModalActivo();
       return;
     }
 
     if (res.ok) {
-      Swal.fireSuccess("Guardado correctamente");
+      mostrarAlerta("Guardado correctamente", "success");
       form.reset();
-      closeAllModals();
-    } else Swal.fireError("No se pudo guardar");
+      cerrarModalActivo();
+    } else {
+      mostrarAlerta("Error al guardar datos", "error");
+    }
   } catch (err) {
     console.error(err);
-    Swal.fireError("Error de red o servidor");
+    mostrarAlerta("Error de red o servidor", "error");
   } finally {
     btn?.removeAttribute("disabled");
   }
@@ -155,92 +132,81 @@ document.addEventListener("submit", (e) => {
 });
 
 /* ======================================================
-   🗑️ Eliminar criterios o ponderaciones - VERSIÓN DEBUG
+   🗑️ Eliminar elementos con confirmación
    ====================================================== */
-document.addEventListener("click", async (e) => {
+document.addEventListener("click", (e) => {
   const btn = e.target.closest("[data-delete-url]");
   if (!btn) return;
 
-  console.log("Botón de eliminar clickeado", btn);
-  
   e.preventDefault();
   e.stopPropagation();
 
   const url = btn.getAttribute("data-delete-url");
   const method = (btn.getAttribute("data-method") || "DELETE").toUpperCase();
-  const tipo = "ponderación";
+  const tipo = btn.dataset.type || "elemento";
 
-  console.log("URL:", url, "Método:", method);
+  mostrarConfirmacion(
+    `¿Eliminar ${tipo}?`,
+    "No podrás revertir esta acción.",
+    async () => {
+      btn.disabled = true;
 
-  const ok = await Swal.fireConfirm(`¿Eliminar ${tipo}?`, "No podrás revertirlo");
-  if (!ok.isConfirmed) return;
-
-  btn.setAttribute("disabled", "disabled");
-
-  try {
-    console.log("Enviando petición DELETE...");
-    const res = await fetch(url, {
-      method,
-      headers: { 
-        "X-Requested-With": "XMLHttpRequest",
-        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-      },
-    });
-
-    console.log("Respuesta recibida:", res.status, res.statusText);
-
-    if (res.ok) {
-      console.log("Eliminación exitosa, buscando elemento para remover...");
-      
-      // Buscar el elemento contenedor de manera más agresiva
-      let item = btn.closest('tr') || 
-                 btn.closest('li') || 
-                 btn.closest('.ponderacion-item') || 
-                 btn.closest('.item') || 
-                 btn.closest('.card') || 
-                 btn.closest('[data-id]') ||
-                 btn.parentElement;
-
-      console.log("Elemento encontrado para eliminar:", item);
-
-      if (item) {
-        // Animación de fade out
-        item.style.transition = 'all 0.3s ease';
-        item.style.opacity = '0';
-        item.style.transform = 'translateX(-100%)';
-        
-        setTimeout(() => {
-          item.remove();
-          console.log("Elemento removido del DOM");
-          Swal.fireSuccess("Ponderación eliminada correctamente");
-        }, 300);
-      } else {
-        console.log("No se encontró el elemento, recargando página...");
-        Swal.fireSuccess("Ponderación eliminada correctamente").then(() => {
-          window.location.reload();
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRF-TOKEN":
+              document.querySelector('meta[name="csrf-token"]')?.content || "",
+          },
         });
+
+        if (res.ok) {
+          let item =
+            btn.closest("tr, li, .item, .card, [data-id]") || btn.parentElement;
+
+          if (item) {
+            item.style.transition = "all 0.3s ease";
+            item.style.opacity = "0";
+            item.style.transform = "translateX(-100%)";
+            setTimeout(() => {
+              item.remove();
+              mostrarAlerta(`${tipo} eliminado correctamente`, "success");
+            }, 300);
+          } else {
+            mostrarAlerta(`${tipo} eliminado`, "success");
+            setTimeout(() => window.location.reload(), 800);
+          }
+        } else {
+          mostrarAlerta("No se pudo eliminar el elemento", "error");
+        }
+      } catch (err) {
+        console.error(err);
+        mostrarAlerta("Error de red o servidor", "error");
+      } finally {
+        btn.disabled = false;
       }
-    } else {
-      console.error("Error en la respuesta:", res.status);
-      Swal.fireError("No se pudo eliminar la ponderación. Código: " + res.status);
     }
-  } catch (err) {
-    console.error("Error en fetch:", err);
-    Swal.fireError("Error de red o servidor: " + err.message);
-  } finally {
-    btn.removeAttribute("disabled");
-  }
+  );
 });
 
 /* ======================================================
-   🧯 Limpieza de modales residuales
+   🧯 Cierre de modales residuales
    ====================================================== */
+function cerrarModalActivo() {
+  document.querySelectorAll(".modal.show").forEach((m) => {
+    m.classList.remove("show");
+    m.style.display = "none";
+  });
+  document.querySelectorAll(".modal-backdrop").forEach((b) => b.remove());
+  document.body.classList.remove("modal-open");
+  document.body.style.removeProperty("overflow");
+}
+
 const modalObserver = new MutationObserver(() => {
-  const anyOpen = document.querySelector(".modal.show");
-  if (!anyOpen) {
+  if (!document.querySelector(".modal.show")) {
     document.querySelectorAll(".modal-backdrop").forEach((b) => b.remove());
     document.body.classList.remove("modal-open");
-    document.body.style.removeProperty("overflow");
   }
 });
 modalObserver.observe(document.body, { childList: true, subtree: true });

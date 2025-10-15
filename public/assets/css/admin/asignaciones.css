@@ -322,3 +322,94 @@ select option {
   font-size: 0.8rem;
   margin-top: 4px;
 }
+
+/* === Separación y diseño más limpio === */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.form-row > div {
+  flex: 1;
+  min-width: 180px;
+}
+
+/* === Botón Cancelar (oculto por defecto) === */
+.btn-secundario {
+  background: #c0392b;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.6rem 1.2rem;
+  margin-left: 0.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.btn-secundario:hover {
+  background: #e74c3c;
+}
+.btn-secundario.hidden {
+  display: none;
+}
+
+/* === Días de clase con estilo tipo botón === */
+.dias-check {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.dias-check label {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  user-select: none;
+}
+.dias-check input[type="checkbox"] {
+  display: none;
+}
+.dias-check input[type="checkbox"]:checked + span,
+.dias-check label:has(input[type="checkbox"]:checked) {
+  background: var(--primary);
+  color: #000;
+  font-weight: 600;
+  border-color: var(--primary);
+  box-shadow: 0 0 6px rgba(255, 158, 100, 0.5);
+}
+
+/* === Horario visual === */
+.horario-grid {
+  margin-top: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.horario-grid table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+.horario-grid th,
+.horario-grid td {
+  padding: 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.9rem;
+}
+.horario-grid th {
+  background: rgba(255, 255, 255, 0.1);
+}
+.horario-grid td.ocupado {
+  background: rgba(255, 158, 100, 0.15);
+  color: var(--primary);
+  font-weight: 600;
+  border-color: var(--primary);
+}
+.horario-grid td.disponible {
+  color: #bbb;
+  font-style: italic;
+}

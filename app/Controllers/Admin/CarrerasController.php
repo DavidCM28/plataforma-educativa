@@ -20,33 +20,68 @@ class CarrerasController extends BaseController
         return view('lms/admin/carreras/index', $data);
     }
 
+    // 🟢 Crear carrera
     public function crear()
     {
-        $this->carreraModel->save([
+        $data = [
             'nombre' => $this->request->getPost('nombre'),
             'siglas' => $this->request->getPost('siglas'),
             'duracion' => $this->request->getPost('duracion'),
             'activo' => 1
-        ]);
+        ];
 
-        return redirect()->to(base_url('admin/carreras'))->with('msg', '✅ Carrera registrada correctamente');
+        $this->carreraModel->insert($data);
+
+        // Si viene desde AJAX → responder JSON
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'ok' => true,
+                'msg' => '✅ Carrera registrada correctamente',
+                'id' => $this->carreraModel->getInsertID()
+            ]);
+        }
+
+        // Si no es AJAX → flujo tradicional
+        return redirect()->to(base_url('admin/carreras'))
+            ->with('msg', '✅ Carrera registrada correctamente');
     }
 
+    // 🟡 Actualizar carrera
     public function actualizar($id)
     {
-        $this->carreraModel->update($id, [
+        $data = [
             'nombre' => $this->request->getPost('nombre'),
             'siglas' => $this->request->getPost('siglas'),
             'duracion' => $this->request->getPost('duracion'),
             'activo' => $this->request->getPost('activo') ? 1 : 0
-        ]);
+        ];
 
-        return redirect()->to(base_url('admin/carreras'))->with('msg', '✏️ Carrera actualizada');
+        $this->carreraModel->update($id, $data);
+
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'ok' => true,
+                'msg' => '✏️ Carrera actualizada correctamente'
+            ]);
+        }
+
+        return redirect()->to(base_url('admin/carreras'))
+            ->with('msg', '✏️ Carrera actualizada');
     }
 
+    // ❌ Eliminar carrera
     public function eliminar($id)
     {
         $this->carreraModel->delete($id);
-        return redirect()->to(base_url('admin/carreras'))->with('msg', '🗑️ Carrera eliminada');
+
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'ok' => true,
+                'msg' => '🗑️ Carrera eliminada correctamente'
+            ]);
+        }
+
+        return redirect()->to(base_url('admin/carreras'))
+            ->with('msg', '🗑️ Carrera eliminada');
     }
 }

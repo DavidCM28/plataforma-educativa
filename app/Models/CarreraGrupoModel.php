@@ -19,11 +19,23 @@ class CarreraGrupoModel extends Model
 
     public function obtenerGruposCompletos()
     {
-        return $this->select('carrera_grupo.id, grupos.nombre AS grupo, grupos.turno, grupos.periodo, grupos.activo, carreras.nombre AS carrera, carreras.siglas, usuarios.nombre AS tutor')
+        return $this->select('
+            carrera_grupo.id,
+            carrera_grupo.carrera_id,
+            carrera_grupo.tutor_id,
+            grupos.nombre AS grupo,
+            grupos.turno,
+            grupos.periodo,
+            grupos.activo,
+            carreras.nombre AS carrera,
+            carreras.siglas,
+            usuarios.nombre AS tutor
+        ')
             ->join('grupos', 'grupos.id = carrera_grupo.grupo_id')
             ->join('carreras', 'carreras.id = carrera_grupo.carrera_id')
             ->join('usuarios', 'usuarios.id = carrera_grupo.tutor_id', 'left')
             ->orderBy('carreras.siglas ASC')
             ->findAll();
     }
+
 }

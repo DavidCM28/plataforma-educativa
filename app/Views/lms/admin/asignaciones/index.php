@@ -6,227 +6,277 @@
     <title>Gestión de Asignaciones</title>
     <link rel="stylesheet" href="<?= base_url('assets/css/dashboard.css') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/css/admin/asignaciones.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/css/alert.css') ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
+
     <?= $this->include('layouts/header-plataforma') ?>
     <?= $this->include('layouts/sidebar-plataforma') ?>
 
+    <div id="alertContainer" class="alert-container"></div>
+
     <main class="content-dark">
         <div class="crud-container">
-            <h2>Gestión de Asignaciones</h2>
+            <h2><i class="fa-solid fa-link"></i> Gestión de Asignaciones</h2>
+            <p class="descripcion">Administra las asignaciones de profesores y alumnos de forma rápida y visual.</p>
 
             <div class="tabs">
-                <button class="tab-btn active" data-tab="profesores">Profesores</button>
-                <button class="tab-btn" data-tab="alumnos">Alumnos</button>
+                <button class="tab-btn active" data-tab="profesores"><i class="fa-solid fa-user-tie"></i>
+                    Profesores</button>
+                <button class="tab-btn" data-tab="alumnos"><i class="fa-solid fa-user-graduate"></i> Alumnos</button>
             </div>
 
-            <!-- ✅ Flash -->
-            <?php if (session()->getFlashdata('msg')): ?>
-                <script>
-                    document.addEventListener("DOMContentLoaded", () =>
-                        Swal.fireSuccess("<?= session()->getFlashdata('msg') ?>")
-                    );
-                </script>
-            <?php endif; ?>
-
-            <!-- ================= PROFESORES ================= -->
+            <!-- ==================== PROFESORES ==================== -->
             <section id="profesores" class="tab-content active">
-                <form class="form-asignacion" action="<?= base_url('admin/asignaciones/asignar-profesor') ?>"
-                    method="POST">
+                <form id="formAsignacion" class="form-asignacion" autocomplete="off">
                     <h3>Asignar Profesor a Materia y Grupo</h3>
-                    <small>Los alumnos del grupo se vincularán automáticamente a esta materia.</small>
+                    <small>Los alumnos del grupo se vincularán automáticamente.</small>
 
-                    <div class="form-group">
-                        <label>Grupo:</label>
-                        <select name="grupo_id" required>
-                            <option value="">-- Selecciona --</option>
-                            <?php foreach ($grupos as $g): ?>
-                                <option value="<?= $g['id'] ?>"><?= esc($g['nombre']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label>Grupo:</label>
+                            <select name="grupo_id" id="grupo_id" required>
+                                <option value="">-- Selecciona --</option>
+                                <?php foreach ($grupos as $g): ?>
+                                    <option value="<?= $g['id'] ?>" data-turno="<?= esc($g['turno']) ?>">
+                                        <?= esc($g['nombre']) ?> (<?= esc($g['turno']) ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                    <div class="form-group">
-                        <label>Materia:</label>
-                        <select name="materia_id" required>
-                            <option value="">-- Selecciona --</option>
-                            <?php foreach ($materias as $m): ?>
-                                <option value="<?= $m['id'] ?>"><?= esc($m['nombre']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                        <div>
+                            <label>Materia:</label>
+                            <select name="materia_id" id="materia_id" required>
+                                <option value="">-- Selecciona --</option>
+                                <?php foreach ($materias as $m): ?>
+                                    <option value="<?= $m['id'] ?>"><?= esc($m['nombre']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                    <div class="form-group">
-                        <label>Profesor:</label>
-                        <select name="profesor_id" required>
-                            <option value="">-- Selecciona --</option>
-                            <?php foreach ($profesores as $p): ?>
-                                <option value="<?= $p['id'] ?>"><?= esc($p['nombre']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Ciclo:</label>
-                        <select name="ciclo" required>
-                            <option value="">-- Selecciona --</option>
-                            <?php foreach ($ciclos as $c): ?>
-                                <option value="<?= esc($c['nombre']) ?>"><?= esc($c['nombre']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        <div>
+                            <label>Profesor:</label>
+                            <select name="profesor_id" id="profesor_id" required>
+                                <option value="">-- Selecciona --</option>
+                                <?php foreach ($profesores as $p): ?>
+                                    <option value="<?= $p['id'] ?>"><?= esc($p['nombre']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="form-row">
                         <div>
-                            <label>Días:</label>
-                            <select name="dias[]" multiple required>
-                                <option value="L">Lunes</option>
-                                <option value="M">Martes</option>
-                                <option value="X">Miércoles</option>
-                                <option value="J">Jueves</option>
-                                <option value="V">Viernes</option>
-                                <option value="S">Sábado</option>
+                            <label>Ciclo:</label>
+                            <select name="ciclo" id="ciclo" required>
+                                <option value="">-- Selecciona --</option>
+                                <?php foreach ($ciclos as $c): ?>
+                                    <option value="<?= $c['nombre'] ?>"><?= esc($c['nombre']) ?></option>
+                                <?php endforeach; ?>
                             </select>
-                            <small>Puedes seleccionar varios con Ctrl o Shift</small>
                         </div>
 
                         <div>
                             <label>Hora inicio:</label>
-                            <input type="time" name="hora_inicio" required>
+                            <select name="hora_inicio" id="hora_inicio" required>
+                                <option value="">-- Selecciona --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Hora fin:</label>
+                            <select name="hora_fin" id="hora_fin" required>
+                                <option value="">-- Selecciona --</option>
+                            </select>
                         </div>
 
                         <div>
-                            <label>Hora fin:</label>
-                            <input type="time" name="hora_fin" required>
+                            <label>Aula:</label>
+                            <input type="text" name="aula" id="aula" placeholder="Ej. A-203">
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <input type="text" name="aula" placeholder="Aula (opcional)">
+                    <div class="form-group">
+                        <label>Días de clase:</label>
+                        <div class="dias-check">
+                            <?php
+                            $dias = ['L' => 'Lun', 'M' => 'Mar', 'X' => 'Mié', 'J' => 'Jue', 'V' => 'Vie'];
+                            foreach ($dias as $k => $d): ?>
+                                <label><input type="checkbox" name="dias[]" value="<?= $k ?>"> <?= $d ?></label>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
 
-                    <button type="submit" class="btn-nuevo"><i class="fa fa-plus"></i> Asignar</button>
+                    <button type="submit" class="btn-nuevo"><i class="fa fa-save"></i> Guardar</button>
+                    <button type="button" id="btnCancelar" class="btn-secundario hidden">
+                        <i class="fa fa-xmark"></i> Cancelar edición
+                    </button>
                 </form>
 
-                <h3>Asignaciones actuales</h3>
-                <table class="tabla-crud">
-                    <thead>
-                        <tr>
-                            <th>Grupo</th>
-                            <th>Materia</th>
-                            <th>Profesor</th>
-                            <th>Ciclo</th>
-                            <th>Aula</th>
-                            <th>Horario</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($asignaciones as $a): ?>
+                <!-- 🗓️ HORARIO VISUAL -->
+                <div id="horarioGrupo" class="horario-grid hidden">
+                    <h4 style="margin: 1rem 0; color: var(--primary);">
+                        <i class="fa-regular fa-calendar-days"></i> Horario actual del grupo
+                    </h4>
+                    <table>
+                        <thead>
                             <tr>
-                                <td><?= esc($a['grupo']) ?></td>
-                                <td><?= esc($a['materia']) ?></td>
-                                <td><?= esc($a['profesor']) ?></td>
-                                <td><?= esc($a['ciclo']) ?></td>
-                                <td><?= esc($a['aula']) ?></td>
-                                <td><?= esc($a['horario']) ?></td>
-                                <td><button class="btn-action btn-delete"
-                                        data-url="<?= base_url('admin/asignaciones/eliminar-profesor/' . $a['id']) ?>"><i
-                                            class="fa fa-trash"></i></button></td>
+                                <th>Hora</th>
+                                <th>Lun</th>
+                                <th>Mar</th>
+                                <th>Mié</th>
+                                <th>Jue</th>
+                                <th>Vie</th>
                             </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody id="tbodyHorario"></tbody>
+                    </table>
+                </div>
             </section>
 
-            <!-- ================= ALUMNOS ================= -->
+            <!-- ==================== ALUMNOS ==================== -->
             <section id="alumnos" class="tab-content">
                 <form class="form-asignacion" action="<?= base_url('admin/asignaciones/asignar-alumno') ?>"
                     method="POST">
                     <h3>Asignar Alumno a Grupo</h3>
-                    <small>El alumno se vinculará automáticamente a todas las materias activas del grupo.</small>
+                    <div class="form-row">
+                        <div>
+                            <label>Grupo:</label>
+                            <select name="grupo_id" required>
+                                <option value="">-- Selecciona --</option>
+                                <?php foreach ($grupos as $g): ?>
+                                    <option value="<?= $g['id'] ?>"><?= esc($g['nombre']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                    <div class="form-group">
-                        <label>Grupo:</label>
-                        <select name="grupo_id" required>
-                            <option value="">-- Selecciona --</option>
-                            <?php foreach ($grupos as $g): ?>
-                                <option value="<?= $g['id'] ?>"><?= esc($g['nombre']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        <div>
+                            <label>Alumno:</label>
+                            <select name="alumno_id" required>
+                                <option value="">-- Selecciona --</option>
+                                <?php foreach ($alumnos as $a): ?>
+                                    <option value="<?= $a['id'] ?>"><?= esc($a['nombre']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </div>
-
-                    <div class="form-group">
-                        <label>Alumno:</label>
-                        <select name="alumno_id" required>
-                            <option value="">-- Selecciona --</option>
-                            <?php foreach ($alumnos as $a): ?>
-                                <option value="<?= $a['id'] ?>"><?= esc($a['nombre']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
                     <button type="submit" class="btn-nuevo"><i class="fa fa-plus"></i> Inscribir</button>
                 </form>
-
-                <h3>Alumnos inscritos</h3>
-                <table class="tabla-crud">
-                    <thead>
-                        <tr>
-                            <th>Alumno</th>
-                            <th>Grupo</th>
-                            <th>Fecha</th>
-                            <th>Estatus</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($inscripciones as $i): ?>
-                            <tr>
-                                <td><?= esc($i['alumno']) ?></td>
-                                <td><?= esc($i['grupo']) ?></td>
-                                <td><?= esc($i['fecha_inscripcion']) ?></td>
-                                <td><?= esc($i['estatus']) ?></td>
-                                <td><button class="btn-action btn-delete"
-                                        data-url="<?= base_url('admin/asignaciones/eliminar-alumno/' . $i['id']) ?>"><i
-                                            class="fa fa-trash"></i></button></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
             </section>
         </div>
     </main>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            document.querySelectorAll(".tab-btn").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    document.querySelectorAll(".tab-btn, .tab-content").forEach(el => el.classList.remove("active"));
-                    btn.classList.add("active");
-                    document.getElementById(btn.dataset.tab).classList.add("active");
-                });
-            });
-
-            document.querySelectorAll(".btn-delete").forEach(btn => {
-                btn.addEventListener("click", async () => {
-                    const url = btn.dataset.url;
-                    const confirm = await Swal.fireConfirm("¿Eliminar asignación?", "Esta acción no se puede deshacer");
-                    if (confirm.isConfirmed) {
-                        await fetch(url);
-                        Swal.fireSuccess("Eliminado correctamente");
-                        setTimeout(() => location.reload(), 1000);
-                    }
-                });
-            });
-        });
-    </script>
-
     <script src="<?= base_url('assets/js/sidebar.js') ?>"></script>
     <script src="<?= base_url('assets/js/alert.js') ?>"></script>
+
+    <script>
+        const grupoSelect = document.getElementById("grupo_id");
+        const horarioContainer = document.getElementById("horarioGrupo");
+        const tbodyHorario = document.getElementById("tbodyHorario");
+
+        // 🕒 Plantillas fijas de horarios
+        const HORARIOS = {
+            "Matutino": [
+                "07:30", "08:20", "09:10", "10:00", "10:50", "11:40", "12:30", "13:20", "14:10", "15:00"
+            ],
+            "Vespertino": [
+                "16:40", "17:20", "18:00", "18:40", "19:20", "20:00", "20:40", "21:20", "22:00"
+            ]
+        };
+
+        const selectInicio = document.getElementById("hora_inicio");
+        const selectFin = document.getElementById("hora_fin");
+
+        // 🕒 Generar selects de hora según turno
+        function generarSelectHoras(turno = "Matutino") {
+            const bloques = HORARIOS[turno];
+            selectInicio.innerHTML = '<option value="">-- Selecciona --</option>';
+            selectFin.innerHTML = '<option value="">-- Selecciona --</option>';
+
+            // Llenar ambas listas
+            bloques.forEach(h => {
+                const opt1 = document.createElement("option");
+                const opt2 = document.createElement("option");
+                opt1.value = h;
+                opt2.value = h;
+                opt1.textContent = h;
+                opt2.textContent = h;
+                selectInicio.appendChild(opt1);
+                selectFin.appendChild(opt2);
+            });
+
+            // Ajuste lógico: la hora fin debe ser posterior a inicio
+            selectInicio.onchange = () => {
+                const idx = selectInicio.selectedIndex;
+                selectFin.innerHTML = '<option value="">-- Selecciona --</option>';
+                bloques.forEach((h, i) => {
+                    if (i > idx - 1) {
+                        const opt = document.createElement("option");
+                        opt.value = h;
+                        opt.textContent = h;
+                        selectFin.appendChild(opt);
+                    }
+                });
+            };
+        }
+
+
+        // 🗓️ Generar tabla según turno
+        function generarTablaHorario(turno = "Matutino") {
+            const bloques = HORARIOS[turno];
+            tbodyHorario.innerHTML = "";
+            bloques.forEach(hora => {
+                const fila = document.createElement("tr");
+                fila.innerHTML = `<td>${hora}</td>` +
+                    ["L", "M", "X", "J", "V"].map(() => `<td class="disponible">—</td>`).join("");
+                tbodyHorario.appendChild(fila);
+            });
+        }
+
+        // 🔄 Cargar horario actual del grupo
+        grupoSelect.addEventListener("change", async () => {
+            const grupoId = grupoSelect.value;
+            if (!grupoId) {
+                horarioContainer.classList.add("hidden");
+                return;
+            }
+
+            const turno = grupoSelect.selectedOptions[0].dataset.turno || "Matutino";
+            generarSelectHoras(turno);
+            generarTablaHorario(turno);
+            horarioContainer.classList.remove("hidden");
+
+
+            try {
+                const res = await fetch(`<?= base_url('admin/asignaciones/horario-grupo/') ?>${grupoId}`);
+                const data = await res.json();
+                if (data.ok && Array.isArray(data.asignaciones)) {
+                    data.asignaciones.forEach(asig => {
+                        const dias = asig.dias || [];
+                        const [inicio, fin] = asig.rango;
+                        const filas = Array.from(tbodyHorario.children);
+                        filas.forEach((fila, i) => {
+                            const hora = parseInt(fila.firstChild.textContent.replace(":", ""));
+                            if (hora >= inicio && hora < fin) {
+                                dias.forEach(d => {
+                                    const col = ["L", "M", "X", "J", "V"].indexOf(d) + 1;
+                                    if (col >= 1 && fila.children[col]) {
+                                        fila.children[col].textContent = asig.materia;
+                                        fila.children[col].classList.add("ocupado");
+                                        fila.children[col].classList.remove("disponible");
+                                    }
+                                });
+                            }
+                        });
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
+    </script>
 </body>
 
 </html>

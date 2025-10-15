@@ -29,7 +29,15 @@ class PlanEstudioModel extends Model
     // ✅ Relación simple (útil para joins)
     public function withCarrera()
     {
-        return $this->select('planes_estudio.*, carreras.nombre AS carrera')
+        return $this->select(
+            'planes_estudio.id AS plan_id, 
+         planes_estudio.carrera_id, 
+         planes_estudio.nombre, 
+         planes_estudio.fecha_vigencia, 
+         planes_estudio.activo, 
+         carreras.nombre AS carrera'
+        )
             ->join('carreras', 'carreras.id = planes_estudio.carrera_id');
     }
+
 }

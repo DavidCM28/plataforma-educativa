@@ -37,33 +37,119 @@ class GruposController extends BaseController
 
     public function crear()
     {
-        $carreraId = $this->request->getPost('carrera_id');
-        $periodo = $this->request->getPost('periodo');
-        $turno = $this->request->getPost('turno');
-        $tutorId = $this->request->getPost('tutor_id');
+        try {
+            $carreraId = $this->request->getPost('carrera_id');
+            $periodo = $this->request->getPost('periodo');
+            $turno = $this->request->getPost('turno');
+            $tutorId = $this->request->getPost('tutor_id');
 
-        $carrera = $this->carreraModel->find($carreraId);
-        if (!$carrera) {
-            return redirect()->back()->with('msg', 'Carrera no encontrada');
+            $carrera = $this->carreraModel->find($carreraId);
+            if (!$carrera) {
+                return $this->response->setJSON(['ok' => false, 'msg' => 'Carrera no encontrada.']);
+            }
+
+            $nombreGrupo = $this->grupoModel->generarNombre($carrera['siglas'], $periodo, $turno);
+
+            $grupoId = $this->grupoModel->insert([
+                'nombre' => $nombreGrupo,
+                'periodo' => $periodo,
+                'turno' => $turno,
+                'activo' => 1,
+            ]);
+
+            $this->carreraGrupoModel->insert([
+                'carrera_id' => $carreraId,
+                'grupo_id' => $grupoId,
+                'tutor_id' => $tutorId ?: null,
+            ]);
+
+            $grupoData = [
+                'id' => $grupoId,
+                'siglas' => $carrera['siglas'],
+                'grupo' => $nombreGrupo,
+                'periodo' => $periodo,
+                'turno' => $turno,
+                'tutor' => $tutorId ? $this->usuarioModel->find($tutorId)['nombre'] : null,
+                'activo' => 1,
+            ];
+
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'ok' => true,
+                    'msg' => "Grupo <b>$nombreGrupo</b> creado correctamente",
+                    'grupo' => $grupoData,
+                ]);
+            }
+
+            return redirect()->to(base_url('admin/grupos'))
+                ->with('msg', "Grupo <b>$nombreGrupo</b> creado correctamente");
+        } catch (\Throwable $e) {
+            return $this->response->setJSON([
+                'ok' => false,
+                'msg' => 'Error al crear grupo: ' . $e->getMessage(),
+            ]);
         }
-
-        $nombreGrupo = $this->grupoModel->generarNombre($carrera['siglas'], $periodo, $turno);
-
-        $grupoId = $this->grupoModel->insert([
-            'nombre' => $nombreGrupo,
-            'periodo' => $periodo,
-            'turno' => $turno,
-            'activo' => 1,
-        ]);
-
-        $this->carreraGrupoModel->insert([
-            'carrera_id' => $carreraId,
-            'grupo_id' => $grupoId,
-            'tutor_id' => $tutorId ?: null,
-        ]);
-
-        return redirect()->to(base_url('admin/grupos'))->with('msg', "Grupo <b>$nombreGrupo</b> creado correctamente");
     }
+
+    public function actualizar($id)
+    {
+        try {
+            $grupo = $this->carreraGrupoModel->find($id);
+            if (!$grupo) {
+                return $this->response->setJSON(['ok' => false, 'msg' => 'Grupo no encontrado.']);
+            }
+
+            $carreraId = $this->request->getPost('carrera_id');
+            $periodo = $this->request->getPost('periodo');
+            $turno = $this->request->getPost('turno');
+            $tutorId = $this->request->getPost('tutor_id');
+
+            $carrera = $this->carreraModel->find($carreraId);
+            if (!$carrera) {
+                return $this->response->setJSON(['ok' => false, 'msg' => 'Carrera no encontrada.']);
+            }
+
+            // Generar nuevo nombre
+            $nombreGrupo = $this->grupoModel->generarNombre($carrera['siglas'], $periodo, $turno);
+
+            // Actualizar tabla grupos
+            $this->grupoModel->update($grupo['grupo_id'], [
+                'nombre' => $nombreGrupo,
+                'periodo' => $periodo,
+                'turno' => $turno,
+            ]);
+
+            // Actualizar relación carrera-grupo
+            $this->carreraGrupoModel->update($id, [
+                'carrera_id' => $carreraId,
+                'tutor_id' => $tutorId ?: null,
+            ]);
+
+            $grupoData = [
+                'id' => $id,
+                'siglas' => $carrera['siglas'],
+                'grupo' => $nombreGrupo,
+                'periodo' => $periodo,
+                'turno' => $turno,
+                'tutor' => $tutorId ? $this->usuarioModel->find($tutorId)['nombre'] : null,
+                'activo' => 1,
+            ];
+
+            return $this->response->setJSON([
+                'ok' => true,
+                'msg' => 'Grupo actualizado correctamente',
+                'grupo' => $grupoData,
+            ]);
+
+        } catch (\Throwable $e) {
+            return $this->response->setJSON([
+                'ok' => false,
+                'msg' => 'Error al actualizar grupo: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+
 
     public function eliminar($id)
     {
