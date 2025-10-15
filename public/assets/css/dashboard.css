@@ -1682,3 +1682,23 @@ body {
   font-size: .85rem;
   opacity: .7;
 }
+/* Evita congelamientos de layout con modals/alerts */
+html, body { height: 100%; }
+body { will-change: overflow; }
+
+/* Botones deshabilitados dentro del modal */
+.modal .btn[disabled], .modal button[disabled] { opacity: .7; cursor: not-allowed; }
+
+/* Contenedores que se refrescan parcialmente */
+[data-refreshable="true"] { position: relative; }
+[data-refreshable="true"].is-updating::after {
+  content: "Actualizando…";
+  position: absolute; right: .75rem; top: .5rem;
+  font-size: .85rem; opacity: .7;
+}
+/* Animación para desaparecer el elemento eliminado */
+.fade-out {
+  opacity: 0 !important;
+  transform: scale(.98);
+  transition: opacity .18s ease, transform .18s ease;
+}

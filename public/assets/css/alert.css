@@ -86,3 +86,30 @@ body.modal-open {
   from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+/* SweetAlert2 por encima de modals */
+.swal2-container { z-index: 20000 !important; pointer-events: all !important; }
+.swal2-backdrop-show { backdrop-filter: blur(3px); }
+body.swal2-shown { overflow: hidden !important; }
+
+/* Modal */
+.modal { pointer-events: none; transition: opacity .2s ease; }
+.modal.show { pointer-events: all; }
+.modal.fade .modal-dialog { transition: transform .2s ease; transform: translateY(-6px); }
+.modal.show .modal-dialog { transform: translateY(0); }
+.modal-backdrop { z-index: 1050 !important; }
+.modal { z-index: 1060; }
+body.modal-open { overflow: hidden !important; padding-right: 0 !important; }
+
+/* Estética SweetAlert2 */
+.swal-custom {
+  border: 1px solid var(--primary, #ff9e64);
+  box-shadow: 0 0 20px rgba(255,158,100,.3);
+  border-radius: var(--radius, 14px);
+  animation: fadeIn .25s ease;
+}
+@keyframes fadeIn { from{opacity:0; transform:translateY(-4px)} to{opacity:1; transform:translateY(0)} }
+.fade-out {
+  opacity: 0 !important;
+  transform: scale(.98);
+  transition: opacity .18s ease, transform .18s ease;
+}
