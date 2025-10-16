@@ -108,11 +108,21 @@ $routes->group('admin/asignaciones', ['namespace' => 'App\Controllers\Admin'], s
     // Profesores ↔ Grupo/Materia
     $routes->post('asignar-profesor', 'AsignacionesController::asignarProfesor');
     $routes->get('eliminar-profesor/(:num)', 'AsignacionesController::eliminarProfesor/$1');
+    $routes->get('detalle/(:num)', 'AsignacionesController::detalle/$1');
+    $routes->post('actualizar/(:num)', 'AsignacionesController::actualizarAsignacion/$1');
+
+
+    // Materias según plan/carrera
+    $routes->get('materias-grupo/(:num)', 'AsignacionesController::materiasPorGrupo/$1');
+    $routes->get('materias-por-grupo/(:num)', 'AsignacionesController::materiasPorGrupo/$1');
+    // Horario visual del grupo
+    $routes->get('horario-grupo/(:num)', 'AsignacionesController::horarioGrupo/$1');
 
     // Alumnos ↔ Grupo
     $routes->post('asignar-alumno', 'AsignacionesController::asignarAlumno');
     $routes->get('eliminar-alumno/(:num)', 'AsignacionesController::eliminarAlumno/$1');
 });
+
 
 // Módulo de Configuración de Ciclos
 $routes->group('admin/ciclos', ['namespace' => 'App\Controllers\Admin'], static function ($routes) {

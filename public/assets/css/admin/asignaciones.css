@@ -413,3 +413,258 @@ select option {
   color: #bbb;
   font-style: italic;
 }
+
+.menu-contextual {
+  position: absolute;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.menu-contextual .btn-mini {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 0.85rem;
+  text-align: left;
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.menu-contextual .btn-mini:hover {
+  background: var(--primary-light);
+  color: #fff;
+}
+
+.grid-canvas {
+  position: relative;
+  display: grid;
+  grid-template-columns: 70px repeat(5, 1fr);
+  grid-template-rows: repeat(10, 60px);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 8px;
+  overflow: hidden;
+  user-select: none;
+}
+
+.grid-canvas::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 70px, var(--border) 70px),
+    linear-gradient(var(--border) 1px, transparent 1px);
+  background-size: 1fr 60px;
+}
+
+.celda-hora {
+  position: absolute;
+  font-size: 0.8rem;
+  left: 10px;
+  color: var(--text-light);
+}
+
+.bloque {
+  position: absolute;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 0.85rem;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  cursor: move;
+  transition: box-shadow 0.2s ease;
+}
+
+.bloque.resizing,
+.bloque.dragging {
+  opacity: 0.8;
+  box-shadow: 0 0 10px var(--primary-light);
+}
+
+.menu-contextual {
+  position: absolute;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  z-index: 1000;
+}
+.menu-contextual .btn-mini {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 0.85rem;
+  text-align: left;
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.menu-contextual .btn-mini:hover {
+  background: var(--primary-light);
+  color: #fff;
+}
+/* === NUEVO GRID VISUAL === */
+.horario-wrapper {
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.grid-header {
+  display: grid;
+  grid-template-columns: 70px repeat(5, 1fr);
+  background: var(--primary);
+  color: white;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.grid-header div {
+  padding: 0.4rem 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.grid-canvas {
+  position: relative;
+  display: grid;
+  grid-template-columns: 70px repeat(5, 1fr);
+  grid-template-rows: repeat(10, 60px);
+  background: linear-gradient(var(--border) 1px, transparent 1px) 0 0 / 100%
+      60px repeat-y,
+    linear-gradient(90deg, var(--border) 1px, transparent 1px) 70px 0 /
+      calc((100% - 70px) / 5) 100% repeat-x;
+  background-color: var(--surface);
+  border-top: 1px solid var(--border);
+  user-select: none;
+  height: 600px;
+}
+
+.celda-hora {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  padding-left: 5px;
+  line-height: 60px;
+}
+
+.bloque {
+  position: absolute;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 0.85rem;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  cursor: move;
+  transition: box-shadow 0.2s ease;
+}
+
+.bloque.dragging,
+.bloque.resizing {
+  opacity: 0.8;
+  box-shadow: 0 0 10px var(--primary-light);
+}
+
+.menu-contextual {
+  position: absolute;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  z-index: 1000;
+}
+.menu-contextual .btn-mini {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 0.85rem;
+  text-align: left;
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.menu-contextual .btn-mini:hover {
+  background: var(--primary-light);
+  color: #fff;
+}
+
+.menu-sub-bloques button {
+  background: #333;
+  color: #fff;
+  border: none;
+  margin: 3px 0;
+  padding: 4px 6px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+.menu-sub-bloques button:hover {
+  background: #444;
+}
+.bloque.arrastrando {
+  box-shadow: 0 0 12px rgba(0, 255, 0, 0.6);
+  opacity: 0.9;
+  transform: scale(1.02);
+  transition: box-shadow 0.2s ease;
+}
+
+.grid-canvas {
+  position: relative;
+  width: 100%;
+  height: 600px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Dibujar líneas de fondo como Google Calendar */
+.grid-canvas::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(var(--border) 1px, transparent 1px) 0 0 / 100%
+      60px repeat-y,
+    linear-gradient(90deg, var(--border) 1px, transparent 1px) 70px 0 /
+      calc((100% - 70px) / 5) 100% repeat-x;
+  pointer-events: none;
+}
+/* === Zonas de redimensionamiento superior/inferior === */
+.bloque::before,
+.bloque::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  cursor: ns-resize;
+  background: transparent;
+}
+.bloque::before {
+  top: -3px;
+}
+.bloque::after {
+  bottom: -3px;
+}

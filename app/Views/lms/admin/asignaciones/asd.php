@@ -170,10 +170,144 @@
 
     <script src="<?= base_url('assets/js/sidebar.js') ?>"></script>
     <script src="<?= base_url('assets/js/alert.js') ?>"></script>
-    <script src="<?= base_url('assets/js/alert.js') ?>"></script>
-    <script src="<?= base_url('assets/js/admin/asignaciones.js') ?>"></script>
 
+    <script>
+        const grupoSelect = document.getElementById("grupo_id");
+        const formAsignacion = document.getElementById("formAsignacion");
+        const gridCanvas = document.getElementById("gridCanvas");
+        const horarioContainer = document.getElementById("horarioGrid");
+        const HORARIOS = {
+            "Matutino": ["07:30", "08:20", "09:10", "10:00", "10:50", "11:40", "12:30", "13:20", "14:10", "15:00"],
+            "Vespertino": ["16:40", "17:20", "18:00", "18:40", "19:20", "20:00", "20:40", "21:20", "22:00"]
+        };
 
+        // 🧱 Render de horas al costado
+        function renderGrid(turno = "Matutino") {
+            gridCanvas.innerHTML = "";
+            const bloques = HORARIOS[turno];
+            bloques.forEach((h, i) => {
+                const hora = document.createElement("div");
+                hora.className = "celda-hora";
+                hora.style.gridColumn = "1 / 2";
+                hora.style.gridRow = (i + 1);
+                hora.textContent = h;
+                gridCanvas.appendChild(hora);
+            });
+        }
+
+        // 🔄 Cargar materias y renderizar horario
+        grupoSelect.addEventListener("change", async () => {
+            const grupoId = grupoSelect.value;
+            if (!grupoId) { horarioContainer.classList.add("hidden"); return; }
+            const turno = grupoSelect.selectedOptions[0].dataset.turno || "Matutino";
+            renderGrid(turno);
+            horarioContainer.classList.remove("hidden");
+            await cargarHorarioActual();
+        });
+
+        // 📦 Cargar asignaciones
+        async function cargarHorarioActual() {
+            const grupoId = grupoSelect.value;
+            if (!grupoId) return;
+            const res = await fetch(`<?= base_url('admin/asignaciones/horario-grupo/') ?>${grupoId}`);
+            const data = await res.json();
+            if (!data.ok) return;
+            const turno = grupoSelect.selectedOptions[0].dataset.turno || "Matutino";
+            renderGrid(turno);
+            const anchoCol = (gridCanvas.offsetWidth - 70) / 5;
+            data.asignaciones.forEach(a => {
+                const [inicio, fin] = a.rango;
+                const alto = (fin - inicio) / 60 * 60;
+                const top = ((inicio - (parseInt(HORARIOS[turno][0].replace(":", "")))) / 100 * 60) || 0;
+                a.dias.forEach(d => {
+                    const col = ["L", "M", "X", "J", "V"].indexOf(d);
+                    if (col >= 0) {
+                        const bloque = document.createElement("div");
+                        bloque.className = "bloque";
+                        bloque.textContent = a.materia;
+                        bloque.style.left = (70 + col * anchoCol) + "px";
+                        bloque.style.top = top + "px";
+                        bloque.style.width = (anchoCol - 8) + "px";
+                        bloque.style.height = alto + "px";
+                        bloque.dataset.dia = d;
+                        gridCanvas.appendChild(bloque);
+                    }
+                });
+            });
+            initInteract(anchoCol);
+        }
+
+        // 🧲 Interact con snap
+        function initInteract(anchoCol) {
+            interact(".bloque")
+                .draggable({
+                    modifiers: [
+                        interact.modifiers.snap({
+                            targets: [interact.snappers.grid({ x: anchoCol, y: 60 })],
+                            range: Infinity,
+                            relativePoints: [{ x: 0, y: 0 }]
+                        }),
+                        interact.modifiers.restrictRect({ restriction: gridCanvas, endOnly: true })
+                    ],
+                    listeners: {
+                        move(event) {
+                            const x = (parseFloat(event.target.getAttribute("data-x")) || 0) + event.dx;
+                            const y = (parseFloat(event.target.getAttribute("data-y")) || 0) + event.dy;
+                            event.target.style.transform = `translate(${x}px,${y}px)`;
+                            event.target.setAttribute("data-x", x);
+                            event.target.setAttribute("data-y", y);
+                        },
+                        end() {
+                            mostrarAlerta("📦 Movido a nueva celda (aún sin guardar)", "info");
+                        }
+                    }
+                })
+                .resizable({
+                    edges: { top: true, bottom: true },
+                    modifiers: [
+                        interact.modifiers.snapSize({
+                            targets: [interact.snappers.grid({ x: anchoCol, y: 60 })],
+                            range: Infinity
+                        }),
+                        interact.modifiers.restrictEdges({ outer: gridCanvas })
+                    ],
+                    listeners: {
+                        move(event) {
+                            let y = parseFloat(event.target.getAttribute("data-y")) || 0;
+                            event.target.style.height = event.rect.height + "px";
+                            y += event.deltaRect.top;
+                            event.target.style.transform = `translateY(${y}px)`;
+                            event.target.setAttribute("data-y", y);
+                        },
+                        end() {
+                            mostrarAlerta("↕️ Duración ajustada a bloque completo", "info");
+                        }
+                    }
+                });
+        }
+
+        // ⚙️ Menú contextual
+        gridCanvas.addEventListener("contextmenu", e => {
+            e.preventDefault();
+            const bloque = e.target.closest(".bloque");
+            if (!bloque) return;
+            const menu = document.createElement("div");
+            menu.className = "menu-contextual";
+            menu.innerHTML = `
+    <button class="btn-mini editar"><i class="fa fa-pen"></i> Editar</button>
+    <button class="btn-mini eliminar"><i class="fa fa-trash"></i> Eliminar</button>`;
+            document.body.appendChild(menu);
+            menu.style.left = e.pageX + "px";
+            menu.style.top = e.pageY + "px";
+            const closeMenu = () => menu.remove();
+            document.addEventListener("click", closeMenu, { once: true });
+            menu.querySelector(".editar").onclick = () => mostrarAlerta("✏️ Edición pendiente", "info");
+            menu.querySelector(".eliminar").onclick = () => {
+                bloque.remove();
+                mostrarAlerta("🗑️ Clase eliminada.", "success");
+            };
+        });
+    </script>
 </body>
 
 </html>
