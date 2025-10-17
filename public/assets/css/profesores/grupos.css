@@ -105,3 +105,79 @@
     transform: translateY(0);
   }
 }
+
+/* Grid de grupos */
+.grupos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.grupo-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    animation: cardAppear 0.4s ease;
+}
+
+.grupo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    border-color: var(--primary);
+}
+
+.grupo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.grupo-header h3 {
+    color: var(--primary);
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.grupo-codigo {
+    background: var(--primary);
+    color: #000;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.grupo-info p {
+    margin: 0.5rem 0;
+    color: var(--text);
+    font-size: 0.9rem;
+}
+
+.grupo-actions {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: #000;
+}
+
+.btn-primary:hover {
+    background: var(--primary-light);
+    transform: translateY(-2px);
+}

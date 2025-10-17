@@ -156,6 +156,14 @@ $routes->group('profesor', ['filter' => 'auth'], function ($routes) {
 $routes->group('profesor', ['namespace' => 'App\Controllers\Profesor'], function ($routes) {
     $routes->get('grupos/ver/(:num)', 'Grupos::ver/$1');
 });
+// Módulo de Profesores
+$routes->group('profesor', ['filter' => 'auth'], function ($routes) {
+    $routes->get('dashboard', 'Profesor\Dashboard::index');
+    $routes->get('grupos', 'Profesor\Grupos::index'); // ✅ RUTA PARA LISTAR GRUPOS
+});
 
+$routes->group('profesor', ['namespace' => 'App\Controllers\Profesor'], function ($routes) {
+    $routes->get('grupos/ver/(:num)', 'Grupos::ver/$1');
+});
 
 
