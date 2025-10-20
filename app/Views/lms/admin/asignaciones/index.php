@@ -6,6 +6,7 @@
     <title>Gestión de Asignaciones</title>
     <link rel="stylesheet" href="<?= base_url('assets/css/dashboard.css') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/css/admin/asignaciones.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/css/admin/asignaciones-alumnos.css') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/css/alert.css') ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
@@ -161,15 +162,16 @@
                         <h3><i class="fa-solid fa-link"></i> Vincular Alumno a Carrera</h3>
 
                         <div class="form-row">
-                            <div>
-                                <label>Alumno:</label>
-                                <select name="alumno_id" id="alumnoSelect" required>
-                                    <option value="">-- Selecciona alumno --</option>
-                                    <?php foreach ($alumnos as $a): ?>
-                                        <option value="<?= $a['id'] ?>"><?= esc($a['nombre']) ?></option>
-                                    <?php endforeach; ?>
-                                </select>
+                            <div class="buscador-alumno">
+                                <label>Buscar alumno:</label>
+                                <input type="text" id="buscadorAlumno" placeholder="Escribe nombre o matrícula..."
+                                    autocomplete="off">
+                                <ul id="resultadosBusqueda" class="resultados-lista"></ul>
+
+                                <!-- Al seleccionar, estos campos se llenan -->
+                                <input type="hidden" name="alumno_id" id="alumno_id">
                             </div>
+
                             <div>
                                 <label>Carrera:</label>
                                 <select name="carrera_id" id="carreraSelect" required>
@@ -185,30 +187,6 @@
                             <i class="fa fa-save"></i> Vincular
                         </button>
                     </form>
-
-                    <div class="tabla-asignados">
-                        <h4><i class="fa-solid fa-table-list"></i> Alumnos y sus Carreras</h4>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Alumno</th>
-                                    <th>Carrera</th>
-                                    <th>Estatus</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tablaAlumnoCarrera">
-                                <?php foreach ($vinculos as $v): ?>
-                                    <tr>
-                                        <td><?= $v['id'] ?></td>
-                                        <td><?= esc($v['alumno']) ?></td>
-                                        <td><?= esc($v['carrera']) ?></td>
-                                        <td><span class="badge"><?= esc($v['estatus']) ?></span></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
 
                 <!-- ==================== SUBTAB 2: ALUMNO ↔ GRUPO ==================== -->
@@ -221,10 +199,20 @@
 
                         <div class="form-row">
                             <div>
+                                <label>Carrera:</label>
+                                <select id="filtroCarreraSelect">
+                                    <option value="">-- Todas las carreras --</option>
+                                    <?php foreach ($carreras as $c): ?>
+                                        <option value="<?= $c['id'] ?>"><?= esc($c['nombre']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div>
                                 <label>Grupo:</label>
                                 <select name="grupo_id" id="grupoAlumnoSelect" required>
                                     <option value="">-- Selecciona grupo --</option>
-                                    <?php foreach ($grupos as $g): ?>
+                                    <?php foreach ($gruposPrimerCiclo as $g): ?>
                                         <option value="<?= $g['id'] ?>"><?= esc($g['grupo']) ?></option>
                                     <?php endforeach; ?>
                                 </select>
@@ -239,17 +227,31 @@
                             </div>
                         </div>
 
+
                         <button type="submit" class="btn-nuevo">
                             <i class="fa fa-plus"></i> Inscribir seleccionados
                         </button>
                     </form>
+                    <div class="gestion-grupos">
+                        <label for="grupoPromover">Seleccionar grupo:</label>
+                        <select id="grupoPromover">
+                            <option value="">-- Selecciona grupo --</option>
+                            <?php foreach ($grupos as $g): ?>
+                                <option value="<?= $g['id'] ?>"><?= esc($g['grupo']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <button id="btnPromoverGrupo" class="btn-nuevo" type="button">
+                            <i class="fa-solid fa-arrow-up"></i> Promover al siguiente ciclo
+                        </button>
+                    </div>
+
 
                     <div class="tabla-asignados">
                         <h4><i class="fa-solid fa-users"></i> Alumnos inscritos</h4>
                         <table>
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th>Matricula</th>
                                     <th>Alumno</th>
                                     <th>Grupo</th>
                                     <th>Estatus</th>
@@ -257,19 +259,6 @@
                                 </tr>
                             </thead>
                             <tbody id="tablaAlumnosInscritos">
-                                <?php foreach ($inscripciones as $i): ?>
-                                    <tr>
-                                        <td><?= $i['id'] ?></td>
-                                        <td><?= esc($i['alumno']) ?></td>
-                                        <td><?= esc($i['grupo']) ?></td>
-                                        <td><span class="badge"><?= esc($i['estatus'] ?? 'Inscrito') ?></span></td>
-                                        <td>
-                                            <button type="button" class="btn-mini btn-eliminar" data-id="<?= $i['id'] ?>">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
@@ -278,54 +267,15 @@
         </div>
     </main>
 
+    <script>
+        const gruposPrimerCiclo = <?= json_encode($gruposPrimerCiclo) ?>;
+        const carrerasLista = <?= json_encode($carreras) ?>;
+    </script>
+
     <script src="<?= base_url('assets/js/sidebar.js') ?>"></script>
     <script src="<?= base_url('assets/js/alert.js') ?>"></script>
     <script src="<?= base_url('assets/js/admin/asignaciones.js') ?>"></script>
-    <script>
-        document.querySelectorAll(".tab-btn").forEach((btn) => {
-            btn.addEventListener("click", () => {
-                // Quitar clase active de todos
-                document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
-                document.querySelectorAll(".tab-content").forEach((c) => c.classList.remove("active"));
-
-                // Activar la pestaña seleccionada
-                btn.classList.add("active");
-                const tabId = btn.dataset.tab;
-                document.getElementById(tabId).classList.add("active");
-            });
-        });
-        // ==========================================================
-        // 🧩 Subpestañas (Carrera / Grupo)
-        // ==========================================================
-        document.querySelectorAll(".subtab-btn").forEach(btn => {
-            btn.addEventListener("click", () => {
-                document.querySelectorAll(".subtab-btn").forEach(b => b.classList.remove("active"));
-                document.querySelectorAll(".subtab-content").forEach(c => c.classList.remove("active"));
-
-                btn.classList.add("active");
-                document.getElementById("subtab-" + btn.dataset.subtab).classList.add("active");
-            });
-        });
-
-        // ==========================================================
-        // 🎓 Vincular alumno a carrera (POST simple)
-        // ==========================================================
-        const formVincularCarrera = document.getElementById("formVincularCarrera");
-        formVincularCarrera?.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const formData = new FormData(formVincularCarrera);
-            const res = await fetch(`${baseUrl}admin/asignaciones/vincular-alumno-carrera`, {
-                method: "POST",
-                body: formData
-            });
-            const data = await res.json();
-            mostrarAlerta(data.msg, data.ok ? "success" : "error");
-            if (data.ok) setTimeout(() => window.location.reload(), 1000);
-        });
-
-    </script>
-
-
+    <script src="<?= base_url('assets/js/admin/asignaciones-alumnos.js') ?>"></script>
 </body>
 
 </html>

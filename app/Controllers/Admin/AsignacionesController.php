@@ -7,26 +7,15 @@ use App\Models\GrupoModel;
 use App\Models\MateriaModel;
 use App\Models\UsuarioModel;
 use App\Models\GrupoMateriaProfesorModel;
-use App\Models\GrupoAlumnoModel;
 use App\Models\CicloAcademicoModel;
 use App\Models\PlanMateriaModel;
 use App\Models\PlanEstudioModel;
 use App\Models\CarreraGrupoModel;
-use App\Models\AlumnoCarreraModel;
 
 class AsignacionesController extends BaseController
 {
-    protected $grupoModel;
-    protected $materiaModel;
-    protected $usuarioModel;
-    protected $grupoMateriaProfesorModel;
-    protected $grupoAlumnoModel;
-    protected $cicloModel;
-    protected $planModel;
-    protected $planMateriaModel;
-    protected $carreraGrupoModel;
-    protected $alumnoCarreraModel;
-    protected $db;
+    protected $grupoModel, $materiaModel, $usuarioModel, $grupoMateriaProfesorModel,
+    $cicloModel, $planModel, $planMateriaModel, $carreraGrupoModel, $db;
 
     public function __construct()
     {
@@ -34,49 +23,82 @@ class AsignacionesController extends BaseController
         $this->materiaModel = new MateriaModel();
         $this->usuarioModel = new UsuarioModel();
         $this->grupoMateriaProfesorModel = new GrupoMateriaProfesorModel();
-        $this->grupoAlumnoModel = new GrupoAlumnoModel();
         $this->cicloModel = new CicloAcademicoModel();
         $this->planModel = new PlanEstudioModel();
         $this->planMateriaModel = new PlanMateriaModel();
         $this->carreraGrupoModel = new CarreraGrupoModel();
-        $this->alumnoCarreraModel = new AlumnoCarreraModel();
         $this->db = \Config\Database::connect();
     }
 
-    /* =========================================================
-       📘 Vista principal
-       ========================================================= */
     public function index()
     {
+        // 🔹 Profesores
         $grupos = $this->carreraGrupoModel->obtenerGruposCompletos();
-        $materias = $this->materiaModel->where('activo', 1)->orderBy('nombre', 'ASC')->findAll();
-        $profesores = $this->usuarioModel->where('rol_id', 3)->orderBy('nombre', 'ASC')->findAll();
-        $alumnos = $this->usuarioModel->select('id, nombre')->where('rol_id', 4)->orderBy('nombre', 'ASC')->findAll();
-        $carreras = $this->db->table('carreras')->select('id, nombre')->where('activo', 1)->orderBy('nombre', 'ASC')->get()->getResultArray();
-        $vinculos = $this->alumnoCarreraModel
-            ->select('alumno_carrera.id, usuarios.nombre AS alumno, carreras.nombre AS carrera, alumno_carrera.estatus')
+        $materias = $this->materiaModel
+            ->where('activo', 1)
+            ->orderBy('nombre', 'ASC')
+            ->findAll();
+        $profesores = $this->usuarioModel
+            ->where('rol_id', 3) // 3 = profesor
+            ->orderBy('nombre', 'ASC')
+            ->findAll();
+        $ciclos = $this->cicloModel
+            ->orderBy('id', 'DESC')
+            ->findAll();
+
+        // 🔹 Alumnos
+        $alumnos = $this->usuarioModel
+            ->select('id, nombre, matricula')
+            ->where('rol_id', 4) // 4 = alumno
+            ->orderBy('nombre', 'ASC')
+            ->findAll();
+
+        // 🔹 Carreras
+        $carreras = $this->db->table('carreras')
+            ->select('id, nombre')
+            ->where('activo', 1)
+            ->orderBy('nombre', 'ASC')
+            ->get()
+            ->getResultArray();
+
+        // 🔹 Relación alumno ↔ carrera
+        $vinculos = $this->db->table('alumno_carrera')
+            ->select('alumno_carrera.id, usuarios.matricula, usuarios.nombre AS alumno, carreras.nombre AS carrera, alumno_carrera.estatus')
             ->join('usuarios', 'usuarios.id = alumno_carrera.alumno_id')
             ->join('carreras', 'carreras.id = alumno_carrera.carrera_id')
             ->orderBy('usuarios.nombre', 'ASC')
-            ->findAll();
-        $ciclos = $this->cicloModel->orderBy('id', 'DESC')->findAll();
-        $inscripciones = $this->grupoAlumnoModel
+            ->get()
+            ->getResultArray();
+
+        // 🔹 Inscripciones (alumnos ↔ grupos)
+        $inscripciones = $this->db->table('grupo_alumno')
             ->select('grupo_alumno.*, grupos.nombre as grupo, usuarios.nombre as alumno')
             ->join('grupos', 'grupos.id = grupo_alumno.grupo_id')
             ->join('usuarios', 'usuarios.id = grupo_alumno.alumno_id')
-            ->findAll();
+            ->get()
+            ->getResultArray();
 
-        return view('lms/admin/asignaciones/index', compact(
-            'grupos',
-            'materias',
-            'profesores',
-            'alumnos',
-            'carreras',
-            'vinculos',
-            'ciclos',
-            'inscripciones'
-        ));
+        // 🔹 Filtrar solo grupos del primer ciclo (para el tab de alumnos)
+        $gruposPrimerCiclo = array_filter($grupos, function ($g) {
+            // Coincide con '1' que no está precedido ni seguido por otro dígito (evita 10, 11, etc.)
+            return preg_match('/(?<!\d)1(?!\d)/', $g['grupo']);
+        });
+
+
+        // 🔹 Enviar todo a la vista
+        return view('lms/admin/asignaciones/index', [
+            'grupos' => $grupos,
+            'gruposPrimerCiclo' => $gruposPrimerCiclo,
+            'materias' => $materias,
+            'profesores' => $profesores,
+            'ciclos' => $ciclos,
+            'alumnos' => $alumnos,
+            'carreras' => $carreras,
+            'vinculos' => $vinculos,
+            'inscripciones' => $inscripciones,
+        ]);
     }
+
 
     /* =========================================================
        👨‍🏫 Asignar profesor a materia-grupo
@@ -240,146 +262,6 @@ class AsignacionesController extends BaseController
 
         return $this->response->setJSON(['ok' => true, 'asignacion' => $asig]);
     }
-
-
-    /* =========================================================
-       🎓 Alumnos
-       ========================================================= */
-    public function asignarAlumno()
-    {
-        $grupoId = $this->request->getPost('grupo_id');
-        $alumnosSeleccionados = $this->request->getPost('alumnos') ?? [$this->request->getPost('alumno_id')];
-
-        if (!$grupoId || empty($alumnosSeleccionados)) {
-            return redirect()->back()->with('msg', '⚠️ Debes seleccionar un grupo y al menos un alumno.');
-        }
-
-        $relacion = $this->carreraGrupoModel
-            ->select('carrera_grupo.carrera_id')
-            ->where('carrera_grupo.grupo_id', $grupoId)
-            ->first();
-
-        if (!$relacion) {
-            return redirect()->back()->with('msg', '❌ El grupo no está vinculado a ninguna carrera.');
-        }
-
-        $carreraId = $relacion['carrera_id'];
-        $grupo = $this->grupoModel->find($grupoId);
-        $limite = $grupo['limite'] ?? 0;
-        $actuales = $this->grupoAlumnoModel->where('grupo_id', $grupoId)->countAllResults();
-
-        if ($limite && $actuales >= $limite) {
-            return redirect()->back()->with('msg', '⚠️ El grupo ya alcanzó su límite de alumnos.');
-        }
-
-        $alumnosValidos = $this->alumnoCarreraModel
-            ->select('alumno_id')
-            ->where('carrera_id', $carreraId)
-            ->whereIn('alumno_id', $alumnosSeleccionados)
-            ->findAll();
-
-        if (empty($alumnosValidos)) {
-            return redirect()->back()->with('msg', '⚠️ Ninguno de los alumnos seleccionados pertenece a la carrera del grupo.');
-        }
-
-        foreach ($alumnosValidos as $a) {
-            $alumnoId = $a['alumno_id'];
-            $yaInscrito = $this->grupoAlumnoModel
-                ->where('grupo_id', $grupoId)
-                ->where('alumno_id', $alumnoId)
-                ->first();
-
-            if ($yaInscrito)
-                continue;
-
-            $this->grupoAlumnoModel->insert([
-                'grupo_id' => $grupoId,
-                'alumno_id' => $alumnoId,
-                'fecha_inscripcion' => date('Y-m-d'),
-                'estatus' => 'Inscrito',
-            ]);
-
-            $grupoAlumnoId = $this->grupoAlumnoModel->getInsertID();
-
-            $asignaciones = $this->grupoMateriaProfesorModel->where('grupo_id', $grupoId)->findAll();
-            foreach ($asignaciones as $asig) {
-                $this->db->table('materia_grupo_alumno')->insert([
-                    'grupo_materia_profesor_id' => $asig['id'],
-                    'grupo_alumno_id' => $grupoAlumnoId,
-                    'calificacion_final' => null,
-                    'asistencia' => 0,
-                ]);
-            }
-        }
-
-        return redirect()->back()->with('msg', '✅ Alumnos asignados correctamente al grupo y materias.');
-    }
-
-    public function eliminarAlumno($id)
-    {
-        $this->grupoAlumnoModel->delete($id);
-        return $this->response->setJSON(['ok' => true, 'msg' => 'Alumno eliminado correctamente.']);
-    }
-
-    public function alumnosPorCarrera($grupoId)
-    {
-        $relacion = $this->carreraGrupoModel
-            ->select('carrera_grupo.carrera_id')
-            ->where('carrera_grupo.grupo_id', $grupoId)
-            ->first();
-
-        if (!$relacion) {
-            return $this->response->setJSON([
-                'ok' => false,
-                'msg' => '❌ El grupo no está vinculado a ninguna carrera.'
-            ]);
-        }
-
-        $carreraId = $relacion['carrera_id'];
-
-        $alumnos = $this->usuarioModel
-            ->select('usuarios.id, usuarios.nombre')
-            ->join('alumno_carrera', 'alumno_carrera.alumno_id = usuarios.id')
-            ->where('alumno_carrera.carrera_id', $carreraId)
-            ->where('usuarios.rol_id', 4)
-            ->where('alumno_carrera.estatus', 'Activo')
-            ->orderBy('usuarios.nombre', 'ASC')
-            ->findAll();
-
-        return $this->response->setJSON([
-            'ok' => true,
-            'alumnos' => $alumnos,
-        ]);
-    }
-
-    public function vincularAlumnoCarrera()
-    {
-        $alumnoId = $this->request->getPost('alumno_id');
-        $carreraId = $this->request->getPost('carrera_id');
-
-        if (!$alumnoId || !$carreraId) {
-            return $this->response->setJSON(['ok' => false, 'msg' => 'Faltan datos.']);
-        }
-
-        $existe = $this->alumnoCarreraModel
-            ->where('alumno_id', $alumnoId)
-            ->where('carrera_id', $carreraId)
-            ->first();
-
-        if ($existe) {
-            return $this->response->setJSON(['ok' => false, 'msg' => '⚠️ El alumno ya está vinculado a esa carrera.']);
-        }
-
-        $this->alumnoCarreraModel->insert([
-            'alumno_id' => $alumnoId,
-            'carrera_id' => $carreraId,
-            'fecha_registro' => date('Y-m-d'),
-            'estatus' => 'Activo',
-        ]);
-
-        return $this->response->setJSON(['ok' => true, 'msg' => '✅ Alumno vinculado a la carrera.']);
-    }
-
     public function materiasPorGrupo($grupoId)
     {
         $relacion = $this->carreraGrupoModel

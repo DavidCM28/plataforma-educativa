@@ -1,12 +1,11 @@
 /* ======================================================
-   🎨 Estilos específicos - Gestión de Usuarios (Unificado)
+   🎨 Gestión de Usuarios - Tema Oscuro Integrado
    ====================================================== */
 
 .crud-container {
   background: var(--surface);
   color: var(--text);
   border-radius: var(--radius);
-  box-shadow: none;
   padding: 2rem;
   margin-top: 1rem;
   animation: fadeIn 0.4s ease;
@@ -21,30 +20,28 @@
   padding-bottom: 4px;
 }
 
-/* === Estilo base global de botones === */
+/* ======================================================
+   🔘 BOTONES
+   ====================================================== */
 button,
 a[class^="btn-"],
 .tab-item {
   font-family: inherit;
   font-size: 0.9rem;
-  line-height: 1;
   font-weight: 600;
   border: none;
-  outline: none;
-  cursor: pointer;
   border-radius: var(--radius);
+  cursor: pointer;
   transition: all 0.25s ease;
-  text-decoration: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   padding: 0.5rem 1rem;
-  height: 36px; /* 🔹 tamaño más compacto */
-  box-shadow: none;
+  height: 36px;
 }
 
-/* 🟧 Botón principal (Nuevo, Editar) */
+/* 🟧 Principal */
 .btn-nuevo,
 .btn-edit {
   background: var(--primary);
@@ -57,26 +54,22 @@ a[class^="btn-"],
   filter: brightness(1.1);
 }
 
-/* 🟦 Botón azul (Importar) */
+/* 🟦 Importar */
 .btn-importar {
   background: #357abd;
   color: #fff;
 }
 .btn-importar:hover {
   background: #4a90e2;
-  transform: translateY(-2px);
-  filter: brightness(1.1);
 }
 
-/* 🟩 Botón verde (Excel) */
+/* 🟩 Plantillas */
 .btn-excel {
   background: #1d8f3f;
   color: #fff;
 }
 .btn-excel:hover {
   background: #28a745;
-  transform: translateY(-2px);
-  filter: brightness(1.1);
 }
 
 /* 🔴 Eliminar */
@@ -86,191 +79,81 @@ a[class^="btn-"],
 }
 .btn-delete:hover {
   background: #ff6655;
-  transform: translateY(-2px);
-  filter: brightness(1.1);
 }
 
-/* 🔵 Ver detalles */
+/* 🔵 Ver */
 .btn-view {
   background: #4a90e2;
   color: #fff;
 }
 .btn-view:hover {
   background: #5fa3f0;
-  transform: translateY(-2px);
-  filter: brightness(1.1);
 }
 
-/* === Tabla CRUD === */
+/* ======================================================
+   🧾 TABLA CRUD
+   ====================================================== */
 .tabla-crud {
   width: 100%;
   border-collapse: collapse;
-  background: var(--color-surface);
+  background: var(--surface);
   border-radius: var(--radius);
   overflow: hidden;
-  box-shadow: none;
+  color: var(--text);
 }
 
 .tabla-crud thead {
-  background: linear-gradient(90deg, var(--primary-dark), var(--primary));
-  color: #fff;
+  background: var(--primary);
+  color: #000;
 }
 
 .tabla-crud th,
 .tabla-crud td {
   padding: 1rem;
   text-align: left;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .tabla-crud tbody tr:hover {
   background-color: rgba(255, 158, 100, 0.08);
-  transition: var(--transition);
 }
 
-/* === Animación ligera === */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* === Responsive === */
-@media (max-width: 768px) {
-  .crud-container {
-    padding: 1rem;
-  }
-
-  .tabla-crud th,
-  .tabla-crud td {
-    font-size: 0.9rem;
-    padding: 0.8rem;
-  }
-
-  .btn-nuevo {
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
-  }
-}
-
-/* === Botones de acción en tabla (más pequeños) === */
-.btn-action {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.25s ease;
-}
-
-.btn-action i {
-  font-size: 0.9rem;
-}
-
-/* === Modal === */
+/* ======================================================
+   💬 MODALES BASE
+   ====================================================== */
 .modal {
   display: none;
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  z-index: 999;
-  justify-content: center;
-  align-items: center;
-  animation: fadeIn 0.3s ease;
-}
-
-.modal-content {
-  background: rgba(33, 36, 43, 0.95);
-  backdrop-filter: blur(6px);
-  border-radius: var(--radius);
-  padding: 2rem;
-  max-width: 600px;
-  width: 90%;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-  color: var(--text);
-  animation: slideUp 0.3s ease;
-  border: 1px solid rgba(255, 158, 100, 0.1);
-}
-
-#userModal .modal-content {
-  background: rgba(33, 36, 43, 0.97);
-}
-#modalCrearUsuario .modal-content {
-  background: rgba(33, 36, 43, 0.96);
-}
-#modalImportar .modal-content {
-  background: rgba(25, 28, 33, 0.97);
-}
-
-/* === Forzar el modal por encima del dashboard, header y sidebar === */
-.modal {
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.7);
-  z-index: 9999 !important; /* ⬅️ eleva la prioridad absoluta */
-  display: none;
+  z-index: 9999 !important;
   justify-content: center;
   align-items: flex-start;
   padding-top: 3rem;
   animation: fadeIn 0.3s ease;
 }
 
-/* Capa de fondo con efecto más oscuro y profundo */
-.modal::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.8));
-  z-index: -1;
-}
-
-/* Asegura que el contenido esté sobre el fondo */
 .modal-content {
-  position: relative;
-  z-index: 10000;
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
+  background: var(--bg-dark);
+  color: var(--text);
+  padding: 2rem;
+  border-radius: var(--radius);
+  width: 600px;
+  max-width: 90%;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(255, 158, 100, 0.15);
+  animation: slideUp 0.3s ease;
 }
 
 .close-btn {
   float: right;
   font-size: 1.6rem;
   cursor: pointer;
-  color: var(--color-text-muted);
-  transition: var(--transition);
+  color: var(--text-muted);
+  transition: color 0.25s ease;
 }
 .close-btn:hover {
   color: var(--primary);
-}
-
-.modal-body {
-  margin-top: 1.2rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.8rem 1rem;
-}
-
-.info-item {
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: var(--radius);
-  padding: 0.6rem 0.8rem;
-  font-size: 0.95rem;
-}
-
-.foto-usuario {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-top: 0.6rem;
-  box-shadow: var(--shadow);
 }
 
 @keyframes slideUp {
@@ -284,44 +167,91 @@ a[class^="btn-"],
   }
 }
 
-/* === Tarjeta de Detalles del Usuario === */
+/* ======================================================
+   🧍‍♂️ FORMULARIOS DE MODAL
+   ====================================================== */
+.form-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-modal .modal-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(255, 158, 100, 0.2);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+/* ======================================================
+   🧾 MODAL DETALLES DE USUARIO
+   ====================================================== */
 .user-detail-card {
   width: 90%;
-  max-width: 620px; /* 🔹 Más ancho para mostrar todo el contenido */
-  max-height: 85vh; /* 🔹 Evita que se salga de la pantalla */
-  overflow-y: auto; /* 🔹 Scroll interno si es muy largo */
+  max-width: 620px;
+  max-height: 85vh;
+  overflow-y: auto;
   text-align: center;
-  background: linear-gradient(
-    180deg,
-    rgba(28, 30, 36, 0.96) 0%,
-    rgba(38, 40, 47, 0.98) 100%
-  );
+  background: var(--surface);
   border: 1px solid rgba(255, 158, 100, 0.15);
   padding: 2rem 2.5rem;
-  border-radius: 16px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.45);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
   animation: fadeIn 0.4s ease;
   scrollbar-width: thin;
   scrollbar-color: var(--primary) rgba(255, 255, 255, 0.05);
 }
 
-/* === Scrollbar (para navegadores WebKit) === */
+/* Scrollbar */
 .user-detail-card::-webkit-scrollbar {
   width: 8px;
-}
-.user-detail-card::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
 }
 .user-detail-card::-webkit-scrollbar-thumb {
   background: var(--primary);
   border-radius: 8px;
 }
-.user-detail-card::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-dark);
-}
 
-/* === Encabezado === */
+/* Encabezado */
 .user-header {
   display: flex;
   flex-direction: column;
@@ -362,7 +292,7 @@ a[class^="btn-"],
   box-shadow: 0 0 8px rgba(0, 255, 150, 0.2);
 }
 
-/* === Bloques de información === */
+/* Bloques de información */
 .user-info {
   display: flex;
   flex-direction: column;
@@ -404,75 +334,13 @@ a[class^="btn-"],
   font-size: 0.92rem;
 }
 
-/* === Animación === */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* === Adaptación para pantallas pequeñas === */
-@media (max-width: 600px) {
-  .user-detail-card {
-    padding: 1.5rem;
-    max-width: 95%;
-    max-height: 80vh;
-  }
-  .info-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-/* === Modal Crear Usuario === */
-.form-modal {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-}
-
-.modal-body {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem 1.2rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group label {
-  font-weight: 600;
-  color: var(--primary-dark);
-  font-size: 0.95rem;
-}
-
-.form-group input,
-.form-group select {
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: var(--radius);
-  padding: 0.6rem 0.8rem;
-  background-color: rgba(255, 255, 255, 0.9);
-  transition: var(--transition);
-}
-.form-group input:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(255, 158, 100, 0.3);
-}
-
-/* === Tabs Unificados === */
+/* ======================================================
+   🪄 TABS FUNCIONALES
+   ====================================================== */
 .tabs-container {
   margin: 20px 0 15px;
 }
+
 .tabs {
   display: flex;
   gap: 8px;
@@ -483,24 +351,30 @@ a[class^="btn-"],
   background: var(--surface);
   box-shadow: var(--shadow);
 }
+
 .tab-item {
   background: var(--bg-dark);
-  color: var(--text);
-  border: 1px solid rgba(255, 158, 100, 0.1);
+  color: var(--text-muted);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s;
 }
+
 .tab-item:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tab-item.active {
   background: var(--primary);
   color: #000;
-  transform: translateY(-2px);
-}
-.tab-item.active {
-  background: var(--accent);
-  color: #000;
-  border-color: var(--accent);
+  border-color: var(--primary);
   box-shadow: 0 0 12px rgba(255, 158, 100, 0.2);
 }
 
-/* === Tab contenido === */
 .tab-content {
   display: none;
   animation: fadeIn 0.3s ease-in-out;
@@ -508,4 +382,18 @@ a[class^="btn-"],
 }
 .tab-content.active {
   display: block;
+}
+
+/* ======================================================
+   ⚙️ ANIMACIONES
+   ====================================================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

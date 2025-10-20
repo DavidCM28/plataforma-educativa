@@ -54,11 +54,18 @@ $routes->group('admin', function ($routes) {
     $routes->get('usuarios/editar/(:num)', 'Admin\Usuarios::edit/$1');
     $routes->post('usuarios/actualizar/(:num)', 'Admin\Usuarios::update/$1');
     $routes->get('usuarios/eliminar/(:num)', 'Admin\Usuarios::delete/$1');
+    $routes->delete('usuarios/eliminar/(:num)', 'Admin\Usuarios::delete/$1');
     $routes->get('usuarios/plantilla', 'Admin\Usuarios::plantilla');
     $routes->post('usuarios/importar', 'Admin\Usuarios::importar');
     $routes->get('usuarios/descargar-credenciales', 'Admin\Usuarios::descargarCredenciales');
     $routes->get('usuarios-detalles/ver/(:num)', 'Admin\UsuariosDetalles::ver/$1');
     $routes->post('usuarios-detalles/guardar', 'Admin\UsuariosDetalles::guardar');
+    // 🔹 Nueva ruta: obtener carreras vía AJAX
+    $routes->get('usuarios/obtenerCarreras', 'Admin\Usuarios::obtenerCarreras');
+
+    // 🔹 Nuevas rutas: descargar plantillas de Excel
+    $routes->get('usuarios/plantilla-alumnos', 'Admin\Usuarios::plantillaAlumnos');
+    $routes->get('usuarios/plantilla-empleados', 'Admin\Usuarios::plantillaEmpleados');
 });
 
 // Módulo de gestión de Carreras
@@ -101,28 +108,38 @@ $routes->group('admin/grupos', ['namespace' => 'App\Controllers\Admin'], functio
 });
 
 // Módulo de Asignaciones
+// ===============================================
+// DOCENTES (materia ↔ grupo ↔ profesor)
+// ===============================================
 $routes->group('admin/asignaciones', ['namespace' => 'App\Controllers\Admin'], static function ($routes) {
     $routes->get('/', 'AsignacionesController::index');
     $routes->post('asignar-profesor', 'AsignacionesController::asignarProfesor');
-    $routes->get('detalle/(:num)', 'AsignacionesController::detalle/$1');
     $routes->post('actualizar/(:num)', 'AsignacionesController::actualizarAsignacion/$1');
+    $routes->get('detalle/(:num)', 'AsignacionesController::detalle/$1');
     $routes->get('eliminar-profesor/(:num)', 'AsignacionesController::eliminarProfesor/$1');
-
-    $routes->post('eliminar-frecuencia/(:num)', 'AsignacionesController::eliminarFrecuencia/$1');
-    $routes->post('actualizar-frecuencia/(:num)', 'AsignacionesController::actualizarFrecuencia/$1');
-
+    $routes->get('materias-por-grupo/(:num)', 'AsignacionesController::materiasPorGrupo/$1');
     $routes->get('horario-grupo/(:num)', 'AsignacionesController::horarioGrupo/$1');
     $routes->get('frecuencias-restantes/(:num)/(:num)', 'AsignacionesController::frecuenciasRestantes/$1/$2');
-
-    $routes->get('materias-por-grupo/(:num)', 'AsignacionesController::materiasPorGrupo/$1');
-    $routes->get('materias-grupo/(:num)', 'AsignacionesController::materiasPorGrupo/$1');
-
-    $routes->post('asignar-alumno', 'AsignacionesController::asignarAlumno');
-    $routes->get('eliminar-alumno/(:num)', 'AsignacionesController::eliminarAlumno/$1');
-
-    $routes->get('alumnos-por-carrera/(:num)', 'AsignacionesController::alumnosPorCarrera/$1');
-    $routes->post('vincular-alumno-carrera', 'AsignacionesController::vincularAlumnoCarrera');
+    $routes->post('eliminar-frecuencia/(:num)', 'AsignacionesController::eliminarFrecuencia/$1');
+    $routes->post('actualizar-frecuencia/(:num)', 'AsignacionesController::actualizarFrecuencia/$1');
 });
+
+// ===============================================
+// ALUMNOS (carrera ↔ grupo ↔ alumno)
+// ===============================================
+$routes->group('admin/asignaciones-alumnos', ['namespace' => 'App\Controllers\Admin'], static function ($routes) {
+    $routes->get('/', 'AsignacionesAlumnosController::index');
+    $routes->post('vincular-alumno-carrera', 'AsignacionesAlumnosController::vincularAlumnoCarrera');
+    $routes->post('asignar-alumno', 'AsignacionesAlumnosController::asignarAlumno');
+    $routes->get('eliminar-alumno/(:num)', 'AsignacionesAlumnosController::eliminarAlumno/$1');
+    $routes->get('alumnos-por-carrera/(:num)', 'AsignacionesAlumnosController::alumnosPorCarrera/$1');
+    $routes->get('buscar-alumno', 'AsignacionesAlumnosController::buscarAlumno');
+    $routes->post('promover-grupo/(:num)', 'AsignacionesAlumnosController::promoverGrupo/$1');
+    $routes->get('alumnos-inscritos/(:num)', 'AsignacionesAlumnosController::alumnosInscritos/$1');
+    $routes->get('grupos-por-carrera/(:num)', 'AsignacionesAlumnosController::gruposPorCarrera/$1');
+
+});
+
 
 
 // Módulo de Configuración de Ciclos

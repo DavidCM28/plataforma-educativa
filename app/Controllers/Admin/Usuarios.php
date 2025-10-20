@@ -5,6 +5,8 @@ namespace App\Controllers\Admin;
 use App\Controllers\BaseController;
 use App\Models\UsuarioModel;
 use App\Models\RolModel;
+use App\Models\CarreraModel;
+use App\Models\AlumnoCarreraModel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
@@ -16,6 +18,7 @@ class Usuarios extends BaseController
     {
         $usuarioModel = new UsuarioModel();
         $rolModel = new RolModel();
+        $carreraModel = new CarreraModel();
 
         $usuarios = $usuarioModel
             ->select('usuarios.*, roles.nombre AS rol')
@@ -23,18 +26,23 @@ class Usuarios extends BaseController
             ->findAll();
 
         $roles = $rolModel->findAll();
+        $carreras = $carreraModel->where('activo', 1)->orderBy('nombre', 'ASC')->findAll();
 
         return view('lms/admin/usuarios/index', [
             'title' => 'Gestión de Usuarios',
             'usuarios' => $usuarios,
-            'roles' => $roles
+            'roles' => $roles,
+            'carreras' => $carreras
         ]);
     }
 
+    // ✅ Crear usuario y si es alumno, vincular a carrera + generar Excel de credenciales
     public function store()
     {
-        $model = new UsuarioModel();
+        $usuarioModel = new UsuarioModel();
         $rolModel = new RolModel();
+        $alumnoCarreraModel = new AlumnoCarreraModel();
+        $carreraModel = new CarreraModel();
 
         $rolId = $this->request->getPost('rol_id');
         $rol = $rolModel->find($rolId);
@@ -43,40 +51,36 @@ class Usuarios extends BaseController
         $nombres = trim($this->request->getPost('nombres'));
         $apellidoPaterno = trim($this->request->getPost('apellido_paterno'));
         $apellidoMaterno = trim($this->request->getPost('apellido_materno'));
+        $carreraId = $this->request->getPost('carrera_id');
 
-        // Generar contraseña temporal
+        // 🔑 Contraseña temporal
         $passwordPlano = substr(str_shuffle('ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'), 0, 8);
         $passwordHash = password_hash($passwordPlano, PASSWORD_BCRYPT);
 
-        // Generar matrícula o número de empleado (buscando el más alto existente)
+        // 🔢 Generar matrícula o número de empleado
         $matricula = null;
         $numEmpleado = null;
 
         if (strpos($rolNombre, 'alumno') !== false) {
-            $ultimo = $model->select('matricula')
+            $ultimo = $usuarioModel->select('matricula')
                 ->where('matricula IS NOT NULL')
                 ->orderBy('CAST(matricula AS UNSIGNED) DESC')
                 ->first();
-
-            $ultimoNumero = $ultimo ? intval($ultimo['matricula']) : 0;
-            $nuevoNumero = $ultimoNumero + 1;
+            $nuevoNumero = $ultimo ? intval($ultimo['matricula']) + 1 : 1;
             $matricula = str_pad($nuevoNumero, 6, '0', STR_PAD_LEFT);
         } else {
-            $ultimo = $model->select('num_empleado')
+            $ultimo = $usuarioModel->select('num_empleado')
                 ->where('num_empleado IS NOT NULL')
                 ->orderBy('CAST(num_empleado AS UNSIGNED) DESC')
                 ->first();
-
-            $ultimoNumero = $ultimo ? intval($ultimo['num_empleado']) : 0;
-            $nuevoNumero = $ultimoNumero + 1;
+            $nuevoNumero = $ultimo ? intval($ultimo['num_empleado']) + 1 : 1;
             $numEmpleado = str_pad($nuevoNumero, 5, '0', STR_PAD_LEFT);
         }
 
+        $email = ($matricula ?? $numEmpleado) . '@utmontemorelos.edu.mx';
 
-        $dominio = "@utmontemorelos.edu.mx";
-        $email = ($matricula ?? $numEmpleado) . $dominio;
-
-        $data = [
+        // 💾 Insertar usuario
+        $usuarioId = $usuarioModel->insert([
             'nombre' => $nombres,
             'apellido_paterno' => $apellidoPaterno,
             'apellido_materno' => $apellidoMaterno,
@@ -88,119 +92,55 @@ class Usuarios extends BaseController
             'activo' => 1,
             'verificado' => 1,
             'created_at' => date('Y-m-d H:i:s')
-        ];
-
-        $model->insert($data);
-
-        return $this->response->setJSON([
-            'success' => true,
-            'email' => $email,
-            'password' => $passwordPlano,
-            'matricula' => $matricula,
-            'num_empleado' => $numEmpleado
         ]);
-    }
 
-    public function update($id)
-    {
-        $model = new UsuarioModel();
-        $data = $this->request->getPost();
-
-        if (empty($data['password'])) {
-            unset($data['password']);
-        } else {
-            $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
-        }
-
-        $model->update($id, $data);
-
-        return $this->response->setJSON(['success' => true]);
-    }
-
-    public function delete($id)
-    {
-        $model = new UsuarioModel();
-        $usuario = $model->find($id);
-
-        if (!$usuario) {
-            return $this->response->setStatusCode(404)->setJSON([
-                'success' => false,
-                'message' => 'Usuario no encontrado.'
+        // 👨‍🎓 Si es alumno, vincular a carrera
+        $carreraNombre = null;
+        if (strpos($rolNombre, 'alumno') !== false && $carreraId) {
+            $alumnoCarreraModel->insert([
+                'alumno_id' => $usuarioId,
+                'carrera_id' => $carreraId,
+                'fecha_registro' => date('Y-m-d'),
+                'estatus' => 'Activo'
             ]);
+            $carrera = $carreraModel->find($carreraId);
+            $carreraNombre = $carrera ? $carrera['nombre'] : null;
         }
 
-        // 🔥 Eliminación física
-        $model->where('id', $id)->delete();
-
-        return $this->response->setJSON([
-            'success' => true,
-            'message' => 'Usuario eliminado definitivamente.'
-        ]);
-    }
-
-    public function detalle($id)
-    {
-        $model = new UsuarioModel();
-
-        $usuario = $model
-            ->select('usuarios.*, roles.nombre AS rol, roles.id AS rol_id')
-            ->join('roles', 'roles.id = usuarios.rol_id', 'left')
-            ->where('usuarios.id', $id)
-            ->first();
-
-        if (!$usuario) {
-            return $this->response->setStatusCode(404)->setJSON([
-                'error' => true,
-                'message' => 'Usuario no encontrado'
-            ]);
-        }
-
-        return $this->response->setJSON($usuario);
-    }
-
-    // 📥 Plantilla Excel
-    public function plantilla()
-    {
-        $roles = (new RolModel())
-            ->select('nombre')
-            ->orderBy('nombre', 'ASC')
-            ->findAll();
-
+        // 📄 Generar Excel con credenciales
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Usuarios');
-        $headers = ['nombres', 'apellido_paterno', 'apellido_materno', 'rol'];
-        $sheet->fromArray([$headers], null, 'A1');
-        $sheet->getStyle('A1:D1')->getFont()->setBold(true);
+        $sheet->setTitle('Credenciales');
 
-        foreach (range('A', 'D') as $col) {
+        $headers = ['Nombre completo', 'Correo', 'Contraseña', 'Matrícula / Empleado', 'Rol', 'Carrera'];
+        $sheet->fromArray([$headers], null, 'A1');
+
+        $nombreCompleto = "{$nombres} {$apellidoPaterno} {$apellidoMaterno}";
+        $sheet->fromArray([
+            [
+                $nombreCompleto,
+                $email,
+                $passwordPlano,
+                $matricula ?? $numEmpleado,
+                ucfirst($rolNombre),
+                $carreraNombre
+            ]
+        ], null, 'A2');
+
+        $sheet->getStyle('A1:F1')->getFont()->setBold(true);
+        foreach (range('A', 'F') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
-        $catalog = $spreadsheet->createSheet();
-        $catalog->setTitle('Catálogos');
-        $catalog->setCellValue('A1', 'Roles');
-        $r = 2;
-        foreach ($roles as $rol) {
-            $catalog->setCellValue("A{$r}", $rol['nombre']);
-            $r++;
-        }
-
-        $spreadsheet->getSheetByName('Catálogos')
-            ->setSheetState(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::SHEETSTATE_HIDDEN);
-
         $writer = new Xlsx($spreadsheet);
-        ob_start();
-        $writer->save('php://output');
-        $excel = ob_get_clean();
+        $filename = 'credenciales_' . date('Ymd_His') . '.xlsx';
+        $tempPath = WRITEPATH . 'uploads/' . $filename;
+        $writer->save($tempPath);
 
-        return $this->response
-            ->setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-            ->setHeader('Content-Disposition', 'attachment; filename="plantilla_usuarios.xlsx"')
-            ->setBody($excel);
+        return $this->response->download($tempPath, null)->setFileName($filename);
     }
 
-    // 📤 Importar Excel
+    // ✅ Importar usuarios desde Excel (alumnos y empleados)
     public function importar()
     {
         helper('text');
@@ -212,17 +152,24 @@ class Usuarios extends BaseController
 
         $spreadsheet = IOFactory::load($file->getTempName());
         $sheet = $spreadsheet->getActiveSheet();
-
         $highestRow = $sheet->getHighestRow();
         $rows = $sheet->rangeToArray("A2:D{$highestRow}", null, true, true, true);
 
         $usuarioModel = new UsuarioModel();
         $rolModel = new RolModel();
-        $roles = $rolModel->findAll();
+        $carreraModel = new CarreraModel();
+        $alumnoCarreraModel = new AlumnoCarreraModel();
 
+        $roles = $rolModel->findAll();
         $rolesMap = [];
         foreach ($roles as $r) {
             $rolesMap[strtolower(trim($r['nombre']))] = $r['id'];
+        }
+
+        $carreras = $carreraModel->findAll();
+        $carrerasMap = [];
+        foreach ($carreras as $c) {
+            $carrerasMap[strtolower(trim($c['nombre']))] = $c['id'];
         }
 
         $ultimoAlumno = $usuarioModel->select('matricula')
@@ -238,22 +185,30 @@ class Usuarios extends BaseController
         $contadorEmpleado = $ultimoEmpleado ? intval($ultimoEmpleado['num_empleado']) : 0;
 
         $report = [];
-        $errores = [];
-        $importados = 0;
 
-        foreach ($rows as $index => $row) {
+        foreach ($rows as $row) {
             $nombre = trim($row['A']);
             $apPat = trim($row['B']);
             $apMat = trim($row['C']);
-            $rolNombre = strtolower(trim($row['D']));
+            $campo4 = trim($row['D']); // puede ser rol o carrera
 
-            if (!$nombre || !$apPat || !$rolNombre)
-                continue;
-            if (!isset($rolesMap[$rolNombre]))
+            if (!$nombre || !$apPat || !$campo4)
                 continue;
 
-            $rolId = $rolesMap[$rolNombre];
-            $isAlumno = strpos($rolNombre, 'alumno') !== false;
+            // Verificar si corresponde a alumno o empleado
+            $esCarrera = isset($carrerasMap[strtolower($campo4)]);
+            $isAlumno = $esCarrera;
+
+            if ($isAlumno) {
+                $rolId = $rolesMap['alumno'] ?? null;
+                $carreraId = $carrerasMap[strtolower($campo4)] ?? null;
+            } else {
+                $rolId = $rolesMap[strtolower($campo4)] ?? null;
+                $carreraId = null;
+            }
+
+            if (!$rolId)
+                continue;
 
             $passwordPlano = substr(str_shuffle('ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'), 0, 8);
             $passwordHash = password_hash($passwordPlano, PASSWORD_BCRYPT);
@@ -266,8 +221,8 @@ class Usuarios extends BaseController
             } else {
                 $contadorEmpleado++;
                 $codigo = str_pad($contadorEmpleado, 5, '0', STR_PAD_LEFT);
-                $matricula = null;
                 $numEmpleado = $codigo;
+                $matricula = null;
             }
 
             $email = ($matricula ?? $numEmpleado) . '@utmontemorelos.edu.mx';
@@ -286,53 +241,272 @@ class Usuarios extends BaseController
                 'created_at' => date('Y-m-d H:i:s')
             ];
 
-            try {
-                $usuarioModel->insert($data);
-                $importados++;
+            $id = $usuarioModel->insert($data);
 
-                $report[] = [
-                    'nombre' => "{$nombre} {$apPat}",
-                    'rol' => ucfirst($rolNombre),
-                    'codigo' => $codigo,
-                    'email' => $email,
-                    'password' => $passwordPlano
-                ];
-            } catch (\Exception $e) {
-                $errores[] = "Fila " . ($index + 2) . ": " . $e->getMessage();
+            if ($isAlumno && $carreraId) {
+                $alumnoCarreraModel->insert([
+                    'alumno_id' => $id,
+                    'carrera_id' => $carreraId,
+                    'fecha_registro' => date('Y-m-d'),
+                    'estatus' => 'Activo'
+                ]);
             }
+
+            $report[] = [
+                'nombre' => "{$nombre} {$apPat} {$apMat}",
+                'correo' => $email,
+                'password' => $passwordPlano,
+                'codigo' => $codigo,
+                'rol' => $isAlumno ? 'Alumno' : ucfirst($campo4),
+                'carrera' => $isAlumno ? $campo4 : '-'
+            ];
         }
 
-        session()->setFlashdata('import_report', json_encode($report));
+        // 🔹 Generar Excel con credenciales importadas
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Credenciales');
 
-        $msg = "{$importados} usuarios importados correctamente.";
-        if ($errores) {
-            $msg .= "<br>Errores:<br>" . implode('<br>', $errores);
+        $headers = ['Nombre', 'Rol', 'Código', 'Correo', 'Contraseña', 'Carrera'];
+        $sheet->fromArray([$headers], null, 'A1');
+        $sheet->getStyle('A1:F1')->getFont()->setBold(true);
+
+        $row = 2;
+        foreach ($report as $r) {
+            $sheet->fromArray([
+                [
+                    $r['nombre'],
+                    $r['rol'],
+                    $r['codigo'],
+                    $r['correo'],
+                    $r['password'],
+                    $r['carrera']
+                ]
+            ], null, "A{$row}");
+            $row++;
         }
 
-        return redirect()->back()->with('success', $msg);
+        foreach (range('A', 'F') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'credenciales_importadas_' . date('Ymd_His') . '.xlsx';
+        $tempPath = WRITEPATH . 'uploads/' . $filename;
+        $writer->save($tempPath);
+
+        return $this->response->download($tempPath, null)->setFileName($filename);
     }
 
-    public function descargarCredenciales()
+    // ✅ Listado simple de carreras (para autocompletar / AJAX)
+    public function obtenerCarreras()
     {
-        $reporte = session()->getFlashdata('import_report');
-        if (!$reporte) {
-            return redirect()->back()->with('error', 'No hay credenciales disponibles.');
-        }
+        $carreras = (new CarreraModel())
+            ->select('id, nombre')
+            ->where('activo', 1)
+            ->orderBy('nombre', 'ASC')
+            ->findAll();
 
-        $datos = json_decode($reporte, true);
-        $filename = 'credenciales_' . date('Ymd_His') . '.csv';
-
-        $f = fopen('php://memory', 'w');
-        fputcsv($f, ['Nombre', 'Rol', 'Código', 'Correo', 'Contraseña'], ',');
-
-        foreach ($datos as $d) {
-            fputcsv($f, [$d['nombre'], $d['rol'], $d['codigo'], $d['email'], $d['password']], ',');
-        }
-
-        fseek($f, 0);
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="' . $filename . '";');
-        fpassthru($f);
-        exit;
+        return $this->response->setJSON($carreras);
     }
+
+    // =======================================================
+// 📄 DESCARGA PLANTILLA DE ALUMNOS
+// =======================================================
+    public function plantillaAlumnos()
+    {
+        $carreraModel = new CarreraModel();
+        $rolModel = new RolModel();
+
+        // 🔹 Obtener el rol de alumno
+        $rolAlumno = $rolModel->where('LOWER(nombre)', 'alumno')->first();
+
+        // 🔹 Obtener todas las carreras activas
+        $carreras = $carreraModel->select('nombre')->where('activo', 1)->orderBy('nombre', 'ASC')->findAll();
+
+        $spreadsheet = new Spreadsheet();
+
+        // 🧾 Hoja principal
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Alumnos');
+        $headers = ['Nombres', 'Apellido paterno', 'Apellido materno', 'Carrera', 'Rol'];
+        $sheet->fromArray([$headers], null, 'A1');
+        $sheet->getStyle('A1:E1')->getFont()->setBold(true);
+
+        // Ejemplo de fila guía
+        $sheet->fromArray(
+            [['Juan', 'Pérez', 'López', $carreras[0]['nombre'] ?? 'Ejemplo Carrera', $rolAlumno['nombre'] ?? 'Alumno']],
+            null,
+            'A2'
+        );
+
+        foreach (range('A', 'E') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // 🧭 Crear hoja oculta de catálogos
+        $catalogSheet = $spreadsheet->createSheet();
+        $catalogSheet->setTitle('Catálogos');
+
+        $catalogSheet->setCellValue('A1', 'Carreras');
+        $row = 2;
+        foreach ($carreras as $c) {
+            $catalogSheet->setCellValue("A{$row}", $c['nombre']);
+            $row++;
+        }
+
+        $catalogSheet->setCellValue('C1', 'Roles');
+        $catalogSheet->setCellValue('C2', $rolAlumno['nombre'] ?? 'Alumno');
+
+        // 🧩 Validación para columna "Carrera"
+        $validationCarrera = $sheet->getCell('D2')->getDataValidation();
+        $validationCarrera->setType(DataValidation::TYPE_LIST);
+        $validationCarrera->setErrorStyle(DataValidation::STYLE_STOP);
+        $validationCarrera->setAllowBlank(false);
+        $validationCarrera->setShowDropDown(true);
+        $validationCarrera->setFormula1('=Catálogos!$A$2:$A$' . ($row - 1));
+
+        // 🧩 Validación para columna "Rol"
+        $validationRol = $sheet->getCell('E2')->getDataValidation();
+        $validationRol->setType(DataValidation::TYPE_LIST);
+        $validationRol->setErrorStyle(DataValidation::STYLE_STOP);
+        $validationRol->setAllowBlank(false);
+        $validationRol->setShowDropDown(true);
+        $validationRol->setFormula1('=Catálogos!$C$2:$C$2');
+
+        // Ocultar hoja de catálogos
+        $catalogSheet->setSheetState(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::SHEETSTATE_HIDDEN);
+
+        // 📤 Exportar Excel
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'plantilla_alumnos_' . date('Ymd_His') . '.xlsx';
+        $tempPath = WRITEPATH . 'uploads/' . $filename;
+        $writer->save($tempPath);
+
+        return $this->response->download($tempPath, null)->setFileName($filename);
+    }
+
+
+
+    // =======================================================
+// 📄 DESCARGA PLANTILLA DE EMPLEADOS (profesores y escolares)
+// =======================================================
+    public function plantillaEmpleados()
+    {
+        $rolModel = new RolModel();
+
+        // 🔹 Obtener roles relevantes
+        $roles = $rolModel
+            ->select('nombre')
+            ->whereIn('LOWER(nombre)', ['profesor', 'escolares', 'administrativo'])
+            ->orderBy('nombre', 'ASC')
+            ->findAll();
+
+        $spreadsheet = new Spreadsheet();
+
+        // 🧾 Hoja principal
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Empleados');
+        $headers = ['Nombres', 'Apellido paterno', 'Apellido materno', 'Rol'];
+        $sheet->fromArray([$headers], null, 'A1');
+        $sheet->getStyle('A1:D1')->getFont()->setBold(true);
+
+        // Ejemplo de fila guía
+        $sheet->fromArray(
+            [['María', 'García', 'Reyes', $roles[0]['nombre'] ?? 'Profesor']],
+            null,
+            'A2'
+        );
+
+        foreach (range('A', 'D') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // 🧭 Crear hoja oculta de roles
+        $catalogSheet = $spreadsheet->createSheet();
+        $catalogSheet->setTitle('Catálogos');
+        $catalogSheet->setCellValue('A1', 'Roles');
+
+        $row = 2;
+        foreach ($roles as $r) {
+            $catalogSheet->setCellValue("A{$row}", $r['nombre']);
+            $row++;
+        }
+
+        // 🧩 Validación para columna "Rol"
+        $validation = $sheet->getCell('D2')->getDataValidation();
+        $validation->setType(DataValidation::TYPE_LIST);
+        $validation->setErrorStyle(DataValidation::STYLE_STOP);
+        $validation->setAllowBlank(false);
+        $validation->setShowDropDown(true);
+        $validation->setFormula1('=Catálogos!$A$2:$A$' . ($row - 1));
+
+        // Ocultar hoja de catálogos
+        $catalogSheet->setSheetState(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::SHEETSTATE_HIDDEN);
+
+        // 📤 Exportar Excel
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'plantilla_empleados_' . date('Ymd_His') . '.xlsx';
+        $tempPath = WRITEPATH . 'uploads/' . $filename;
+        $writer->save($tempPath);
+
+        return $this->response->download($tempPath, null)->setFileName($filename);
+    }
+
+    public function detalle($id)
+    {
+        $usuarioModel = new UsuarioModel();
+
+        $usuario = $usuarioModel
+            ->select('
+            usuarios.*,
+            roles.nombre AS rol,
+            carreras.nombre AS carrera
+        ')
+            ->join('roles', 'roles.id = usuarios.rol_id', 'left')
+            ->join('alumno_carrera', 'alumno_carrera.alumno_id = usuarios.id', 'left')
+            ->join('carreras', 'carreras.id = alumno_carrera.carrera_id', 'left')
+            ->where('usuarios.id', $id)
+            ->first();
+
+        if (!$usuario) {
+            return $this->response
+                ->setStatusCode(404)
+                ->setJSON(['error' => 'Usuario no encontrado']);
+        }
+
+        return $this->response->setJSON($usuario);
+    }
+
+    // =======================================================
+// 🗑️ ELIMINAR USUARIO
+// =======================================================
+    public function delete($id)
+    {
+        $usuarioModel = new UsuarioModel();
+        $alumnoCarreraModel = new AlumnoCarreraModel();
+
+        // Verificar si el usuario existe
+        $usuario = $usuarioModel->find($id);
+        if (!$usuario) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'success' => false,
+                'message' => 'Usuario no encontrado'
+            ]);
+        }
+
+        // Eliminar relación en alumno_carrera si existe
+        $alumnoCarreraModel->where('alumno_id', $id)->delete();
+
+        // Eliminar usuario
+        $usuarioModel->delete($id);
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'Usuario eliminado correctamente'
+        ]);
+    }
+
+
 }
+
