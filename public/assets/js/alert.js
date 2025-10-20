@@ -29,18 +29,20 @@ function mostrarAlerta(mensaje, tipo = "info", duracion = 3000) {
   }, duracion);
 }
 
-/* 🔸 Modal de confirmación */
+/* 🔸 Modal de confirmación (actualizado y compatible con CSS) */
 function mostrarConfirmacion(titulo, mensaje, onAceptar, onCancelar) {
   const modal = document.getElementById("confirmModal");
   if (!modal) return console.warn("No se encontró #confirmModal");
 
-  document.getElementById("confirmTitle").textContent = titulo;
-  document.getElementById("confirmMessage").textContent = mensaje;
+  // Mostrar contenido
+  document.getElementById("confirmTitle").innerHTML = titulo;
+  document.getElementById("confirmMessage").innerHTML = mensaje;
   modal.classList.remove("hidden");
 
-  const btnAceptar = document.getElementById("btnAceptar");
-  const btnCancelar = document.getElementById("btnCancelar");
+  const btnAceptar = document.getElementById("confirmAceptar");
+  const btnCancelar = document.getElementById("confirmCancelar");
 
+  // Cierre modal
   const cerrar = () => modal.classList.add("hidden");
 
   btnAceptar.onclick = () => {
@@ -51,6 +53,11 @@ function mostrarConfirmacion(titulo, mensaje, onAceptar, onCancelar) {
   btnCancelar.onclick = () => {
     cerrar();
     if (onCancelar) onCancelar();
+  };
+
+  // Cerrar con clic fuera del modal
+  modal.onclick = (e) => {
+    if (e.target === modal) cerrar();
   };
 }
 

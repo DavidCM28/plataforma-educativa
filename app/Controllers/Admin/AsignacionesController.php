@@ -12,7 +12,7 @@ use App\Models\CicloAcademicoModel;
 use App\Models\PlanMateriaModel;
 use App\Models\PlanEstudioModel;
 use App\Models\CarreraGrupoModel;
-
+use App\Models\AlumnoCarreraModel;
 
 class AsignacionesController extends BaseController
 {
@@ -25,6 +25,7 @@ class AsignacionesController extends BaseController
     protected $planModel;
     protected $planMateriaModel;
     protected $carreraGrupoModel;
+    protected $alumnoCarreraModel;
     protected $db;
 
     public function __construct()
@@ -38,7 +39,7 @@ class AsignacionesController extends BaseController
         $this->planModel = new PlanEstudioModel();
         $this->planMateriaModel = new PlanMateriaModel();
         $this->carreraGrupoModel = new CarreraGrupoModel();
-
+        $this->alumnoCarreraModel = new AlumnoCarreraModel();
         $this->db = \Config\Database::connect();
     }
 
@@ -47,276 +48,353 @@ class AsignacionesController extends BaseController
        ========================================================= */
     public function index()
     {
-        $data = [
-            'grupos' => $this->carreraGrupoModel->obtenerGruposCompletos(),
-            'materias' => $this->materiaModel->where('activo', 1)->orderBy('nombre', 'ASC')->findAll(),
-            'profesores' => $this->usuarioModel->where('rol_id', 3)->orderBy('nombre', 'ASC')->findAll(),
-            'alumnos' => $this->usuarioModel->where('rol_id', 4)->orderBy('nombre', 'ASC')->findAll(),
-            'ciclos' => $this->cicloModel->orderBy('id', 'DESC')->findAll(),
-            'inscripciones' => $this->grupoAlumnoModel
-                ->select('grupo_alumno.*, grupos.nombre as grupo, usuarios.nombre as alumno')
-                ->join('grupos', 'grupos.id = grupo_alumno.grupo_id')
-                ->join('usuarios', 'usuarios.id = grupo_alumno.alumno_id')
-                ->findAll(),
-        ];
+        $grupos = $this->carreraGrupoModel->obtenerGruposCompletos();
+        $materias = $this->materiaModel->where('activo', 1)->orderBy('nombre', 'ASC')->findAll();
+        $profesores = $this->usuarioModel->where('rol_id', 3)->orderBy('nombre', 'ASC')->findAll();
+        $alumnos = $this->usuarioModel->select('id, nombre')->where('rol_id', 4)->orderBy('nombre', 'ASC')->findAll();
+        $carreras = $this->db->table('carreras')->select('id, nombre')->where('activo', 1)->orderBy('nombre', 'ASC')->get()->getResultArray();
+        $vinculos = $this->alumnoCarreraModel
+            ->select('alumno_carrera.id, usuarios.nombre AS alumno, carreras.nombre AS carrera, alumno_carrera.estatus')
+            ->join('usuarios', 'usuarios.id = alumno_carrera.alumno_id')
+            ->join('carreras', 'carreras.id = alumno_carrera.carrera_id')
+            ->orderBy('usuarios.nombre', 'ASC')
+            ->findAll();
+        $ciclos = $this->cicloModel->orderBy('id', 'DESC')->findAll();
+        $inscripciones = $this->grupoAlumnoModel
+            ->select('grupo_alumno.*, grupos.nombre as grupo, usuarios.nombre as alumno')
+            ->join('grupos', 'grupos.id = grupo_alumno.grupo_id')
+            ->join('usuarios', 'usuarios.id = grupo_alumno.alumno_id')
+            ->findAll();
 
-        return view('lms/admin/asignaciones/index', $data);
+        return view('lms/admin/asignaciones/index', compact(
+            'grupos',
+            'materias',
+            'profesores',
+            'alumnos',
+            'carreras',
+            'vinculos',
+            'ciclos',
+            'inscripciones'
+        ));
     }
 
-
     /* =========================================================
-       👨‍🏫 Asignar profesor a materia-grupo con validación de choques
+       👨‍🏫 Asignar profesor a materia-grupo
        ========================================================= */
     public function asignarProfesor()
     {
-        $grupoId = $this->request->getPost('grupo_id');
-        $materiaId = $this->request->getPost('materia_id');
-        $profesorId = $this->request->getPost('profesor_id');
-        $ciclo = $this->request->getPost('ciclo');
-        $aula = $this->request->getPost('aula');
-        $dias = $this->request->getPost('dias') ?? [];
-        $horaInicio = $this->request->getPost('hora_inicio');
-        $horaFin = $this->request->getPost('hora_fin');
+        $post = $this->request->getPost();
+        $grupo_id = $post['grupo_id'] ?? null;
+        $materia_id = $post['materia_id'] ?? null;
+        $profesor_id = $post['profesor_id'] ?? null;
+        $aula = $post['aula'] ?? null;
+        $ciclo_id = $post['ciclo_id'] ?? null;
 
-        if (!$grupoId || !$materiaId || !$profesorId || !$horaInicio || !$horaFin) {
+        $ciclo_nombre = null;
+        if ($ciclo_id) {
+            $ciclo = $this->cicloModel->find($ciclo_id);
+            $ciclo_nombre = $ciclo['nombre'] ?? null;
+        }
+
+        if (!$grupo_id || !$materia_id || !$profesor_id) {
+            return $this->response->setJSON(['ok' => false, 'msg' => 'Faltan datos (grupo, materia o profesor).']);
+        }
+
+        $horarios = json_decode($post['horarios_json'] ?? '[]', true);
+        if (!$horarios || !is_array($horarios) || empty($horarios)) {
+            return $this->response->setJSON(['ok' => false, 'msg' => 'Selecciona al menos un bloque de horario.']);
+        }
+
+        $materia = $this->materiaModel->find($materia_id);
+        if (!$materia) {
+            return $this->response->setJSON(['ok' => false, 'msg' => '❌ Materia no encontrada.']);
+        }
+
+        $frecuenciasRequeridas = (int) $materia['horas_semana'];
+        $bloquesSeleccionados = array_sum(array_map('count', $horarios));
+
+        $asignacionesPrevias = $this->grupoMateriaProfesorModel
+            ->where('grupo_id', $grupo_id)
+            ->where('materia_id', $materia_id)
+            ->findAll();
+
+        $bloquesPrevios = 0;
+        foreach ($asignacionesPrevias as $asig) {
+            $bloquesPrevios += count(explode(';', $asig['horario']));
+        }
+
+        $totalBloques = $bloquesPrevios + $bloquesSeleccionados;
+        $restantes = $frecuenciasRequeridas - $totalBloques;
+
+        if ($totalBloques > $frecuenciasRequeridas) {
             return $this->response->setJSON([
                 'ok' => false,
-                'msg' => '⚠️ Todos los campos son obligatorios.'
+                'msg' => "⚠️ La materia «{$materia['nombre']}» solo requiere $frecuenciasRequeridas frecuencias por semana."
             ]);
         }
 
-        // Generar string de horario (ej. "LMX 07:30-09:10")
-        $nuevoRango = implode('', $dias) . ' ' . $horaInicio . '-' . $horaFin;
+        $bloquesTexto = [];
+        foreach ($horarios as $dia => $horas) {
+            sort($horas);
+            foreach ($horas as $hInicio) {
+                $hFin = $this->calcularFin($hInicio);
+                $inicioMin = $this->horaToMinutos($hInicio);
+                $finMin = $this->horaToMinutos($hFin);
 
-        // Verificar si ya existe una asignación para ese grupo/materia/profesor
-        $asignacionExistente = $this->grupoMateriaProfesorModel
-            ->where('grupo_id', $grupoId)
-            ->where('materia_id', $materiaId)
-            ->where('profesor_id', $profesorId)
-            ->first();
+                if ($conf = $this->hayChoqueHorario($grupo_id, [$dia], $inicioMin, $finMin, 'grupo'))
+                    return $this->response->setJSON(['ok' => false, 'msg' => "⚠️ Choque con GRUPO: $conf el día $dia"]);
+                if ($conf = $this->hayChoqueHorario($profesor_id, [$dia], $inicioMin, $finMin, 'profesor'))
+                    return $this->response->setJSON(['ok' => false, 'msg' => "⚠️ Choque con PROFESOR: $conf el día $dia"]);
 
-        if ($asignacionExistente) {
-            // Agregar nuevo rango al final del horario existente
-            $horarioActual = trim($asignacionExistente['horario']);
-            $bloques = array_map('trim', explode(';', $horarioActual));
-
-            // Evitar duplicados exactos
-            if (!in_array($nuevoRango, $bloques)) {
-                $horarioStr = $horarioActual . '; ' . $nuevoRango;
-                $this->grupoMateriaProfesorModel->update($asignacionExistente['id'], [
-                    'horario' => $horarioStr,
-                ]);
+                $bloquesTexto[] = "{$dia} {$hInicio}-{$hFin}";
             }
-
-            $asignacionId = $asignacionExistente['id'];
-        } else {
-            // Crear nueva asignación
-            $this->grupoMateriaProfesorModel->insert([
-                'grupo_id' => $grupoId,
-                'materia_id' => $materiaId,
-                'profesor_id' => $profesorId,
-                'ciclo' => $ciclo,
-                'aula' => $aula,
-                'horario' => $nuevoRango,
-            ]);
-
-            $asignacionId = $this->grupoMateriaProfesorModel->getInsertID();
         }
 
-        // Vincular alumnos del grupo (solo si es nueva asignación)
-        $alumnos = $this->grupoAlumnoModel->where('grupo_id', $grupoId)->findAll();
-        foreach ($alumnos as $alumno) {
-            $this->db->table('materia_grupo_alumno')->insert([
-                'grupo_materia_profesor_id' => $asignacionId,
-                'grupo_alumno_id' => $alumno['id'],
-                'calificacion_final' => null,
-                'asistencia' => 0,
-            ]);
-        }
-
-        return $this->response->setJSON([
-            'ok' => true,
-            'msg' => '✅ Profesor asignado correctamente. Se agregó el horario sin duplicar.'
+        $this->grupoMateriaProfesorModel->insert([
+            'grupo_id' => $grupo_id,
+            'materia_id' => $materia_id,
+            'profesor_id' => $profesor_id,
+            'horario' => implode('; ', $bloquesTexto),
+            'aula' => $aula,
+            'ciclo_id' => $ciclo_id,
+            'ciclo' => $ciclo_nombre,
         ]);
-    }
 
-
-    /* =========================================================
-       🧮 Función auxiliar: convertir hora ("HH:MM") → minutos
-       ========================================================= */
-    private function horaToMinutos(string $hora): int
-    {
-        [$h, $m] = explode(':', $hora);
-        return (int) $h * 60 + (int) $m;
+        return $this->response->setJSON(['ok' => true, 'msg' => "✅ Asignación guardada. Restan $restantes frecuencias."]);
     }
 
     /* =========================================================
-       ⚖️ Función auxiliar: validar choques de horario
+       ✏️ Actualizar asignación
        ========================================================= */
-    private function hayChoqueHorario($id, $dias, $inicioMin, $finMin, $modo = 'grupo')
+    public function actualizarAsignacion($id)
     {
-        $builder = $this->grupoMateriaProfesorModel
-            ->select('materias.nombre AS materia, grupo_materia_profesor.horario')
-            ->join('materias', 'materias.id = grupo_materia_profesor.materia_id');
+        $asig = $this->grupoMateriaProfesorModel->find($id);
+        if (!$asig)
+            return $this->response->setJSON(['ok' => false, 'msg' => '❌ Asignación no encontrada.']);
 
-        if ($modo === 'grupo') {
-            $builder->where('grupo_id', $id);
-        } else {
-            $builder->where('profesor_id', $id);
+        $profesor = $this->request->getPost('profesor_id');
+        $aula = $this->request->getPost('aula');
+        $ciclo_id = $this->request->getPost('ciclo_id');
+
+        $ciclo_nombre = null;
+        if ($ciclo_id) {
+            $ciclo = $this->cicloModel->find($ciclo_id);
+            $ciclo_nombre = $ciclo['nombre'] ?? null;
         }
 
-        $asignaciones = $builder->findAll();
+        $horario = $asig['horario'] ?? null;
+        if (empty($horario) || $horario === '-') {
+            $horario = $asig['horario'];
+        }
 
-        foreach ($asignaciones as $a) {
-            [$diasTxt, $rango] = explode(' ', $a['horario']);
-            [$hInicio, $hFin] = explode('-', $rango);
+        $this->grupoMateriaProfesorModel->update($id, [
+            'profesor_id' => $profesor,
+            'aula' => $aula,
+            'ciclo_id' => $ciclo_id,
+            'ciclo' => $ciclo_nombre,
+            'horario' => $horario,
+        ]);
 
-            $inicioExistente = $this->horaToMinutos($hInicio);
-            $finExistente = $this->horaToMinutos($hFin);
+        return $this->response->setJSON(['ok' => true, 'msg' => '✏️ Asignación actualizada correctamente.']);
+    }
 
-            // Días compartidos
-            $diasComunes = array_intersect(str_split($diasTxt), $dias);
+    /* =========================================================
+       📋 Detalle (para edición)
+       ========================================================= */
+    public function detalle($id)
+    {
+        $asig = $this->grupoMateriaProfesorModel
+            ->select('
+            grupo_materia_profesor.*,
+            materias.nombre AS materia_nombre,
+            usuarios.nombre AS profesor_nombre,
+            ciclos_academicos.id AS ciclo_id,
+            ciclos_academicos.nombre AS ciclo_nombre
+        ')
+            ->join('materias', 'materias.id = grupo_materia_profesor.materia_id', 'left')
+            ->join('usuarios', 'usuarios.id = grupo_materia_profesor.profesor_id', 'left')
+            ->join('ciclos_academicos', 'ciclos_academicos.id = grupo_materia_profesor.ciclo_id', 'left')
+            ->find($id);
 
-            if (!empty($diasComunes)) {
-                // Si hay traslape
-                if ($inicioMin < $finExistente && $finMin > $inicioExistente) {
-                    return $a['materia'] . ' (' . implode(',', $diasComunes) . ')';
+        if (!$asig)
+            return $this->response->setJSON(['ok' => false]);
+
+        $bloques = [];
+        $horario = trim($asig['horario'] ?? '');
+        if ($horario !== '') {
+            $partes = array_filter(array_map('trim', explode(';', $horario)));
+            foreach ($partes as $bloque) {
+                if (preg_match('/^([LMXJV]+)\s+(\d{2}:\d{2})-(\d{2}:\d{2})$/', $bloque, $m)) {
+                    $bloques[] = [
+                        'dias' => str_split($m[1]),
+                        'hora_inicio' => $m[2],
+                        'hora_fin' => $m[3]
+                    ];
                 }
             }
         }
 
-        return false;
+        $asig['bloques'] = $bloques;
+        $asig['ciclo_id'] = $asig['ciclo_id'] ?? null;
+        $asig['ciclo'] = $asig['ciclo_nombre'] ?? $asig['ciclo'] ?? '';
+
+        return $this->response->setJSON(['ok' => true, 'asignacion' => $asig]);
     }
 
+
     /* =========================================================
-       🎓 Asignar alumno al grupo
+       🎓 Alumnos
        ========================================================= */
     public function asignarAlumno()
     {
         $grupoId = $this->request->getPost('grupo_id');
-        $alumnoId = $this->request->getPost('alumno_id');
+        $alumnosSeleccionados = $this->request->getPost('alumnos') ?? [$this->request->getPost('alumno_id')];
 
-        if (!$grupoId || !$alumnoId) {
-            return redirect()->back()->with('msg', 'Faltan datos para inscribir.');
+        if (!$grupoId || empty($alumnosSeleccionados)) {
+            return redirect()->back()->with('msg', '⚠️ Debes seleccionar un grupo y al menos un alumno.');
         }
 
-        $this->grupoAlumnoModel->insert([
-            'grupo_id' => $grupoId,
-            'alumno_id' => $alumnoId,
-            'fecha_inscripcion' => date('Y-m-d'),
-            'estatus' => 'Inscrito'
-        ]);
+        $relacion = $this->carreraGrupoModel
+            ->select('carrera_grupo.carrera_id')
+            ->where('carrera_grupo.grupo_id', $grupoId)
+            ->first();
 
-        $grupoAlumnoId = $this->grupoAlumnoModel->getInsertID();
+        if (!$relacion) {
+            return redirect()->back()->with('msg', '❌ El grupo no está vinculado a ninguna carrera.');
+        }
 
-        $asignaciones = $this->grupoMateriaProfesorModel->where('grupo_id', $grupoId)->findAll();
+        $carreraId = $relacion['carrera_id'];
+        $grupo = $this->grupoModel->find($grupoId);
+        $limite = $grupo['limite'] ?? 0;
+        $actuales = $this->grupoAlumnoModel->where('grupo_id', $grupoId)->countAllResults();
 
-        foreach ($asignaciones as $asig) {
-            $this->db->table('materia_grupo_alumno')->insert([
-                'grupo_materia_profesor_id' => $asig['id'],
-                'grupo_alumno_id' => $grupoAlumnoId,
-                'calificacion_final' => null,
-                'asistencia' => 0,
+        if ($limite && $actuales >= $limite) {
+            return redirect()->back()->with('msg', '⚠️ El grupo ya alcanzó su límite de alumnos.');
+        }
+
+        $alumnosValidos = $this->alumnoCarreraModel
+            ->select('alumno_id')
+            ->where('carrera_id', $carreraId)
+            ->whereIn('alumno_id', $alumnosSeleccionados)
+            ->findAll();
+
+        if (empty($alumnosValidos)) {
+            return redirect()->back()->with('msg', '⚠️ Ninguno de los alumnos seleccionados pertenece a la carrera del grupo.');
+        }
+
+        foreach ($alumnosValidos as $a) {
+            $alumnoId = $a['alumno_id'];
+            $yaInscrito = $this->grupoAlumnoModel
+                ->where('grupo_id', $grupoId)
+                ->where('alumno_id', $alumnoId)
+                ->first();
+
+            if ($yaInscrito)
+                continue;
+
+            $this->grupoAlumnoModel->insert([
+                'grupo_id' => $grupoId,
+                'alumno_id' => $alumnoId,
+                'fecha_inscripcion' => date('Y-m-d'),
+                'estatus' => 'Inscrito',
             ]);
+
+            $grupoAlumnoId = $this->grupoAlumnoModel->getInsertID();
+
+            $asignaciones = $this->grupoMateriaProfesorModel->where('grupo_id', $grupoId)->findAll();
+            foreach ($asignaciones as $asig) {
+                $this->db->table('materia_grupo_alumno')->insert([
+                    'grupo_materia_profesor_id' => $asig['id'],
+                    'grupo_alumno_id' => $grupoAlumnoId,
+                    'calificacion_final' => null,
+                    'asistencia' => 0,
+                ]);
+            }
         }
 
-        return redirect()->back()->with('msg', 'Alumno inscrito correctamente en el grupo y materias.');
+        return redirect()->back()->with('msg', '✅ Alumnos asignados correctamente al grupo y materias.');
     }
 
-    /* =========================================================
-       🗑️ Eliminar profesor/asignación
-       ========================================================= */
-    public function eliminarProfesor($id)
-    {
-        $this->grupoMateriaProfesorModel->delete($id);
-        return $this->response->setJSON(['ok' => true, 'msg' => 'Asignación eliminada correctamente.']);
-    }
-
-    /* =========================================================
-       🗑️ Eliminar alumno del grupo
-       ========================================================= */
     public function eliminarAlumno($id)
     {
         $this->grupoAlumnoModel->delete($id);
         return $this->response->setJSON(['ok' => true, 'msg' => 'Alumno eliminado correctamente.']);
     }
 
-    /* =========================================================
-   🕒 Horario visual del grupo (materia + profesor + horario)
-   ========================================================= */
-    public function horarioGrupo($grupoId)
+    public function alumnosPorCarrera($grupoId)
     {
-        $asignaciones = $this->grupoMateriaProfesorModel
-            ->select('
-            grupo_materia_profesor.id,
-            grupo_materia_profesor.grupo_id,
-            grupo_materia_profesor.materia_id,
-            grupo_materia_profesor.profesor_id,
-            grupo_materia_profesor.horario,
-            materias.nombre AS materia,
-            usuarios.nombre AS profesor
-        ')
-            ->join('materias', 'materias.id = grupo_materia_profesor.materia_id')
-            ->join('usuarios', 'usuarios.id = grupo_materia_profesor.profesor_id', 'left')
-            ->where('grupo_id', $grupoId)
-            ->findAll();
-
-        $resultado = [];
-
-        foreach ($asignaciones as $a) {
-            $bloques = explode(';', $a['horario']);
-            foreach ($bloques as $bloque) {
-                $bloque = trim($bloque);
-                if (preg_match('/^([LMXJV]+)\s+(\d{2}:\d{2})-(\d{2}:\d{2})$/', $bloque, $m)) {
-                    $diasTxt = $m[1];
-                    $inicio = $m[2];
-                    $fin = $m[3];
-
-                    $inicioNum = (int) str_replace(':', '', $inicio);
-                    $finNum = (int) str_replace(':', '', $fin);
-
-                    $resultado[] = [
-                        'id' => $a['id'],
-                        'grupo_id' => $a['grupo_id'],
-                        'materia_id' => $a['materia_id'],
-                        'profesor_id' => $a['profesor_id'],
-                        'materia' => $a['materia'],
-                        'profesor' => $a['profesor'] ?? 'Sin asignar',
-                        'dias' => str_split($diasTxt),
-                        'rango' => [$inicioNum, $finNum],
-                        'inicio_str' => $inicio,
-                        'fin_str' => $fin
-                    ];
-                }
-            }
-        }
-
-        return $this->response->setJSON(['ok' => true, 'asignaciones' => $resultado]);
-    }
-
-
-    public function materiasPorGrupo($grupoId)
-    {
-        $carreraGrupoModel = new CarreraGrupoModel();
-
-        // 1️⃣ Obtener la carrera asociada al grupo
-        $relacion = $carreraGrupoModel
-            ->select('carrera_grupo.carrera_id, grupos.periodo')
-            ->join('grupos', 'grupos.id = carrera_grupo.grupo_id')
+        $relacion = $this->carreraGrupoModel
+            ->select('carrera_grupo.carrera_id')
             ->where('carrera_grupo.grupo_id', $grupoId)
             ->first();
 
         if (!$relacion) {
             return $this->response->setJSON([
                 'ok' => false,
-                'msg' => '❌ No se encontró la relación del grupo con una carrera.'
+                'msg' => '❌ El grupo no está vinculado a ninguna carrera.'
             ]);
         }
 
         $carreraId = $relacion['carrera_id'];
-        $periodo = $relacion['periodo']; // esto es tu "ciclo actual" o cuatrimestre
 
-        // 2️⃣ Buscar el plan activo de la carrera
+        $alumnos = $this->usuarioModel
+            ->select('usuarios.id, usuarios.nombre')
+            ->join('alumno_carrera', 'alumno_carrera.alumno_id = usuarios.id')
+            ->where('alumno_carrera.carrera_id', $carreraId)
+            ->where('usuarios.rol_id', 4)
+            ->where('alumno_carrera.estatus', 'Activo')
+            ->orderBy('usuarios.nombre', 'ASC')
+            ->findAll();
+
+        return $this->response->setJSON([
+            'ok' => true,
+            'alumnos' => $alumnos,
+        ]);
+    }
+
+    public function vincularAlumnoCarrera()
+    {
+        $alumnoId = $this->request->getPost('alumno_id');
+        $carreraId = $this->request->getPost('carrera_id');
+
+        if (!$alumnoId || !$carreraId) {
+            return $this->response->setJSON(['ok' => false, 'msg' => 'Faltan datos.']);
+        }
+
+        $existe = $this->alumnoCarreraModel
+            ->where('alumno_id', $alumnoId)
+            ->where('carrera_id', $carreraId)
+            ->first();
+
+        if ($existe) {
+            return $this->response->setJSON(['ok' => false, 'msg' => '⚠️ El alumno ya está vinculado a esa carrera.']);
+        }
+
+        $this->alumnoCarreraModel->insert([
+            'alumno_id' => $alumnoId,
+            'carrera_id' => $carreraId,
+            'fecha_registro' => date('Y-m-d'),
+            'estatus' => 'Activo',
+        ]);
+
+        return $this->response->setJSON(['ok' => true, 'msg' => '✅ Alumno vinculado a la carrera.']);
+    }
+
+    public function materiasPorGrupo($grupoId)
+    {
+        $relacion = $this->carreraGrupoModel
+            ->select('carrera_grupo.carrera_id, grupos.periodo')
+            ->join('grupos', 'grupos.id = carrera_grupo.grupo_id')
+            ->where('carrera_grupo.grupo_id', $grupoId)
+            ->first();
+
+        if (!$relacion) {
+            return $this->response->setJSON(['ok' => false, 'msg' => '❌ No se encontró la relación del grupo con una carrera.']);
+        }
+
+        $carreraId = $relacion['carrera_id'];
+        $periodo = $relacion['periodo'];
+
         $plan = $this->planModel
             ->where('carrera_id', $carreraId)
             ->where('activo', 1)
@@ -324,13 +402,9 @@ class AsignacionesController extends BaseController
             ->first();
 
         if (!$plan) {
-            return $this->response->setJSON([
-                'ok' => false,
-                'msg' => '⚠️ No se encontró un plan activo para la carrera seleccionada.'
-            ]);
+            return $this->response->setJSON(['ok' => false, 'msg' => '⚠️ No se encontró un plan activo para la carrera seleccionada.']);
         }
 
-        // 3️⃣ Buscar materias del plan que correspondan al periodo del grupo
         $materias = $this->planMateriaModel
             ->select('materias.id, materias.nombre, plan_materias.cuatrimestre, plan_materias.tipo')
             ->join('materias', 'materias.id = plan_materias.materia_id')
@@ -341,112 +415,264 @@ class AsignacionesController extends BaseController
             ->findAll();
 
         if (!$materias) {
+            return $this->response->setJSON(['ok' => false, 'msg' => '⚠️ No hay materias registradas para el ciclo ' . $periodo]);
+        }
+
+        return $this->response->setJSON(['ok' => true, 'materias' => $materias]);
+    }
+
+    /* =========================================================
+       🗑️ Frecuencias
+       ========================================================= */
+    public function eliminarFrecuencia($id)
+    {
+        $asig = $this->grupoMateriaProfesorModel->find($id);
+        if (!$asig) {
+            return $this->response->setJSON(['ok' => false, 'msg' => 'Asignación no encontrada.']);
+        }
+
+        $dia = $this->request->getPost('dia');
+        $inicio = $this->request->getPost('inicio');
+        $fin = $this->request->getPost('fin');
+
+        if (!$dia || !$inicio || !$fin) {
+            return $this->response->setJSON(['ok' => false, 'msg' => 'Faltan datos de frecuencia.']);
+        }
+
+        $bloques = array_filter(array_map('trim', explode(';', $asig['horario'] ?? '')));
+        $nuevosBloques = [];
+
+        foreach ($bloques as $bloque) {
+            if (!preg_match('/^([LMXJV]+)\s+(\d{2}:\d{2})-(\d{2}:\d{2})$/', $bloque, $m))
+                continue;
+            $diasTxt = $m[1];
+            $bInicio = $m[2];
+            $bFin = $m[3];
+
+            if ($bInicio === $inicio && $bFin === $fin && str_contains($diasTxt, $dia)) {
+                $diasRestantes = str_replace($dia, '', $diasTxt);
+                if ($diasRestantes !== '')
+                    $nuevosBloques[] = $diasRestantes . ' ' . $bInicio . '-' . $bFin;
+            } else {
+                $nuevosBloques[] = $bloque;
+            }
+        }
+
+        if (empty($nuevosBloques)) {
+            $this->grupoMateriaProfesorModel->delete($id);
+            return $this->response->setJSON(['ok' => true, 'msg' => 'Frecuencia eliminada y asignación vacía eliminada.']);
+        }
+
+        $this->grupoMateriaProfesorModel->update($id, ['horario' => implode('; ', $nuevosBloques)]);
+        return $this->response->setJSON(['ok' => true, 'msg' => 'Frecuencia eliminada.']);
+    }
+
+    public function actualizarFrecuencia($id)
+    {
+        $asig = $this->grupoMateriaProfesorModel->find($id);
+        if (!$asig) {
+            return $this->response->setJSON(['ok' => false, 'msg' => 'Asignación no encontrada.']);
+        }
+
+        $oldDia = $this->request->getPost('old_dia');
+        $oldInicio = $this->request->getPost('old_inicio');
+        $oldFin = $this->request->getPost('old_fin');
+        $newDias = $this->request->getPost('new_dias');
+        $newInicio = $this->request->getPost('new_inicio');
+        $newFin = $this->request->getPost('new_fin');
+
+        if (!$oldDia || !$oldInicio || !$oldFin || !$newDias || !$newInicio || !$newFin) {
+            return $this->response->setJSON(['ok' => false, 'msg' => 'Faltan datos para actualizar la frecuencia.']);
+        }
+
+        $inicioMin = $this->horaToMinutos($newInicio);
+        $finMin = $this->horaToMinutos($newFin);
+        $diasArray = str_split($newDias);
+
+        $grupoId = $asig['grupo_id'];
+        $profesorId = $asig['profesor_id'];
+
+        if ($conf = $this->hayChoqueHorario($grupoId, $diasArray, $inicioMin, $finMin, 'grupo'))
+            return $this->response->setJSON(['ok' => false, 'msg' => "⚠️ Choque con el GRUPO: $conf"]);
+        if ($conf = $this->hayChoqueHorario($profesorId, $diasArray, $inicioMin, $finMin, 'profesor'))
+            return $this->response->setJSON(['ok' => false, 'msg' => "⚠️ Choque con el PROFESOR: $conf"]);
+
+        $bloques = array_filter(array_map('trim', explode(';', $asig['horario'] ?? '')));
+        $nuevosBloques = [];
+        $reemplazado = false;
+
+        foreach ($bloques as $bloque) {
+            if (!preg_match('/^([LMXJV]+)\s+(\d{2}:\d{2})-(\d{2}:\d{2})$/', $bloque, $m))
+                continue;
+            $diasTxt = $m[1];
+            $bInicio = $m[2];
+            $bFin = $m[3];
+
+            if ($bInicio === $oldInicio && $bFin === $oldFin && str_contains($diasTxt, $oldDia) && !$reemplazado) {
+                $diasRestantes = str_replace($oldDia, '', $diasTxt);
+                if ($diasRestantes !== '')
+                    $nuevosBloques[] = $diasRestantes . ' ' . $bInicio . '-' . $bFin;
+                $nuevosBloques[] = $newDias . ' ' . $newInicio . '-' . $newFin;
+                $reemplazado = true;
+            } else
+                $nuevosBloques[] = $bloque;
+        }
+
+        if (!$reemplazado) {
+            return $this->response->setJSON(['ok' => false, 'msg' => 'No se encontró la frecuencia a actualizar.']);
+        }
+
+        $this->grupoMateriaProfesorModel->update($id, ['horario' => implode('; ', $nuevosBloques)]);
+        return $this->response->setJSON(['ok' => true, 'msg' => 'Frecuencia actualizada correctamente.']);
+    }
+
+    /* =========================================================
+       ⚙️ Auxiliares
+       ========================================================= */
+    private function calcularFin($inicio)
+    {
+        $t = \DateTime::createFromFormat('H:i', $inicio);
+        $t->modify('+50 minutes');
+        return $t->format('H:i');
+    }
+
+    private function horaToMinutos($hora)
+    {
+        [$h, $m] = explode(':', $hora);
+        return (int) $h * 60 + (int) $m;
+    }
+
+    private function hayChoqueHorario($id, $dias, $inicioMin, $finMin, $modo = 'grupo')
+    {
+        $builder = $this->grupoMateriaProfesorModel
+            ->select('materias.nombre AS materia, grupo_materia_profesor.horario')
+            ->join('materias', 'materias.id = grupo_materia_profesor.materia_id');
+        $builder->where($modo === 'grupo' ? 'grupo_id' : 'profesor_id', $id);
+        $asignaciones = $builder->findAll();
+
+        foreach ($asignaciones as $a) {
+            $bloques = array_filter(array_map('trim', explode(';', $a['horario'] ?? '')));
+            foreach ($bloques as $bloque) {
+                if (preg_match('/^([LMXJV]+)\s+(\d{2}:\d{2})-(\d{2}:\d{2})$/', $bloque, $m)) {
+                    $diasTxt = str_split($m[1]);
+                    // 💡 Si hay cruce de días
+                    if (array_intersect($diasTxt, $dias)) {
+                        $iniExist = $this->horaToMinutos($m[2]);
+                        $finExist = $this->horaToMinutos($m[3]);
+                        // 💡 Si hay cruce de horas
+                        if ($inicioMin < $finExist && $finMin > $iniExist) {
+                            return $a['materia']; // ⚠️ Choque detectado
+                        }
+                    }
+                }
+            }
+        }
+
+        return false; // ✅ Sin choques
+    }
+
+
+
+    /* =========================================================
+   🗓️ Horario visual del grupo
+   ========================================================= */
+    public function horarioGrupo($grupoId)
+    {
+        $asignaciones = $this->grupoMateriaProfesorModel
+            ->select('
+            grupo_materia_profesor.id,
+            grupo_materia_profesor.grupo_id,
+            grupo_materia_profesor.materia_id,
+            grupo_materia_profesor.profesor_id,
+            grupo_materia_profesor.horario,
+            grupo_materia_profesor.aula,
+            materias.nombre AS materia,
+            usuarios.nombre AS profesor
+        ')
+            ->join('materias', 'materias.id = grupo_materia_profesor.materia_id', 'left')
+            ->join('usuarios', 'usuarios.id = grupo_materia_profesor.profesor_id', 'left')
+            ->where('grupo_materia_profesor.grupo_id', $grupoId)
+            ->findAll();
+
+        $result = [];
+        foreach ($asignaciones as $a) {
+            $bloques = array_filter(array_map('trim', explode(';', $a['horario'] ?? '')));
+            foreach ($bloques as $b) {
+                if (preg_match('/^([LMXJV]+)\s+(\d{2}:\d{2})-(\d{2}:\d{2})$/', $b, $m)) {
+                    $result[] = [
+                        'id' => $a['id'],
+                        'grupo_id' => $a['grupo_id'],
+                        'materia_id' => $a['materia_id'],
+                        'profesor_id' => $a['profesor_id'],
+                        'materia' => $a['materia'],
+                        'profesor' => $a['profesor'],
+                        'dias' => str_split($m[1]),
+                        'inicio_str' => $m[2],
+                        'fin_str' => $m[3],
+                        'aula' => $a['aula'] ?? '',
+                    ];
+                }
+            }
+        }
+
+        return $this->response->setJSON(['ok' => true, 'asignaciones' => $result]);
+    }
+
+    /* =========================================================
+   ⏱️ Frecuencias restantes por materia en grupo
+   ========================================================= */
+    public function frecuenciasRestantes($grupoId, $materiaId)
+    {
+        $materia = $this->materiaModel->find($materiaId);
+        if (!$materia) {
             return $this->response->setJSON([
                 'ok' => false,
-                'msg' => '⚠️ No hay materias registradas para el ciclo ' . $periodo
+                'msg' => '❌ Materia no encontrada.'
             ]);
         }
 
-        // 4️⃣ Respuesta final
+        $totales = (int) $materia['horas_semana'];
+
+        $asignaciones = $this->grupoMateriaProfesorModel
+            ->where('grupo_id', $grupoId)
+            ->where('materia_id', $materiaId)
+            ->findAll();
+
+        $usadas = 0;
+        foreach ($asignaciones as $a) {
+            $bloques = array_filter(array_map('trim', explode(';', $a['horario'] ?? '')));
+            $usadas += count($bloques);
+        }
+
+        $restantes = max(0, $totales - $usadas);
+
         return $this->response->setJSON([
             'ok' => true,
-            'materias' => $materias
+            'totales' => $totales,
+            'usadas' => $usadas,
+            'restantes' => $restantes
         ]);
     }
 
     /* =========================================================
-       ✏️ Actualizar asignación existente
+       🗑️ Eliminar asignación completa (profesor ↔ materia-grupo)
        ========================================================= */
-    public function actualizarAsignacion($id)
+    public function eliminarProfesor($id)
     {
-        $asignacion = $this->grupoMateriaProfesorModel->find($id);
-
-        if (!$asignacion) {
+        $asig = $this->grupoMateriaProfesorModel->find($id);
+        if (!$asig) {
             return $this->response->setJSON([
                 'ok' => false,
                 'msg' => '❌ Asignación no encontrada.'
             ]);
         }
 
-        $grupoId = $asignacion['grupo_id'];
-        $materiaId = $asignacion['materia_id'];
-
-        $nuevoProfesor = $this->request->getPost('profesor_id');
-        $aula = $this->request->getPost('aula');
-        $dias = $this->request->getPost('dias') ?? [];
-        $horaInicio = $this->request->getPost('hora_inicio');
-        $horaFin = $this->request->getPost('hora_fin');
-
-        $nuevoRango = implode('', $dias) . ' ' . $horaInicio . '-' . $horaFin;
-
-        // 🔹 Actualiza el profesor en todas las asignaciones del mismo grupo/materia
-        $this->grupoMateriaProfesorModel
-            ->where('grupo_id', $grupoId)
-            ->where('materia_id', $materiaId)
-            ->set(['profesor_id' => $nuevoProfesor])
-            ->update();
-
-        // 🔹 Actualiza el horario y aula de la asignación actual
-        $this->grupoMateriaProfesorModel->update($id, [
-            'horario' => $nuevoRango,
-            'aula' => $aula,
-        ]);
-
+        $this->grupoMateriaProfesorModel->delete($id);
         return $this->response->setJSON([
             'ok' => true,
-            'msg' => '✏️ Profesor actualizado en todas las asignaciones de esta materia.'
+            'msg' => '🗑️ Asignación eliminada correctamente.'
         ]);
     }
-
-
-    public function detalle($id)
-    {
-        $asignacion = $this->grupoMateriaProfesorModel
-            ->select('grupo_materia_profesor.*, materias.nombre AS materia_nombre, usuarios.nombre AS profesor_nombre')
-            ->join('materias', 'materias.id = grupo_materia_profesor.materia_id', 'left')
-            ->join('usuarios', 'usuarios.id = grupo_materia_profesor.profesor_id', 'left')
-            ->find($id);
-
-        if (!$asignacion) {
-            return $this->response->setJSON(['ok' => false]);
-        }
-
-        // ======================================================
-        // 🔍 Extraer todos los bloques de horario ("LMX 10:00-10:50; J 12:30-13:20")
-        // ======================================================
-        $bloques = [];
-        $horarios = array_map('trim', explode(';', $asignacion['horario'] ?? ''));
-
-        foreach ($horarios as $bloque) {
-            if (preg_match('/^([LMXJV]+)\s+(\d{2}:\d{2})-(\d{2}:\d{2})$/', trim($bloque), $m)) {
-                $bloques[] = [
-                    'dias' => str_split($m[1]),
-                    'hora_inicio' => $m[2],
-                    'hora_fin' => $m[3],
-                    'texto' => trim($bloque)
-                ];
-            }
-        }
-
-        // Si hay al menos un bloque, tomamos el primero como principal (para edición rápida)
-        $primerBloque = $bloques[0] ?? [
-            'dias' => [],
-            'hora_inicio' => '',
-            'hora_fin' => ''
-        ];
-
-        // Agregar campos adicionales útiles para el frontend
-        $asignacion['bloques'] = $bloques;
-        $asignacion['dias'] = $primerBloque['dias'];
-        $asignacion['hora_inicio'] = $primerBloque['hora_inicio'];
-        $asignacion['hora_fin'] = $primerBloque['hora_fin'];
-
-        return $this->response->setJSON([
-            'ok' => true,
-            'asignacion' => $asignacion
-        ]);
-    }
-
 
 
 }

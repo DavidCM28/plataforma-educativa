@@ -668,3 +668,287 @@ select option {
 .bloque::after {
   bottom: -3px;
 }
+
+#alumnos select[multiple] {
+  height: 220px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface, #1f1f1f);
+  color: var(--text-light, #ddd);
+  padding: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.tabla-asignados {
+  margin-top: 1.5rem;
+}
+
+.tabla-asignados table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface, #1f1f1f);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tabla-asignados th,
+.tabla-asignados td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: left;
+}
+
+.tabla-asignados th {
+  background: var(--primary);
+  color: white;
+}
+
+.badge {
+  background: var(--primary-light, #28a745);
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+}
+
+.horario-selector {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  user-select: none;
+}
+
+.horario-selector .fila {
+  display: grid;
+  grid-template-columns: 60px repeat(5, 1fr);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.horario-selector .celda {
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.horario-selector .celda.hora {
+  background: var(--dark);
+  color: #ccc;
+  cursor: default;
+}
+
+.horario-selector .celda.dia {
+  background: var(--primary);
+  color: #fff;
+  cursor: default;
+}
+
+.horario-selector .celda.seleccionada {
+  background: var(--secondary);
+  color: #fff;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.horario-selector .celda:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.horario-selector {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  user-select: none;
+  margin-top: 8px;
+}
+
+.horario-selector .fila {
+  display: grid;
+  grid-template-columns: 60px repeat(5, 1fr);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.horario-selector .celda {
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.horario-selector .celda.hora {
+  background: var(--dark);
+  color: #ccc;
+  cursor: default;
+}
+
+.horario-selector .celda.dia {
+  background: var(--primary);
+  color: #fff;
+  cursor: default;
+}
+
+.horario-selector .celda.seleccionada {
+  background: var(--secondary);
+  color: #fff;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.turno-info {
+  font-size: 0.85rem;
+  color: #aaa;
+  margin: 0.3rem 0;
+}
+
+.hidden {
+  display: none;
+}
+
+/* =====================================================
+   🎨 ESTILO VISUAL DE CELDAS SELECCIONADAS
+   ===================================================== */
+.horario-selector .celda.seleccionada {
+  background: var(--accent-soft);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.horario-selector .celda.seleccionada:hover {
+  filter: brightness(1.2);
+}
+
+.frecuencias-info {
+  margin-top: 6px;
+  transition: all 0.3s ease;
+}
+.frecuencia-barra {
+  width: 100%;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.frecuencia-barra-progreso {
+  height: 100%;
+  background: var(--primary);
+  width: 0%;
+  transition: width 0.4s ease, background 0.3s ease;
+}
+.frecuencia-texto {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.8rem;
+  color: var(--text-light);
+  text-align: center;
+}
+.celda.ocupada {
+  background-color: rgba(0, 100, 0, 0.8);
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 0.7rem;
+  padding: 0;
+}
+.celda.ocupada .info-celda {
+  padding: 2px;
+  pointer-events: none; /* ✅ deja pasar el click */
+  user-select: none;
+}
+.context-menu {
+  position: absolute;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 2000;
+  animation: fadeIn 0.15s ease-in;
+}
+.context-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+}
+.context-menu li {
+  padding: 8px 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.context-menu li:hover {
+  background: #eee;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+/* ================================
+   📋 MENÚ CONTEXTUAL DE HORARIO
+   ================================ */
+.context-menu {
+  position: absolute;
+  background: #1e1e1e;
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  z-index: 1000;
+  min-width: 180px;
+  padding: 6px 0;
+  font-family: "Poppins", sans-serif;
+  animation: fadeIn 0.15s ease;
+}
+
+.context-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.context-menu li {
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.context-menu li:hover {
+  background: #333;
+}
+
+.context-menu i {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.celda.ocupada .info-celda {
+  pointer-events: none;
+  user-select: none;
+}
