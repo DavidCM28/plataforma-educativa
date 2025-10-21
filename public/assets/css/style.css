@@ -11,6 +11,9 @@
   --secondary: #ffbfa0;
   --accent: #ff7f3f;
 
+  /* Extra pedido */
+  --pastel-orange: #ffb27d; /* Naranja pastel para 'Regresar al inicio' */
+
   /* Extras */
   --radius: 12px;
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -1927,9 +1930,7 @@ body.dark-mode .program-detail p,
 body.dark-mode .program-detail li,
 body.dark-mode .program-detail span,
 body.dark-mode .program-detail small {
-  color: var(
-    --color-text
-  ) !important; /* recuerda: en dark-mode --dark = blanco */
+  color: var(--color-text) !important;
 }
 
 body.dark-mode .program-detail .text-muted {
@@ -2077,7 +2078,7 @@ body.dark-mode .dropdown-menu li a:hover {
   min-width: 220px;
 }
 
-/* Mostrar SOLO cuando el padre tiene hover */
+/* Mostrar SOLO cuando pasas sobre Oferta Educativa */
 .dropdown-submenu:hover > .dropdown-menu {
   display: block;
 }
@@ -2186,6 +2187,8 @@ body.dark-mode span,
 body.dark-mode li,
 body.dark-mode a,
 body.dark-mode strong,
+body-dark-mode summary,
+body-dark-mode details,
 body.dark-mode summary,
 body.dark-mode details {
   color: var(--color-text) !important;
@@ -2212,7 +2215,7 @@ body.dark-mode {
     position: fixed;
     bottom: 90px; /* más arriba para no tapar WhatsApp */
     right: 20px;
-    background: #0078ff;
+    background: #fa9907;
     color: white;
     border-radius: 50%;
     width: 55px;
@@ -2248,7 +2251,7 @@ body.dark-mode {
 }
 
 .chatbot-header {
-    background: #0078ff;
+    background: #fcaa05;
     color: white;
     padding: 12px;
     display: flex;
@@ -2305,3 +2308,168 @@ body.dark-mode {
     80% { opacity: 1; }
     100% { opacity: 1; }
 }
+
+/* ============================
+   PERSONALIZACIONES SOLICITADAS
+============================ */
+
+/* 1) Botón "Regresar al inicio" en naranja pastel */
+.btn-regresar,
+#btn-regresar {
+  background: var(--pastel-orange);
+  border: 2px solid var(--pastel-orange);
+  color: #1f1f1f;            /* texto legible en claro */
+  border-radius: 12px;
+  padding: 12px 22px;
+  transition: var(--transition);
+}
+.btn-regresar:hover,
+#btn-regresar:hover {
+  background: transparent;
+  color: var(--pastel-orange);
+  transform: translateY(-2px);
+  box-shadow: 0 7px 15px rgba(255,178,125,.25);
+}
+
+/* 2) Botón "Enviar mensaje": texto negro en claro y blanco en oscuro */
+.contact-form .submit-btn {
+  background: var(--primary);
+  border: 2px solid var(--primary);
+  color: #000;               /* modo claro: negro */
+  border-radius: 12px;
+  padding: 12px 22px;
+  transition: var(--transition);
+}
+body.dark-mode .contact-form .submit-btn {
+  color: #fff;               /* modo oscuro: blanco */
+}
+.contact-form .submit-btn:hover {
+  background: transparent;
+  color: var(--primary);
+}
+
+/* 3) Chatbot en modo oscuro: letras blancas (+ fondo oscuro para contraste) */
+body.dark-mode #chatbot-window {
+  background: #2a2a2a;
+  border: 1px solid #444;
+}
+body.dark-mode #chatbot-window,
+body.dark-mode #chatbot-window * {
+  color: #ffffff !important; /* letras blancas en todo el chatbot */
+}
+body.dark-mode #chatbot-window .chat-options button {
+  background: #3a3a3a;
+  border-color: #555;
+  color: #fff !important;
+}
+
+/* CHATBOT: mantener letras negras en modo oscuro */
+body.dark-mode #chatbot-window,
+body.dark-mode #chatbot-window * {
+  color: #111 !important;            /* texto negro */
+}
+
+/* Si quieres que el cuerpo del chatbot siga claro en dark mode */
+body.dark-mode #chatbot-window {
+  background: #ffffff !important;     /* fondo claro para buen contraste */
+  border-color: #e6e6e6 !important;
+}
+
+/* Mantén el header del chatbot con su barra naranja y texto blanco */
+body.dark-mode #chatbot-window .chatbot-header {
+  background: #fcaa05 !important;
+  color: #ffffff !important;
+}
+
+/* Botones de opciones dentro del chatbot en modo oscuro, con texto negro */
+body.dark-mode #chatbot-window .chat-options button {
+  background: #f1f1f1 !important;
+  border-color: #dddddd !important;
+  color: #111 !important;
+}
+/* ==========================
+   CHATBOT: burbuja tipo WhatsApp al cargar + pulso
+========================== */
+
+/* Pulso suave alrededor del botón */
+#chatbot-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(250, 153, 7, 0.45);
+  animation: chatbotPulse 2.6s ease-out infinite;
+  pointer-events: none;
+}
+
+/* Burbuja/tooltip tipo WhatsApp que aparece al cargar */
+#chatbot-button::after {
+  content: "¿Necesitas ayuda?";
+  position: absolute;
+  right: 70px;          /* separada del botón */
+  bottom: 6px;
+  padding: 8px 12px;
+  background: #ffffff;
+  color: #111;
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.15);
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(6px) scale(.96);
+  white-space: nowrap;
+  pointer-events: none; /* que no estorbe clics */
+  z-index: 10001;
+  /* Animación auto: aparece, se queda un poco y se desvanece */
+  animation: chatbotHint 4.5s ease 0.6s 1 both;
+}
+
+/* Colita de la burbuja (hecha con clip-path) */
+#chatbot-button::after {
+  clip-path: path("M0,0 h100% v100% h-100% z");
+}
+#chatbot-button::after {
+  /* truco: pseudo-colita con sombra proyectada */
+  box-shadow:
+    0 6px 16px rgba(0,0,0,.15),
+    -8px 8px 0 -6px #ffffff; /* “colita” cuadrada simulada */
+}
+
+/* Dark mode: burbuja en oscuro para contraste */
+body.dark-mode #chatbot-button::after {
+  background: #2a2a2a;
+  color: #fff;
+  box-shadow:
+    0 6px 16px rgba(0,0,0,.35),
+    -8px 8px 0 -6px #2a2a2a;
+}
+
+/* Keyframes */
+@keyframes chatbotPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(250,153,7,0.45); }
+  70%  { box-shadow: 0 0 0 18px rgba(250,153,7,0); }
+  100% { box-shadow: 0 0 0 0 rgba(250,153,7,0); }
+}
+
+@keyframes chatbotHint {
+  0%   { opacity: 0; transform: translateY(6px) scale(.96); }
+  12%  { opacity: 1; transform: translateY(0) scale(1); }
+  75%  { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-4px) scale(.98); }
+}
+
+/* Responsive: acercar la burbuja al botón en móviles */
+@media (max-width: 576px) {
+  #chatbot-button::after { right: 64px; font-size: 12px; }
+}
+
+/* Accesibilidad: respetar prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  #chatbot-button::before,
+  #chatbot-button::after {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1; /* déjala visible sin animación */
+  }
+}
+
