@@ -2473,3 +2473,30 @@ body.dark-mode #chatbot-button::after {
   }
 }
 
+/* =========================================
+   FIX: Mantener texto negro en modal (modo oscuro)
+   sin alterar el estilo original
+========================================= */
+body.dark-mode .modal-content,
+body.dark-mode .modal-content *,
+body.dark-mode .swal2-popup,
+body.dark-mode .swal2-popup * {
+  color: #111111 !important;   /* texto negro */
+}
+
+/* Mantén el fondo blanco original */
+body.dark-mode .modal-content,
+body.dark-mode .swal2-popup {
+  background-color: #ffffff !important;
+}
+
+/* Conservar ícono azul y botón "Cerrar" */
+body.dark-mode .swal2-icon .swal2-icon-content {
+  color: #2db7ff !important;
+}
+
+body.dark-mode .swal2-confirm,
+body.dark-mode .modal .btn {
+  background-color: #fa9907 !important;
+  color: #ffffff !important;
+}
