@@ -109,27 +109,40 @@ class AsignacionesAlumnosController extends BaseController
         $alumnosSeleccionados = $this->request->getPost('alumnos') ?? [$this->request->getPost('alumno_id')];
 
         if (!$grupoId || empty($alumnosSeleccionados)) {
-            return redirect()->back()->with('msg', '⚠️ Debes seleccionar un grupo y al menos un alumno.');
+            return $this->response->setJSON(['ok' => false, 'msg' => '⚠️ Debes seleccionar un grupo y al menos un alumno.']);
         }
 
+        // 🔹 Obtener información del grupo
+        $grupo = $this->grupoModel->find($grupoId);
+        if (!$grupo) {
+            return $this->response->setJSON(['ok' => false, 'msg' => '❌ Grupo no encontrado.']);
+        }
+
+        // 🔹 Obtener carrera vinculada
         $relacion = $this->carreraGrupoModel
             ->select('carrera_grupo.carrera_id')
             ->where('carrera_grupo.grupo_id', $grupoId)
             ->first();
 
         if (!$relacion) {
-            return redirect()->back()->with('msg', '❌ El grupo no está vinculado a ninguna carrera.');
+            return $this->response->setJSON(['ok' => false, 'msg' => '❌ El grupo no está vinculado a ninguna carrera.']);
         }
 
         $carreraId = $relacion['carrera_id'];
-        $grupo = $this->grupoModel->find($grupoId);
-        $limite = $grupo['limite'] ?? 0;
+        $limite = $grupo['limite'] ?? 40; // si no tiene campo, fijamos 40 por defecto
         $actuales = $this->grupoAlumnoModel->where('grupo_id', $grupoId)->countAllResults();
 
-        if ($limite && $actuales >= $limite) {
-            return redirect()->back()->with('msg', '⚠️ El grupo ya alcanzó su límite de alumnos.');
+        // 🔹 Comprobar si excede el límite
+        $totalDespues = $actuales + count($alumnosSeleccionados);
+        if ($totalDespues > $limite) {
+            return $this->response->setJSON([
+                'ok' => false,
+                'excede' => true,
+                'msg' => "⚠️ El grupo <b>{$grupo['nombre']}</b> excede el límite de {$limite} alumnos. ¿Deseas crear un nuevo grupo?"
+            ]);
         }
 
+        // 🔹 Validar que pertenecen a la misma carrera
         $alumnosValidos = $this->alumnoCarreraModel
             ->select('alumno_id')
             ->where('carrera_id', $carreraId)
@@ -137,9 +150,10 @@ class AsignacionesAlumnosController extends BaseController
             ->findAll();
 
         if (empty($alumnosValidos)) {
-            return redirect()->back()->with('msg', '⚠️ Ninguno de los alumnos seleccionados pertenece a la carrera del grupo.');
+            return $this->response->setJSON(['ok' => false, 'msg' => '⚠️ Ninguno de los alumnos pertenece a la carrera del grupo.']);
         }
 
+        // 🔹 Insertar alumnos
         foreach ($alumnosValidos as $a) {
             $alumnoId = $a['alumno_id'];
             $yaInscrito = $this->grupoAlumnoModel
@@ -170,8 +184,60 @@ class AsignacionesAlumnosController extends BaseController
             }
         }
 
-        return redirect()->back()->with('msg', '✅ Alumnos asignados correctamente al grupo y materias.');
+        return $this->response->setJSON(['ok' => true, 'msg' => '✅ Alumnos asignados correctamente al grupo.']);
     }
+
+    public function crearGrupoExtra($grupoId)
+    {
+        $grupo = $this->grupoModel->find($grupoId);
+        if (!$grupo) {
+            return $this->response->setJSON(['ok' => false, 'msg' => 'Grupo no encontrado.']);
+        }
+
+        // Ejemplo: ITIDI1M → ITIDI1MA (actual), ITIDI1MB (nuevo)
+        $nombreActual = $grupo['nombre'];
+        $nuevoNombre = preg_replace('/A$/i', 'B', $nombreActual);
+        if (!str_ends_with($nombreActual, 'A')) {
+            $nombreActual .= 'A';
+            $nuevoNombre = preg_replace('/([A-Z0-9]+)$/i', '${1}A', $nombreActual);
+            $nuevoNombre = preg_replace('/A$/i', 'B', $nuevoNombre);
+        }
+
+        // Renombrar actual si no tiene sufijo
+        $this->grupoModel->update($grupoId, ['nombre' => $nombreActual]);
+
+        // Crear grupo nuevo con sufijo B
+        $nuevoGrupo = [
+            'nombre' => $nuevoNombre,
+            'turno' => $grupo['turno'],
+            'periodo' => $grupo['periodo'],
+            'activo' => 1,
+            'limite' => $grupo['limite'] ?? 40,
+        ];
+        $this->grupoModel->insert($nuevoGrupo);
+        $nuevoGrupoId = $this->grupoModel->getInsertID();
+
+        // Vincular con la misma carrera
+        $relacion = $this->carreraGrupoModel
+            ->where('grupo_id', $grupoId)
+            ->first();
+        if ($relacion) {
+            $this->carreraGrupoModel->insert([
+                'carrera_id' => $relacion['carrera_id'],
+                'grupo_id' => $nuevoGrupoId
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'ok' => true,
+            'msg' => "✅ Se creó el grupo <b>{$nuevoNombre}</b> con capacidad disponible.",
+            'nuevoGrupo' => [
+                'id' => $nuevoGrupoId,
+                'grupo' => $nuevoNombre
+            ]
+        ]);
+    }
+
 
     public function eliminarAlumno($id)
     {
@@ -272,7 +338,7 @@ class AsignacionesAlumnosController extends BaseController
             return $this->response->setJSON(['ok' => false, 'msg' => '⚠️ Este grupo no está vinculado a una carrera.']);
         }
 
-        // Calcular el nuevo ciclo (ej. de 3 → 4)
+        // Detectar número actual del grupo (ej. ITIID6M → 6)
         $nombreGrupo = $grupoActual['nombre'];
         preg_match('/(\d+)/', $nombreGrupo, $matches);
         $numeroActual = $matches[1] ?? null;
@@ -282,44 +348,92 @@ class AsignacionesAlumnosController extends BaseController
             return $this->response->setJSON(['ok' => false, 'msg' => '⚠️ No se pudo detectar el número de ciclo actual.']);
         }
 
-        // Crear nuevo grupo
-        $nuevoGrupo = [
-            'nombre' => preg_replace('/\d+/', $nuevoCiclo, $nombreGrupo, 1),
-            'periodo' => $grupoActual['periodo'],
-            'turno' => $grupoActual['turno'],
-            'activo' => 1,
-        ];
+        // 🔹 Determinar turno según el ciclo
+        $turno = $grupoActual['turno'];
+        if ($nuevoCiclo >= 7) {
+            $turno = 'Vespertino';
+        }
 
-        $this->grupoModel->insert($nuevoGrupo);
-        $nuevoGrupoId = $this->grupoModel->getInsertID();
+        // 🔹 Generar nombre del grupo destino
+        $nuevoNombre = preg_replace('/\d+/', $nuevoCiclo, $nombreGrupo, 1);
+        if ($nuevoCiclo >= 7) {
+            $nuevoNombre = preg_replace('/M$/i', 'V', $nuevoNombre);
+        }
 
-        // Vincular el nuevo grupo con la misma carrera
-        $this->carreraGrupoModel->insert([
-            'carrera_id' => $relacion['carrera_id'],
-            'grupo_id' => $nuevoGrupoId,
-        ]);
+        // 🔹 Buscar si ya existe ese grupo
+        $grupoDestino = $this->grupoModel->where('nombre', $nuevoNombre)->first();
 
-        // Obtener alumnos activos del grupo actual
+        // 🔹 Si no existe, crearlo
+        if (!$grupoDestino) {
+            $this->grupoModel->insert([
+                'nombre' => $nuevoNombre,
+                'periodo' => $grupoActual['periodo'],
+                'turno' => $turno,
+                'activo' => 1,
+            ]);
+            $nuevoGrupoId = $this->grupoModel->getInsertID();
+
+            // Vincular con la misma carrera
+            $this->carreraGrupoModel->insert([
+                'carrera_id' => $relacion['carrera_id'],
+                'grupo_id' => $nuevoGrupoId,
+            ]);
+
+            $msgGrupo = "✅ Se creó el grupo <b>{$nuevoNombre}</b> y los alumnos fueron promovidos.";
+        } else {
+            // 🔹 Si ya existe, usar ese grupo destino
+            $nuevoGrupoId = $grupoDestino['id'];
+            $msgGrupo = "✅ Los alumnos fueron promovidos al grupo existente <b>{$nuevoNombre}</b>.";
+        }
+
+        // 🔹 Obtener alumnos activos del grupo actual
         $alumnosActuales = $this->grupoAlumnoModel
             ->where('grupo_id', $grupoId)
             ->where('estatus', 'Inscrito')
             ->findAll();
 
-        // Pasarlos al nuevo grupo
-        foreach ($alumnosActuales as $a) {
-            $this->grupoAlumnoModel->insert([
-                'grupo_id' => $nuevoGrupoId,
-                'alumno_id' => $a['alumno_id'],
-                'fecha_inscripcion' => date('Y-m-d'),
-                'estatus' => 'Inscrito',
+        if (empty($alumnosActuales)) {
+            return $this->response->setJSON([
+                'ok' => true,
+                'msg' => "{$msgGrupo} (Sin alumnos activos para promover).",
+                'nuevoGrupo' => [
+                    'id' => $nuevoGrupoId,
+                    'grupo' => $nuevoNombre,
+                ],
             ]);
+        }
+
+        // 🔹 Mover alumnos (sin duplicar)
+        foreach ($alumnosActuales as $a) {
+            $yaExiste = $this->grupoAlumnoModel
+                ->where('grupo_id', $nuevoGrupoId)
+                ->where('alumno_id', $a['alumno_id'])
+                ->first();
+
+            if (!$yaExiste) {
+                $this->grupoAlumnoModel->insert([
+                    'grupo_id' => $nuevoGrupoId,
+                    'alumno_id' => $a['alumno_id'],
+                    'fecha_inscripcion' => date('Y-m-d'),
+                    'estatus' => 'Inscrito',
+                ]);
+            }
+
+            // Eliminar del grupo anterior
+            $this->grupoAlumnoModel->delete($a['id']);
         }
 
         return $this->response->setJSON([
             'ok' => true,
-            'msg' => '✅ Se creó el grupo del siguiente ciclo y se promovieron los alumnos.'
+            'msg' => $msgGrupo,
+            'nuevoGrupo' => [
+                'id' => $nuevoGrupoId,
+                'grupo' => $nuevoNombre,
+            ],
+            'yaExistia' => (bool) $grupoDestino, // ✅ agregado
         ]);
     }
+
 
     public function alumnosInscritos($grupoId)
     {
@@ -370,5 +484,21 @@ class AsignacionesAlumnosController extends BaseController
         return $this->response->setJSON(['ok' => true, 'grupos' => $grupos]);
     }
 
+    public function eliminarMultiples()
+    {
+        $data = $this->request->getJSON(true);
+        $ids = $data['ids'] ?? [];
+
+        if (empty($ids)) {
+            return $this->response->setJSON(['ok' => false, 'msg' => 'No se recibieron alumnos a eliminar.']);
+        }
+
+        try {
+            $this->grupoAlumnoModel->whereIn('id', $ids)->delete();
+            return $this->response->setJSON(['ok' => true, 'msg' => '✅ Alumnos eliminados correctamente.']);
+        } catch (\Exception $e) {
+            return $this->response->setJSON(['ok' => false, 'msg' => '❌ Error al eliminar los alumnos.']);
+        }
+    }
 
 }

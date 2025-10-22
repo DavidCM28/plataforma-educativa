@@ -84,11 +84,14 @@ class AsignacionesController extends BaseController
             return preg_match('/(?<!\d)1(?!\d)/', $g['grupo']);
         });
 
+        // 🔹 Guardar copia completa (para el tab de promoción)
+        $gruposTotales = $grupos;
 
         // 🔹 Enviar todo a la vista
         return view('lms/admin/asignaciones/index', [
             'grupos' => $grupos,
             'gruposPrimerCiclo' => $gruposPrimerCiclo,
+            'gruposTotales' => $gruposTotales,
             'materias' => $materias,
             'profesores' => $profesores,
             'ciclos' => $ciclos,

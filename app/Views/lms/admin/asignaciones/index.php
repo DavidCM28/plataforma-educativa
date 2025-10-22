@@ -192,8 +192,8 @@
                 <!-- ==================== SUBTAB 2: ALUMNO ↔ GRUPO ==================== -->
                 <div id="subtab-grupos" class="subtab-content">
                     <form id="formAsignarAlumnos" class="form-asignacion"
-                        action="<?= base_url('admin/asignaciones/asignar-alumno') ?>" method="POST">
-                        <h3><i class="fa-solid fa-user-plus"></i> Asignar Alumnos a Grupo</h3>
+                        action="<?= base_url('admin/asignaciones-alumnos/asignar-alumno') ?>" <h3><i
+                            class="fa-solid fa-user-plus"></i> Asignar Alumnos a Grupo</h3>
                         <small>Solo se mostrarán los alumnos que pertenezcan a la carrera del grupo
                             seleccionado.</small>
 
@@ -248,20 +248,29 @@
 
                     <div class="tabla-asignados">
                         <h4><i class="fa-solid fa-users"></i> Alumnos inscritos</h4>
+
+                        <div class="acciones-tabla">
+                            <label><input type="checkbox" id="selectAllAlumnos"> Seleccionar todos</label>
+                            <button id="btnEliminarSeleccionados" class="btn-mini btn-danger" type="button">
+                                <i class="fa fa-trash"></i> Eliminar seleccionados
+                            </button>
+                        </div>
+
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Matricula</th>
+                                    <th></th> <!-- columna de selección -->
+                                    <th>Matrícula</th>
                                     <th>Alumno</th>
                                     <th>Grupo</th>
                                     <th>Estatus</th>
                                     <th>Acción</th>
                                 </tr>
                             </thead>
-                            <tbody id="tablaAlumnosInscritos">
-                            </tbody>
+                            <tbody id="tablaAlumnosInscritos"></tbody>
                         </table>
                     </div>
+
                 </div>
             </section>
         </div>
@@ -269,8 +278,10 @@
 
     <script>
         const gruposPrimerCiclo = <?= json_encode($gruposPrimerCiclo) ?>;
+        const gruposTotales = <?= json_encode($gruposTotales) ?>;
         const carrerasLista = <?= json_encode($carreras) ?>;
     </script>
+
 
     <script src="<?= base_url('assets/js/sidebar.js') ?>"></script>
     <script src="<?= base_url('assets/js/alert.js') ?>"></script>

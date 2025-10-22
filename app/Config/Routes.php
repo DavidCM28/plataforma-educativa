@@ -129,16 +129,25 @@ $routes->group('admin/asignaciones', ['namespace' => 'App\Controllers\Admin'], s
 // ===============================================
 $routes->group('admin/asignaciones-alumnos', ['namespace' => 'App\Controllers\Admin'], static function ($routes) {
     $routes->get('/', 'AsignacionesAlumnosController::index');
+
+    // 🔹 Acciones principales
     $routes->post('vincular-alumno-carrera', 'AsignacionesAlumnosController::vincularAlumnoCarrera');
     $routes->post('asignar-alumno', 'AsignacionesAlumnosController::asignarAlumno');
-    $routes->get('eliminar-alumno/(:num)', 'AsignacionesAlumnosController::eliminarAlumno/$1');
-    $routes->get('alumnos-por-carrera/(:num)', 'AsignacionesAlumnosController::alumnosPorCarrera/$1');
-    $routes->get('buscar-alumno', 'AsignacionesAlumnosController::buscarAlumno');
     $routes->post('promover-grupo/(:num)', 'AsignacionesAlumnosController::promoverGrupo/$1');
+
+    // 🔹 Consultas dinámicas
+    $routes->get('buscar-alumno', 'AsignacionesAlumnosController::buscarAlumno');
+    $routes->get('alumnos-por-carrera/(:num)', 'AsignacionesAlumnosController::alumnosPorCarrera/$1');
     $routes->get('alumnos-inscritos/(:num)', 'AsignacionesAlumnosController::alumnosInscritos/$1');
     $routes->get('grupos-por-carrera/(:num)', 'AsignacionesAlumnosController::gruposPorCarrera/$1');
+    $routes->post('crear-grupo-extra/(:num)', 'AsignacionesAlumnosController::crearGrupoExtra/$1');
+    $routes->post('eliminar-multiples', 'AsignacionesAlumnosController::eliminarMultiples');
 
+
+    // 🔹 Eliminación
+    $routes->delete('eliminar-alumno/(:num)', 'AsignacionesAlumnosController::eliminarAlumno/$1');
 });
+
 
 
 
