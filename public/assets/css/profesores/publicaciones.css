@@ -1,0 +1,322 @@
+/* ============================================================
+   📰 ESTILOS DE PUBLICACIONES, COMENTARIOS Y RESPUESTAS
+   ============================================================ */
+
+:root {
+  --bg-dark: #181a20;
+  --surface: #21242b;
+  --primary: #ff9e64;
+  --accent: #ffb84c;
+  --accent-soft: #ffc87a;
+  --text: #f9f9fb;
+  --text-muted: #b5b5b5;
+  --radius: 16px;
+  --shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ==============================
+   📦 Contenedor principal
+============================== */
+.publicacion {
+  background: var(--surface);
+  color: var(--text);
+  padding: 1.4rem 1.6rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 1.8rem;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.publicacion:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+/* ==============================
+   🧑 Encabezado
+============================== */
+.publicacion-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1rem;
+}
+
+.publicacion-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--primary);
+}
+
+.publicacion-datos {
+  flex: 1;
+}
+
+.publicacion-nombre {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.publicacion-fecha {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.publicacion-acciones {
+  display: flex;
+  gap: 6px;
+}
+
+.publicacion-acciones button {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: color 0.2s;
+}
+
+.publicacion-acciones button:hover {
+  color: var(--primary);
+}
+
+/* ==============================
+   📝 Contenido
+============================== */
+.publicacion-contenido {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text);
+  margin-bottom: 1rem;
+  padding-left: 6px;
+}
+
+/* ==============================
+   📎 Archivos adjuntos
+============================== */
+.publicacion-archivos {
+  margin: 0.8rem 0 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.publicacion-archivos a {
+  color: var(--accent-soft);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.publicacion-archivos a:hover {
+  color: var(--accent);
+}
+
+/* ==============================
+   💬 Comentarios
+============================== */
+.publicacion-comentarios {
+  background: #1b1e25;
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+}
+
+.comentario {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.comentario:last-child {
+  border-bottom: none;
+}
+
+.comentario-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent);
+}
+
+.comentario-body {
+  flex: 1;
+}
+
+.comentario-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.comentario-nombre {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.comentario-fecha {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-left: 8px;
+}
+
+.comentario-texto {
+  color: var(--text);
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+}
+
+.comentario-acciones {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.comentario-acciones button {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.comentario-acciones button:hover {
+  color: var(--accent);
+}
+
+/* ==============================
+   ↩️ Botón de respuesta
+============================== */
+.btn-responder {
+  background: none;
+  border: none;
+  color: var(--accent-soft);
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-top: 3px;
+  transition: color 0.2s;
+}
+
+.btn-responder:hover {
+  color: var(--accent);
+}
+
+/* ==============================
+   ✍️ Formulario de nuevo comentario
+============================== */
+.form-comentario {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+  background: var(--bg-dark);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.form-comentario textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  padding: 0.7rem 1rem;
+  resize: none;
+  font-size: 0.95rem;
+}
+
+.form-comentario textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.form-comentario button {
+  background: var(--primary);
+  border: none;
+  color: var(--bg-dark);
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.form-comentario button:hover {
+  background: var(--accent);
+}
+
+/* ==============================
+   💬 Subcomentarios (respuestas)
+============================== */
+.respuestas {
+  margin-left: 3rem;
+  margin-top: 0.6rem;
+  border-left: 2px solid rgba(255, 255, 255, 0.08);
+  padding-left: 1rem;
+}
+
+.placeholder {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 0.5rem 0;
+}
+/* ==============================
+   ✏️ EDICIÓN INLINE
+============================== */
+.form-editar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  background: var(--bg-dark);
+  border-radius: var(--radius);
+  padding: 0.8rem;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.editar-textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  resize: vertical;
+  font-size: 1rem;
+  min-height: 70px;
+  line-height: 1.4;
+}
+
+.editar-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.editar-acciones button {
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.btn-guardar {
+  background: var(--primary);
+  color: var(--bg-dark);
+}
+
+.btn-guardar:hover {
+  background: var(--accent);
+}
+
+.btn-cancelar {
+  background: #333;
+  color: var(--text-muted);
+}
+
+.btn-cancelar:hover {
+  background: #444;
+  color: var(--text);
+}

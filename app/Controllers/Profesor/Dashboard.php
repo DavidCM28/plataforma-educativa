@@ -16,28 +16,49 @@ class Dashboard extends BaseController
         $datos = $model->obtenerTotalesPorProfesor($profesorId);
         $asignaciones = $model->obtenerAsignacionesPorProfesor($profesorId);
 
-        // 🔹 Separar días y hora del campo horario (robusto)
-        // 🔹 Separar días y hora del campo horario (versión definitiva)
         foreach ($asignaciones as &$asignacion) {
-            $horario = trim(preg_replace('/\s+/', ' ', $asignacion['horario'] ?? ''));
+            $texto = trim($asignacion['horario'] ?? '');
 
-            if (!empty($horario)) {
-                // Coincide con formatos tipo "L-X-V 08:20-09:00" o "M-J 10:00-12:00"
-                if (preg_match('/^([A-ZÁÉÍÓÚÑ\-]+)\s+([0-9]{1,2}:[0-9]{2}-[0-9]{1,2}:[0-9]{2})$/u', $horario, $matches)) {
-                    $asignacion['dias'] = $matches[1] ?? '-';
-                    $asignacion['hora'] = $matches[2] ?? '-';
+            if (!empty($texto)) {
+                // 🔹 Separar cada bloque por punto y coma (;)
+                $bloques = array_filter(array_map('trim', preg_split('/[;,]+/', $texto)));
+
+                $mapa = []; // ['L' => ['07:30-08:20'], 'X' => ['10:00-10:50', '10:50-11:40']]
+
+                foreach ($bloques as $bloque) {
+                    // Coincide con formato tipo "L 07:30-08:20"
+                    if (preg_match('/^([A-ZÁÉÍÓÚÑ])\s+([0-9]{1,2}:[0-9]{2}-[0-9]{1,2}:[0-9]{2})$/u', $bloque, $m)) {
+                        $dia = strtoupper(trim($m[1]));
+                        $hora = trim($m[2]);
+                        $mapa[$dia][] = $hora;
+                    }
+                }
+
+                // 🔹 Crear versiones legibles
+                if (!empty($mapa)) {
+                    $diasArray = [];
+                    $horasArray = [];
+                    foreach ($mapa as $dia => $horas) {
+                        $diasArray[] = $dia;
+                        $horasArray[] = implode(', ', $horas);
+                    }
+
+                    $asignacion['dias'] = implode(' / ', $diasArray);
+                    $asignacion['hora'] = implode(' / ', $horasArray);
+                    $asignacion['horario_detalle'] = $mapa;
                 } else {
-                    // Respaldo si el formato no cumple con el patrón
-                    $partes = explode(' ', $horario, 2);
-                    $asignacion['dias'] = trim($partes[0] ?? '-');
-                    $asignacion['hora'] = trim($partes[1] ?? '-');
+                    $asignacion['dias'] = '-';
+                    $asignacion['hora'] = '-';
+                    $asignacion['horario_detalle'] = [];
                 }
             } else {
                 $asignacion['dias'] = '-';
                 $asignacion['hora'] = '-';
+                $asignacion['horario_detalle'] = [];
             }
         }
         unset($asignacion);
+
 
 
         return view('lms/dashboards/profesor_dashboard', [

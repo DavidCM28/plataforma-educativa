@@ -25,7 +25,6 @@ const HORARIOS = {
     "12:30",
     "13:20",
     "14:10",
-    "15:00",
   ],
   Vespertino: [
     "16:40",
@@ -36,9 +35,13 @@ const HORARIOS = {
     "20:00",
     "20:40",
     "21:20",
-    "22:00",
   ],
 };
+
+function horaToMinutos(hora) {
+  const [hh, mm] = hora.split(":").map(Number);
+  return hh * 60 + mm;
+}
 
 // ==========================================================
 // 🧠 CAMBIO DE GRUPO → generar cuadrícula y cargar materias
@@ -357,25 +360,35 @@ async function cargarHorarioGrupo(grupoId) {
     data.asignaciones.forEach((asig) => {
       const { materia, profesor, dias, inicio_str, fin_str, id } = asig;
       dias.forEach((dia) => {
-        const iInicio = horas.indexOf(inicio_str);
-        const iFin = horas.indexOf(fin_str);
+        const iInicio = horas.findIndex(
+          (h) => horaToMinutos(h) === horaToMinutos(inicio_str)
+        );
+
+        // Buscar el primer bloque cuya hora sea mayor al fin
+        let iFin = horas.findIndex(
+          (h) => horaToMinutos(h) > horaToMinutos(fin_str)
+        );
+
+        // Si no hay uno mayor (es el último bloque), tomar hasta el final
+        if (iFin === -1) iFin = horas.length;
+
         if (iInicio === -1) return;
 
-        for (let i = iInicio; i < iFin; i++) {
-          const celda = contenedorSelector.querySelector(
-            `.celda[data-dia="${dia}"][data-hora="${horas[i]}"]`
-          );
-          if (!celda) continue;
+        // Pintar desde inicio hasta fin
+        const celda = contenedorSelector.querySelector(
+          `.celda[data-dia="${dia}"][data-hora="${inicio_str}"]`
+        );
+        if (celda) {
           celda.classList.add("ocupada");
           celda.dataset.materia = materia;
           celda.dataset.profesor = profesor;
           celda.dataset.asignacionId = id;
           celda.innerHTML = `
-            <div class="info-celda">
-              <strong>${materia}</strong><br>
-              <small><i class="fa-solid fa-user-tie"></i> ${profesor}</small><br>
-              <small><i class="fa-regular fa-clock"></i> ${inicio_str} - ${fin_str}</small>
-            </div>`;
+    <div class="info-celda">
+      <strong>${materia}</strong><br>
+      <small><i class="fa-solid fa-user-tie"></i> ${profesor}</small><br>
+      <small><i class="fa-regular fa-clock"></i> ${inicio_str} - ${fin_str}</small>
+    </div>`;
         }
       });
     });
@@ -529,20 +542,24 @@ async function actualizarTablaAsignaciones(grupoId) {
 // 🕒 Eliminar frecuencia individual (una celda, con confirmación)
 // ==========================================================
 async function eliminarFrecuenciaIndividual(asignacionId, dia, horaInicio) {
-  // 🔹 Calcular hora de fin (siguiente bloque)
+  // 🔹 Determinar turno y duración por bloque
   const turno = grupoSelect.selectedOptions[0]?.dataset.turno || "Matutino";
-  const horas = HORARIOS[turno];
-  const i = horas.indexOf(horaInicio);
-  const horaFin = i !== -1 && i + 1 < horas.length ? horas[i + 1] : null;
+  const duracion = turno.toLowerCase() === "vespertino" ? 40 : 50;
 
-  if (!horaFin) {
-    mostrarAlerta(
-      "No se pudo determinar el bloque final de la frecuencia.",
-      "error"
-    );
-    return;
-  }
+  // 🔹 Calcular hora de fin precisa (+40 o +50 minutos)
+  const [hh, mm] = horaInicio.split(":").map(Number);
+  const finDate = new Date();
+  finDate.setHours(hh, mm + duracion, 0, 0);
 
+  const horaFin = finDate
+    .toLocaleTimeString("es-MX", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    })
+    .padStart(5, "0");
+
+  // 🔹 Confirmar acción
   mostrarConfirmacion(
     "Eliminar frecuencia",
     `¿Deseas eliminar la frecuencia del <b>${dia}</b> a las <b>${horaInicio}</b>?`,
@@ -560,28 +577,29 @@ async function eliminarFrecuenciaIndividual(asignacionId, dia, horaInicio) {
             }),
           }
         );
+
         const data = await res.json();
 
         if (data.ok) {
           mostrarAlerta(
-            data.msg || "Frecuencia eliminada correctamente.",
+            data.msg || "✅ Frecuencia eliminada correctamente.",
             "success"
           );
           await cargarHorarioGrupo(grupoSelect.value);
           actualizarTablaAsignaciones(grupoSelect.value);
         } else {
           mostrarAlerta(
-            data.msg || "No se pudo eliminar la frecuencia.",
+            data.msg || "⚠️ No se pudo eliminar la frecuencia.",
             "error"
           );
         }
       } catch (err) {
         console.error("Error al eliminar frecuencia:", err);
-        mostrarAlerta("Error al eliminar frecuencia.", "error");
+        mostrarAlerta("❌ Error al eliminar frecuencia.", "error");
       }
     },
     () => {
-      mostrarAlerta("Operación cancelada", "info");
+      mostrarAlerta("Operación cancelada.", "info");
     }
   );
 }

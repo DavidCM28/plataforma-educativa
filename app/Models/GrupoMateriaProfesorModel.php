@@ -73,10 +73,45 @@ class GrupoMateriaProfesorModel extends Model
         $materias = [];
         $grupos = [];
 
-        foreach ($asignaciones as $a) {
-            $materias[$a['materia_id']] = true;
-            $grupos[$a['grupo_id']] = true;
+        foreach ($asignaciones as &$asignacion) {
+            $horarioTexto = trim($asignacion['horario'] ?? '');
+
+            if (!empty($horarioTexto)) {
+                // Dividir por punto y coma (;) o coma, quitar espacios extras
+                $bloques = array_filter(array_map('trim', preg_split('/[;,]+/', $horarioTexto)));
+
+                $mapaDias = []; // ejemplo: ['L' => ['07:30-08:20'], 'V' => ['07:30-08:20'], 'X' => ['10:00-10:50','10:50-11:40']]
+
+                foreach ($bloques as $bloque) {
+                    // Coincide con formatos tipo "X 10:00-10:50"
+                    if (preg_match('/^([A-ZÁÉÍÓÚÑ\-]+)\s+([0-9]{1,2}:[0-9]{2}-[0-9]{1,2}:[0-9]{2})$/u', $bloque, $m)) {
+                        $dia = trim($m[1]);
+                        $hora = trim($m[2]);
+                        $mapaDias[$dia][] = $hora;
+                    }
+                }
+
+                // Convertir a formato legible
+                $diasMostrar = [];
+                $horasMostrar = [];
+
+                foreach ($mapaDias as $dia => $horas) {
+                    $diasMostrar[] = $dia;
+                    $horasMostrar[] = implode(', ', $horas);
+                }
+
+                $asignacion['dias'] = implode(' / ', $diasMostrar);
+                $asignacion['hora'] = implode(' / ', $horasMostrar);
+                $asignacion['horario_detalle'] = $mapaDias; // útil para el horario semanal
+            } else {
+                $asignacion['dias'] = '-';
+                $asignacion['hora'] = '-';
+                $asignacion['horario_detalle'] = [];
+            }
         }
+        unset($asignacion);
+
+
 
         return [
             'total_materias' => count($materias),

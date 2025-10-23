@@ -1,53 +1,165 @@
 <?= $this->extend('lms/dashboard-plataforma') ?>
 <?= $this->section('contenidoDashboard') ?>
+<script>
+    window.base_url = "<?= rtrim(site_url(), '/') ?>/";
 
+</script>
+
+
+<script src="<?= base_url('assets/js/alert.js') ?>"></script>
+<script src="<?= base_url('assets/js/profesores/asistencias.js') ?>"></script>
+<script src="<?= base_url('assets/js/profesores/publicaciones.js') ?>"></script>
+<link rel="stylesheet" href="<?= base_url('assets/css/alert.css') ?>">
 <link rel="stylesheet" href="<?= base_url('assets/css/profesores/grupos.css') ?>">
+<link rel="stylesheet" href="<?= base_url('assets/css/profesores/tareas.css') ?>">
+<script src="<?= base_url('assets/js/profesores/tareas.js') ?>"></script>
 
-<section class="grupo-panel">
-    <h2><i class="fas fa-users"></i> <?= esc($grupo['materia']) ?> - <?= esc($grupo['grupo']) ?></h2>
+<!-- 🔔 Contenedor global de alertas -->
+<div id="alertContainer" class="alert-container"></div>
 
-    <div class="tabs">
-        <button class="tab-btn active" data-tab="listados">👥 Lista de Alumnos</button>
-        <button class="tab-btn" data-tab="asistencias">📊 Asistencias</button>
-        <button class="tab-btn" data-tab="tareas">📝 Tareas</button>
-        <button class="tab-btn" data-tab="actividades">🎯 Actividades</button>
-        <button class="tab-btn" data-tab="participacion">💬 Participación</button>
-        <button class="tab-btn" data-tab="examenes">📚 Exámenes</button>
-        <button class="tab-btn" data-tab="proyectos">🚀 Proyectos</button>
-        <button class="tab-btn" data-tab="calificaciones">📈 Calificaciones</button>
-    </div>
-
-    <!-- Lista de Alumnos -->
-    <div class="tab-content active" id="listados">
-        <?= view('lms/profesor/grupos/listado', ['alumnos' => $alumnos]) ?>
-    </div>
-
-    <!-- Asistencias -->
-    <div class="tab-content" id="asistencias">
-        <div class="tabla-header">
-            <h3>Control de Asistencias</h3>
-            <button class="btn-primary">Registrar Asistencia</button>
+<!-- ⚠️ Modal de confirmación -->
+<div id="confirmModal" class="confirm-modal hidden">
+    <div class="confirm-box">
+        <h3 id="confirmTitle">Confirmar acción</h3>
+        <p id="confirmMessage">¿Estás seguro de continuar?</p>
+        <div class="confirm-buttons">
+            <button id="confirmCancelar">Cancelar</button>
+            <button id="confirmAceptar">Aceptar</button>
         </div>
-        <table class="alumnos-tabla">
+    </div>
+</div>
+
+
+<section class="grupo-teams">
+    <div class="grupo-header">
+        <div class="grupo-info">
+            <h2><?= esc($grupo['materia']) ?> <span class="grupo-tag"><?= esc($grupo['grupo']) ?></span></h2>
+            <p class="grupo-sub"><i class="fas fa-chalkboard-teacher"></i> Profesor:
+                <?= esc($grupo['profesor'] ?? 'Sin asignar') ?>
+            </p>
+        </div>
+    </div>
+
+    <!-- ============================================================
+📁 NAVEGACIÓN DEL GRUPO (Tabs principales tipo Teams)
+============================================================ -->
+    <nav class="tabs-teams">
+        <div class="tabs-main">
+            <button class="tab-btn active" data-tab="inicio" title="Publicaciones">
+                <i class="fas fa-comments"></i><span> Publicaciones</span>
+            </button>
+
+            <button class="tab-btn" data-tab="alumnos" title="Lista de alumnos">
+                <i class="fas fa-users"></i> <span> Alumnos</span>
+            </button>
+
+            <button class="tab-btn" data-tab="asistencias" title="Asistencias">
+                <i class="fas fa-calendar-check"></i> <span> Asistencias</span>
+            </button>
+
+            <button class="tab-btn" data-tab="tareas" title="Tareas">
+                <i class="fas fa-tasks"></i> <span> Tareas</span>
+            </button>
+
+            <button class="tab-btn" data-tab="actividades" title="Actividades">
+                <i class="fas fa-bullseye"></i> <span> Actividades</span>
+            </button>
+
+            <button class="tab-btn" data-tab="participacion" title="Participación">
+                <i class="fas fa-user-check"></i> <span> Participación</span>
+            </button>
+
+            <button class="tab-btn" data-tab="examenes" title="Exámenes">
+                <i class="fas fa-book"></i> <span> Exámenes</span>
+            </button>
+
+            <button class="tab-btn" data-tab="proyectos" title="Proyectos">
+                <i class="fas fa-rocket"></i> <span> Proyectos</span>
+            </button>
+
+            <button class="tab-btn" data-tab="calificaciones" title="Calificaciones">
+                <i class="fas fa-chart-line"></i> <span> Calificaciones</span>
+            </button>
+        </div>
+    </nav>
+
+
+
+    <!-- 📰 INICIO (Publicaciones tipo Teams) -->
+    <div class="tab-content active" id="inicio">
+        <div class="publicar-card">
+            <form id="formPublicacion" enctype="multipart/form-data">
+                <textarea name="contenido" id="contenido"
+                    placeholder="Escribe un aviso o mensaje para el grupo..."></textarea>
+                <div class="acciones-publicar">
+                    <label for="archivos" class="btn-archivo"><i class="fas fa-paperclip"></i> Adjuntar</label>
+                    <input type="file" name="archivos[]" id="archivos" multiple hidden>
+                    <button type="submit" class="btn-main"><i class="fas fa-paper-plane"></i> Publicar</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="feedPublicaciones" class="feed-publicaciones" data-asignacion="<?= $asignacionId ?>">
+            <p class="placeholder"><i class="fas fa-spinner fa-spin"></i> Cargando publicaciones...</p>
+        </div>
+
+    </div>
+
+    <!-- LISTA DE ALUMNOS -->
+    <div class="tab-content" id="alumnos">
+
+        <!-- 🔹 Barra de filtros -->
+        <div class="filtros-alumnos">
+            <div class="buscador">
+                <i class="fas fa-search"></i>
+                <input type="text" id="buscarAlumno" placeholder="Buscar alumno o matrícula...">
+            </div>
+
+            <div class="orden">
+                <label for="ordenarPor"><i class="fas fa-sort"></i> Ordenar por:</label>
+                <select id="ordenarPor">
+                    <option value="apellido">Apellidos</option>
+                    <option value="matricula">Matrícula</option>
+                </select>
+            </div>
+
+            <button id="btnResetFiltros" class="btn-reset">
+                <i class="fas fa-sync-alt"></i> Reiniciar
+            </button>
+        </div>
+
+        <!-- 🧑‍🎓 Tabla de alumnos -->
+        <table class="alumnos-lista" id="tablaAlumnos">
             <thead>
                 <tr>
-                    <th>Alumno</th>
-                    <th>Asistencias</th>
-                    <th>Faltas</th>
-                    <th>Porcentaje</th>
+                    <th>Foto</th>
+                    <th>Nombre</th>
+                    <th>Matrícula</th>
+                    <th>Carrera</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (!empty($alumnos)): ?>
-                    <?php foreach ($alumnos as $alumno): ?>
+                    <?php foreach ($alumnos as $a): ?>
                         <tr>
-                            <td><?= esc($alumno['nombre'] . ' ' . $alumno['apellido_paterno']) ?></td>
-                            <td><span class="estado-badge estado-completado">15</span></td>
-                            <td><span class="estado-badge estado-pendiente">2</span></td>
-                            <td>88%</td>
                             <td>
-                                <button class="btn-action btn-info">
+                                <?php if (!empty($a['foto'])): ?>
+                                    <?php
+                                    $esCloud = str_contains($a['foto'], 'cloudinary.com') || str_contains($a['foto'], 'http');
+                                    $rutaFoto = $esCloud ? $a['foto'] : base_url('uploads/usuarios/' . esc($a['foto']));
+                                    ?>
+                                    <img src="<?= esc($rutaFoto) ?>" class="foto-alumno">
+                                <?php else: ?>
+                                    <?php $iniciales = strtoupper(substr($a['nombre'], 0, 1) . substr($a['apellido_paterno'], 0, 1)); ?>
+                                    <div class="avatar-iniciales"><?= $iniciales ?></div>
+                                <?php endif; ?>
+                            </td>
+                            <td><?= esc($a['apellido_paterno'] . ' ' . $a['apellido_materno'] . ' ' . $a['nombre']) ?></td>
+                            <td><?= esc($a['matricula']) ?></td>
+                            <td><?= esc($a['carrera'] ?? '-') ?></td>
+                            <td>
+                                <button class="btn-icon ver-detalle" data-id="<?= $a['alumno_id'] ?>" title="Ver detalles">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </td>
@@ -55,185 +167,330 @@
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="5" style="text-align:center;">No hay alumnos en este grupo.</td>
+                        <td colspan="5" class="sin-alumnos">No hay alumnos registrados.</td>
                     </tr>
                 <?php endif; ?>
             </tbody>
         </table>
     </div>
 
-    <!-- Tareas -->
+    <!-- ============================================================
+     📅 ASISTENCIAS
+============================================================ -->
+    <div class="tab-content" id="asistencias">
+        <div id="contenedorAsistencias" class="asistencias-cargando">
+            <p><i class="fas fa-spinner fa-spin"></i> Cargando asistencias...</p>
+        </div>
+    </div>
+
+    <!-- ============================================================
+📚 TAREAS (se carga desde tareas.php)
+============================================================ -->
     <div class="tab-content" id="tareas">
-        <?= view('lms/profesor/grupos/tareas', ['tareas' => $tareas, 'alumnos' => $alumnos]) ?>
+        <div id="contenedorTareas" class="tareas-cargando">
+            <p><i class="fas fa-spinner fa-spin"></i> Cargando tareas...</p>
+        </div>
     </div>
 
-    <!-- Actividades -->
+    <!-- ============================================================
+🎯 ACTIVIDADES
+============================================================ -->
     <div class="tab-content" id="actividades">
-        <div class="tabla-header">
-            <h3>Actividades del Grupo</h3>
-            <button class="btn-primary">Nueva Actividad</button>
-        </div>
-        <table class="alumnos-tabla">
-            <thead>
-                <tr>
-                    <th>Actividad</th>
-                    <th>Fecha</th>
-                    <th>Entregados</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Presentación Oral</td>
-                    <td>10/12/2024</td>
-                    <td><?= count($alumnos) ?>/<?= count($alumnos) ?></td>
-                    <td><span class="estado-badge estado-completado">Completado</span></td>
-                    <td>
-                        <button class="btn-action btn-info">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Debate Grupal</td>
-                    <td>18/12/2024</td>
-                    <td>15/<?= count($alumnos) ?></td>
-                    <td><span class="estado-badge estado-en-progreso">En Progreso</span></td>
-                    <td>
-                        <button class="btn-action btn-info">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <p class="placeholder"><i class="fas fa-spinner fa-spin"></i> Módulo de actividades en desarrollo...</p>
     </div>
 
-    <!-- Participación -->
+    <!-- ============================================================
+🙋‍♂️ PARTICIPACIÓN
+============================================================ -->
     <div class="tab-content" id="participacion">
-        <div class="tabla-header">
-            <h3>Participación en Clase</h3>
-            <button class="btn-primary">Ver Estadísticas</button>
-        </div>
-        <table class="alumnos-tabla">
-            <thead>
-                <tr>
-                    <th>Alumno</th>
-                    <th>Participaciones</th>
-                    <th>Nivel</th>
-                    <th>Última Actividad</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (!empty($alumnos)): ?>
-                    <?php foreach ($alumnos as $alumno): ?>
-                        <tr>
-                            <td><?= esc($alumno['nombre'] . ' ' . $alumno['apellido_paterno']) ?></td>
-                            <td>15</td>
-                            <td>
-                                <div class="nivel-participacion">
-                                    <div class="nivel-punto activo"></div>
-                                    <div class="nivel-punto activo"></div>
-                                    <div class="nivel-punto activo"></div>
-                                    <div class="nivel-punto"></div>
-                                    <div class="nivel-punto"></div>
-                                </div>
-                            </td>
-                            <td>Hoy</td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="4" style="text-align:center;">No hay alumnos en este grupo.</td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+        <p class="placeholder"><i class="fas fa-spinner fa-spin"></i> Módulo de participación en desarrollo...</p>
     </div>
 
-    <!-- Exámenes -->
+    <!-- ============================================================
+📘 EXÁMENES
+============================================================ -->
     <div class="tab-content" id="examenes">
-        <div class="tabla-header">
-            <h3>Gestión de Exámenes</h3>
-            <button class="btn-primary">Programar Examen</button>
-        </div>
-        <table class="alumnos-tabla">
-            <thead>
-                <tr>
-                    <th>Examen</th>
-                    <th>Fecha</th>
-                    <th>Duración</th>
-                    <th>Ponderación</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Examen Parcial 1</td>
-                    <td>05/12/2024</td>
-                    <td>2 horas</td>
-                    <td>30%</td>
-                    <td><span class="estado-badge estado-completado">Calificado</span></td>
-                </tr>
-                <tr>
-                    <td>Examen Parcial 2</td>
-                    <td>15/12/2024</td>
-                    <td>2 horas</td>
-                    <td>30%</td>
-                    <td><span class="estado-badge estado-pendiente">Pendiente</span></td>
-                </tr>
-            </tbody>
-        </table>
+        <p class="placeholder"><i class="fas fa-spinner fa-spin"></i> Módulo de exámenes en desarrollo...</p>
     </div>
 
-    <!-- Proyectos -->
+    <!-- ============================================================
+🚀 PROYECTOS
+============================================================ -->
     <div class="tab-content" id="proyectos">
-        <div class="tabla-header">
-            <h3>Proyectos del Grupo</h3>
-            <button class="btn-primary">Nuevo Proyecto</button>
-        </div>
-        <table class="alumnos-tabla">
-            <thead>
-                <tr>
-                    <th>Proyecto</th>
-                    <th>Fecha Entrega</th>
-                    <th>Grupos</th>
-                    <th>Progreso</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Proyecto Final - Sistema Web</td>
-                    <td>20/12/2024</td>
-                    <td>5/8</td>
-                    <td>
-                        <div class="progreso-bar">
-                            <div class="progreso-fill" style="width: 60%"></div>
-                        </div>
-                    </td>
-                    <td><span class="estado-badge estado-en-progreso">En Desarrollo</span></td>
-                </tr>
-            </tbody>
-        </table>
+        <p class="placeholder"><i class="fas fa-spinner fa-spin"></i> Módulo de proyectos en desarrollo...</p>
     </div>
 
-    <!-- Calificaciones -->
+    <!-- ============================================================
+📊 CALIFICACIONES
+============================================================ -->
     <div class="tab-content" id="calificaciones">
-        <?= view('lms/profesor/grupos/calificaciones', ['calificaciones' => $calificaciones, 'alumnos' => $alumnos]) ?>
+        <p class="placeholder"><i class="fas fa-spinner fa-spin"></i> Módulo de calificaciones en desarrollo...</p>
     </div>
+
+
+    <!-- 🧩 Modal Detalles Alumno (Diseño Moderno Tipo Perfil) -->
+    <div id="modalAlumno" class="modal hidden">
+        <div class="modal-card">
+            <span class="close">&times;</span>
+
+            <div class="modal-header">
+                <div class="foto-alumno-modal">
+                    <img id="fotoAlumnoModal" src="" alt="Foto del alumno">
+                </div>
+                <div class="info-basica">
+                    <h2 id="nombreAlumnoModal">Alumno</h2>
+                    <p id="matriculaAlumnoModal" class="texto-muted"></p>
+                    <p id="correoAlumnoModal" class="texto-muted"></p>
+                </div>
+            </div>
+
+            <div class="modal-seccion">
+                <h3>📘 Datos Académicos</h3>
+                <div class="campo"><label>Carrera:</label><span id="carreraAlumnoModal">-</span></div>
+                <div class="campo"><label>Grupo:</label><span id="grupoAlumnoModal">-</span></div>
+                <div class="campo"><label>Ciclo:</label><span id="cicloAlumnoModal">-</span></div>
+                <div class="campo"><label>Turno:</label><span id="turnoAlumnoModal">-</span></div>
+            </div>
+
+            <div class="modal-seccion">
+                <h3>📋 Datos Personales</h3>
+                <div class="campo"><label>CURP:</label><span id="curpAlumnoModal">-</span></div>
+                <div class="campo"><label>Fecha Nacimiento:</label><span id="fechaAlumnoModal">-</span></div>
+                <div class="campo"><label>Teléfono:</label><span id="telefonoAlumnoModal">-</span></div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-main cerrar-modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
 </section>
 
 <script>
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById(btn.dataset.tab).classList.add('active');
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+
+            btn.classList.add("active");
+            const target = document.getElementById(btn.dataset.tab);
+            if (!target) return;
+
+            target.classList.add("active");
+
+            // 🚀 Si es la pestaña de asistencias, carga el contenido dinámicamente
+            if (btn.dataset.tab === "asistencias") {
+                const contenedor = document.getElementById("contenedorAsistencias");
+                contenedor.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> Cargando asistencias...</p>`;
+
+                try {
+                    const res = await fetch("<?= base_url('profesor/grupos/asistencias/' . $asignacionId) ?>");
+                    const html = await res.text();
+                    contenedor.innerHTML = html;
+
+                    // ✅ Inicializar lógica desde el archivo externo
+                    window.AsistenciasUI?.inicializar(<?= $asignacionId ?>);
+                } catch (error) {
+                    contenedor.innerHTML = `<p class="error">❌ Error al cargar asistencias: ${error.message}</p>`;
+                }
+            }
+
+        });
+    });
+
+
+    // 🔹 Aplicar diseño tipo perfil en el modal existente
+    document.querySelectorAll(".ver-detalle").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const id = btn.dataset.id;
+            const modal = document.getElementById("modalAlumno");
+
+            try {
+                const res = await fetch("<?= base_url('profesor/grupos/detalles-alumno/') ?>" + id);
+                const data = await res.json();
+
+                if (data.error) {
+                    alert("⚠️ Error del servidor: " + data.error);
+                    console.error(data.error);
+                    return;
+                }
+
+                // 🖼️ Foto
+                const foto = data.usuario?.foto || "";
+                const esCloud = foto.includes("cloudinary.com") || foto.includes("http");
+                document.getElementById("fotoAlumnoModal").src =
+                    foto
+                        ? (esCloud ? foto : "<?= base_url('uploads/usuarios/') ?>" + foto)
+                        : "https://ui-avatars.com/api/?background=ff9e64&color=000&name=" + encodeURIComponent(data.usuario?.nombre ?? "Alumno");
+
+                // 🧾 Datos básicos
+                document.getElementById("nombreAlumnoModal").textContent =
+                    `${data.usuario?.nombre ?? ""} ${data.usuario?.apellido_paterno ?? ""}`;
+                document.getElementById("matriculaAlumnoModal").textContent = `Matrícula: ${data.usuario?.matricula ?? "-"}`;
+                document.getElementById("correoAlumnoModal").textContent = data.usuario?.email ?? "-";
+
+                // 🎓 Académicos
+                document.getElementById("carreraAlumnoModal").textContent = data.academico?.carrera ?? "-";
+                document.getElementById("grupoAlumnoModal").textContent = data.academico?.grupo ?? "-";
+                document.getElementById("cicloAlumnoModal").textContent = data.academico?.semestre ?? "-";
+                document.getElementById("turnoAlumnoModal").textContent = data.academico?.turno ?? "-";
+
+                // 📋 Personales
+                document.getElementById("curpAlumnoModal").textContent = data.detalles?.curp ?? "-";
+                document.getElementById("fechaAlumnoModal").textContent = data.detalles?.fecha_nacimiento ?? "-";
+                document.getElementById("telefonoAlumnoModal").textContent = data.detalles?.telefono ?? "-";
+
+                modal.classList.remove("hidden");
+            } catch (err) {
+                alert("❌ Error inesperado: " + err.message);
+                console.error(err);
+            }
+        });
+    });
+
+    // ❌ Cerrar modal
+    document.addEventListener("click", e => {
+        if (e.target.classList.contains("close") || e.target.classList.contains("cerrar-modal")) {
+            document.getElementById("modalAlumno").classList.add("hidden");
+        }
+    });
+
+    /* ============================================================
+       🔍 FILTRADO Y ORDENADO DE ALUMNOS EN VIVO
+    ============================================================ */
+    const inputBuscar = document.getElementById("buscarAlumno");
+    const selectOrden = document.getElementById("ordenarPor");
+    const btnReset = document.getElementById("btnResetFiltros");
+    const tabla = document.getElementById("tablaAlumnos");
+    const filas = Array.from(tabla.querySelectorAll("tbody tr"));
+
+    function filtrarYOrdenar() {
+        const texto = inputBuscar.value.toLowerCase().trim();
+        const criterio = selectOrden.value;
+
+        // 🔍 Filtrar por texto (nombre completo o matrícula)
+        let visibles = filas.filter(fila => {
+            const nombreCompleto = fila.cells[1].textContent.toLowerCase(); // Apellidos + nombre
+            const matricula = fila.cells[2].textContent.toLowerCase();
+            const carrera = fila.cells[3].textContent.toLowerCase();
+            return (
+                nombreCompleto.includes(texto) ||
+                matricula.includes(texto) ||
+                carrera.includes(texto)
+            );
+        });
+
+        // 🔽 Ordenar según el criterio
+        visibles.sort((a, b) => {
+            if (criterio === "apellido") {
+                const aText = a.cells[1].textContent.toLowerCase();
+                const bText = b.cells[1].textContent.toLowerCase();
+                return aText.localeCompare(bText, "es", { sensitivity: "base" });
+            } else {
+                const aMat = a.cells[2].textContent.toLowerCase();
+                const bMat = b.cells[2].textContent.toLowerCase();
+                return aMat.localeCompare(bMat, "es", { sensitivity: "base" });
+            }
+        });
+
+        // 🧩 Limpiar y volver a renderizar
+        const tbody = tabla.querySelector("tbody");
+        tbody.innerHTML = "";
+        visibles.forEach(f => tbody.appendChild(f));
+    }
+
+    function resaltarCoincidencias(fila, texto) {
+        if (!texto) return;
+        const regex = new RegExp(`(${texto})`, "gi");
+        const celda = fila.cells[1];
+        celda.innerHTML = celda.textContent.replace(regex, '<mark>$1</mark>');
+    }
+
+    inputBuscar.addEventListener("input", () => {
+        filtrarYOrdenar();
+        const texto = inputBuscar.value.toLowerCase().trim();
+        filas.forEach(f => resaltarCoincidencias(f, texto));
+    });
+
+
+    // ⌨️ Evento al escribir
+    inputBuscar.addEventListener("input", filtrarYOrdenar);
+    // 🔁 Evento al cambiar el tipo de orden
+    selectOrden.addEventListener("change", filtrarYOrdenar);
+    // 🔄 Reiniciar filtros
+    btnReset.addEventListener("click", () => {
+        inputBuscar.value = "";
+        selectOrden.value = "apellido";
+        filas.forEach(f => tabla.querySelector("tbody").appendChild(f));
+    });
+
+</script>
+<script>
+    // ============================================================
+    // 🎯 ACTIVAR TAB SEGÚN PARÁMETRO ?tab=
+    // ============================================================
+    document.addEventListener("DOMContentLoaded", () => {
+        const params = new URLSearchParams(window.location.search);
+        const tabParam = params.get("tab");
+        if (!tabParam) return;
+
+        const targetBtn = document.querySelector(`.tab-btn[data-tab="${tabParam}"]`);
+        const targetTab = document.getElementById(tabParam);
+
+        if (targetBtn && targetTab) {
+            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+
+            targetBtn.classList.add("active");
+            targetTab.classList.add("active");
+        }
+    });
+
+</script>
+
+<script>// ============================================================
+    // 📘 Cargar dinámicamente el módulo de TAREAS
+    // ============================================================
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+
+            btn.classList.add("active");
+            const target = document.getElementById(btn.dataset.tab);
+            if (!target) return;
+
+            target.classList.add("active");
+
+            // 🚀 Si es la pestaña de asistencias
+            if (btn.dataset.tab === "asistencias") {
+                const contenedor = document.getElementById("contenedorAsistencias");
+                contenedor.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> Cargando asistencias...</p>`;
+                try {
+                    const res = await fetch("<?= base_url('profesor/grupos/asistencias/' . $asignacionId) ?>");
+                    const html = await res.text();
+                    contenedor.innerHTML = html;
+                    window.AsistenciasUI?.inicializar(<?= $asignacionId ?>);
+                } catch (error) {
+                    contenedor.innerHTML = `<p class="error">❌ Error al cargar asistencias: ${error.message}</p>`;
+                }
+            }
+
+            // 🚀 Si es la pestaña de tareas
+            if (btn.dataset.tab === "tareas") {
+                const contenedor = document.getElementById("contenedorTareas");
+                contenedor.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> Cargando tareas...</p>`;
+                try {
+                    const res = await fetch("<?= base_url('profesor/grupos/tareas/' . $asignacionId) ?>");
+                    const html = await res.text();
+                    contenedor.innerHTML = html;
+                    window.TareasUI?.inicializar(<?= $asignacionId ?>);
+                } catch (error) {
+                    contenedor.innerHTML = `<p class="error">❌ Error al cargar tareas: ${error.message}</p>`;
+                }
+            }
         });
     });
 </script>
-
 <?= $this->endSection() ?>

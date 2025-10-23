@@ -159,13 +159,22 @@ class AsignacionesController extends BaseController
         }
 
         $bloquesTexto = [];
+        // 🔹 Detectar turno del grupo (matutino o vespertino)
+        $grupo = $this->grupoModel->find($grupo_id);
+        $turno = strtolower($grupo['turno'] ?? 'matutino'); // Asegura minúsculas
+        $duracion = $turno === 'vespertino' ? 40 : 50; // 40 min vespertino, 50 min matutino
+
+        $bloquesTexto = [];
         foreach ($horarios as $dia => $horas) {
             sort($horas);
             foreach ($horas as $hInicio) {
-                $hFin = $this->calcularFin($hInicio);
+                // Usar la duración correcta
+                $hFin = $this->calcularFin($hInicio, $duracion);
+
                 $inicioMin = $this->horaToMinutos($hInicio);
                 $finMin = $this->horaToMinutos($hFin);
 
+                // Verificar choques
                 if ($conf = $this->hayChoqueHorario($grupo_id, [$dia], $inicioMin, $finMin, 'grupo'))
                     return $this->response->setJSON(['ok' => false, 'msg' => "⚠️ Choque con GRUPO: $conf el día $dia"]);
                 if ($conf = $this->hayChoqueHorario($profesor_id, [$dia], $inicioMin, $finMin, 'profesor'))
@@ -175,16 +184,39 @@ class AsignacionesController extends BaseController
             }
         }
 
-        $this->grupoMateriaProfesorModel->insert([
-            'grupo_id' => $grupo_id,
-            'materia_id' => $materia_id,
-            'profesor_id' => $profesor_id,
-            'horario' => implode('; ', $bloquesTexto),
-            'aula' => $aula,
-            'ciclo_id' => $ciclo_id,
-            'ciclo' => $ciclo_nombre,
-        ]);
 
+
+        $asignacionExistente = $this->grupoMateriaProfesorModel
+            ->where('grupo_id', $grupo_id)
+            ->where('materia_id', $materia_id)
+            ->where('profesor_id', $profesor_id)
+            ->first();
+
+        if ($asignacionExistente) {
+            // Concatenar nuevo horario al existente
+            $horarioPrevio = $asignacionExistente['horario'] ?? '';
+            $nuevoHorario = trim($horarioPrevio ? "$horarioPrevio; " . implode('; ', $bloquesTexto) : implode('; ', $bloquesTexto));
+
+            $this->grupoMateriaProfesorModel->update($asignacionExistente['id'], [
+                'horario' => $nuevoHorario,
+                'aula' => $aula,
+                'ciclo_id' => $ciclo_id,
+                'ciclo' => $ciclo_nombre,
+            ]);
+        } else {
+            // Nueva asignación
+            $this->grupoMateriaProfesorModel->insert([
+                'grupo_id' => $grupo_id,
+                'materia_id' => $materia_id,
+                'profesor_id' => $profesor_id,
+                'horario' => implode('; ', $bloquesTexto),
+                'aula' => $aula,
+                'ciclo_id' => $ciclo_id,
+                'ciclo' => $ciclo_nombre,
+            ]);
+        }
+
+        $this->sincronizarMateriaGrupoAlumno($grupo_id);
         return $this->response->setJSON(['ok' => true, 'msg' => "✅ Asignación guardada. Restan $restantes frecuencias."]);
     }
 
@@ -330,14 +362,26 @@ class AsignacionesController extends BaseController
         foreach ($bloques as $bloque) {
             if (!preg_match('/^([LMXJV]+)\s+(\d{2}:\d{2})-(\d{2}:\d{2})$/', $bloque, $m))
                 continue;
+
             $diasTxt = $m[1];
             $bInicio = $m[2];
             $bFin = $m[3];
 
-            if ($bInicio === $inicio && $bFin === $fin && str_contains($diasTxt, $dia)) {
+            // Convertir a minutos para comparación flexible
+            $bInicioMin = $this->horaToMinutos($bInicio);
+            $bFinMin = $this->horaToMinutos($bFin);
+            $inicioMin = $this->horaToMinutos($inicio);
+            $finMin = $this->horaToMinutos($fin);
+
+            // 💡 Se considera coincidencia si el inicio es igual y el fin es muy cercano (±5 min)
+            $finCoincide = abs($bFinMin - $finMin) <= 5;
+
+            if ($bInicio === $inicio && $finCoincide && str_contains($diasTxt, $dia)) {
+                // Eliminar solo el día seleccionado
                 $diasRestantes = str_replace($dia, '', $diasTxt);
-                if ($diasRestantes !== '')
+                if ($diasRestantes !== '') {
                     $nuevosBloques[] = $diasRestantes . ' ' . $bInicio . '-' . $bFin;
+                }
             } else {
                 $nuevosBloques[] = $bloque;
             }
@@ -345,12 +389,18 @@ class AsignacionesController extends BaseController
 
         if (empty($nuevosBloques)) {
             $this->grupoMateriaProfesorModel->delete($id);
-            return $this->response->setJSON(['ok' => true, 'msg' => 'Frecuencia eliminada y asignación vacía eliminada.']);
+
+            $grupoId = $asig['grupo_id'];
+            $this->grupoMateriaProfesorModel->delete($id);
+            $this->sincronizarMateriaGrupoAlumno($grupoId);
+            return $this->response->setJSON(['ok' => true, 'msg' => '🗑️ Frecuencia eliminada y asignación vacía eliminada.']);
+
         }
 
         $this->grupoMateriaProfesorModel->update($id, ['horario' => implode('; ', $nuevosBloques)]);
-        return $this->response->setJSON(['ok' => true, 'msg' => 'Frecuencia eliminada.']);
+        return $this->response->setJSON(['ok' => true, 'msg' => '✅ Frecuencia eliminada correctamente.']);
     }
+
 
     public function actualizarFrecuencia($id)
     {
@@ -414,12 +464,13 @@ class AsignacionesController extends BaseController
     /* =========================================================
        ⚙️ Auxiliares
        ========================================================= */
-    private function calcularFin($inicio)
+    private function calcularFin($inicio, $duracion = 50)
     {
         $t = \DateTime::createFromFormat('H:i', $inicio);
-        $t->modify('+50 minutes');
+        $t->modify("+{$duracion} minutes");
         return $t->format('H:i');
     }
+
 
     private function horaToMinutos($hora)
     {
@@ -438,14 +489,26 @@ class AsignacionesController extends BaseController
         foreach ($asignaciones as $a) {
             $bloques = array_filter(array_map('trim', explode(';', $a['horario'] ?? '')));
             foreach ($bloques as $bloque) {
+                // Coincide con formato: "LMXJV 07:30-08:20"
                 if (preg_match('/^([LMXJV]+)\s+(\d{2}:\d{2})-(\d{2}:\d{2})$/', $bloque, $m)) {
                     $diasTxt = str_split($m[1]);
-                    // 💡 Si hay cruce de días
+
+                    // 💡 Verificar si hay coincidencia de día
                     if (array_intersect($diasTxt, $dias)) {
                         $iniExist = $this->horaToMinutos($m[2]);
                         $finExist = $this->horaToMinutos($m[3]);
-                        // 💡 Si hay cruce de horas
-                        if ($inicioMin < $finExist && $finMin > $iniExist) {
+
+                        /**
+                         * 💡 Detección robusta de choques por rango:
+                         * Se considera choque si los rangos de tiempo se superponen, sin importar duración exacta.
+                         * Ejemplo:
+                         *   Nuevo: 17:20-18:00
+                         *   Existente: 17:00-17:40  → choque (se solapan)
+                         *   Existente: 18:00-18:40  → NO choque (fin = inicio)
+                         */
+                        $seSolapan = !($finMin <= $iniExist || $inicioMin >= $finExist);
+
+                        if ($seSolapan) {
                             return $a['materia']; // ⚠️ Choque detectado
                         }
                     }
@@ -455,6 +518,7 @@ class AsignacionesController extends BaseController
 
         return false; // ✅ Sin choques
     }
+
 
 
 
@@ -552,11 +616,68 @@ class AsignacionesController extends BaseController
             ]);
         }
 
+        $grupoId = $asig['grupo_id'];
         $this->grupoMateriaProfesorModel->delete($id);
+        $this->sincronizarMateriaGrupoAlumno($grupoId);
         return $this->response->setJSON([
             'ok' => true,
             'msg' => '🗑️ Asignación eliminada correctamente.'
         ]);
+
+    }
+
+    /**
+     * Sincroniza las relaciones materia-grupo-alumno.
+     * - Crea vínculos nuevos para alumnos que aún no tengan el registro.
+     * - Elimina los vínculos de materias eliminadas.
+     */
+    private function sincronizarMateriaGrupoAlumno($grupoId)
+    {
+        // 1️⃣ Obtener las asignaciones activas del grupo (materias-profesor)
+        $asignaciones = $this->grupoMateriaProfesorModel
+            ->select('id')
+            ->where('grupo_id', $grupoId)
+            ->findAll();
+
+        $idsAsignaciones = array_column($asignaciones, 'id');
+
+        // 2️⃣ Obtener alumnos inscritos en el grupo
+        $alumnosGrupo = $this->db->table('grupo_alumno')
+            ->select('id')
+            ->where('grupo_id', $grupoId)
+            ->get()
+            ->getResultArray();
+
+        $idsGrupoAlumno = array_column($alumnosGrupo, 'id');
+
+        // 3️⃣ Si no hay alumnos o asignaciones, no hay nada que vincular
+        if (empty($idsAsignaciones) || empty($idsGrupoAlumno)) {
+            return;
+        }
+
+        $tabla = $this->db->table('materia_grupo_alumno');
+
+        // 4️⃣ Eliminar registros huérfanos (de asignaciones eliminadas)
+        $tabla->whereNotIn('grupo_materia_profesor_id', $idsAsignaciones)->delete();
+
+        // 5️⃣ Insertar vínculos que falten (sin duplicar)
+        foreach ($idsAsignaciones as $idAsig) {
+            foreach ($idsGrupoAlumno as $idGrupoAlumno) {
+                $existe = $this->db->table('materia_grupo_alumno')
+                    ->where('grupo_materia_profesor_id', $idAsig)
+                    ->where('grupo_alumno_id', $idGrupoAlumno)
+                    ->countAllResults();
+
+                if ($existe == 0) {
+                    $tabla->insert([
+                        'grupo_materia_profesor_id' => $idAsig,
+                        'grupo_alumno_id' => $idGrupoAlumno,
+                        'calificacion_final' => null,
+                        'asistencia' => 0,
+                    ]);
+                }
+            }
+        }
     }
 
 

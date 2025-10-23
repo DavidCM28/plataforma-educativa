@@ -175,22 +175,44 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function ($rou
     $routes->get('criterios/ponderaciones/listar/(:num)/(:num)', 'CriteriosController::listarPonderaciones/$1/$2');
 });
 
-// Módulo de Profesores
-$routes->group('profesor', ['filter' => 'auth'], function ($routes) {
-    $routes->get('dashboard', 'Profesor\Dashboard::index');
-});
+// ============================================================
+// 📘 MÓDULO DE PROFESORES
+// ============================================================
+$routes->group('profesor', ['namespace' => 'App\Controllers\Profesor', 'filter' => 'auth'], function ($routes) {
 
-$routes->group('profesor', ['namespace' => 'App\Controllers\Profesor'], function ($routes) {
-    $routes->get('grupos/ver/(:num)', 'Grupos::ver/$1');
-});
-// Módulo de Profesores
-$routes->group('profesor', ['filter' => 'auth'], function ($routes) {
-    $routes->get('dashboard', 'Profesor\Dashboard::index');
-    $routes->get('grupos', 'Profesor\Grupos::index'); // ✅ RUTA PARA LISTAR GRUPOS
-});
+    // 🏠 Dashboard principal
+    $routes->get('dashboard', 'Dashboard::index');
 
-$routes->group('profesor', ['namespace' => 'App\Controllers\Profesor'], function ($routes) {
+    // 👥 Grupos
+    $routes->get('grupos', 'Grupos::index');
     $routes->get('grupos/ver/(:num)', 'Grupos::ver/$1');
+    $routes->get('grupos/detalles-alumno/(:num)', 'Grupos::detallesAlumno/$1');
+
+    // 📅 Asistencias
+    $routes->group('grupos', function ($routes) {
+        $routes->get('asistencias/(:num)', 'Grupos::asistencias/$1');
+        $routes->post('guardar-asistencias/(:num)', 'Grupos::guardarAsistencias/$1');
+    });
+
+    // 📰 Publicaciones 
+    $routes->group('grupos', function ($routes) {
+        $routes->get('publicaciones/(:num)', 'PublicacionesController::listar/$1');   // GET
+        $routes->post('publicar/(:num)', 'PublicacionesController::publicar/$1');    // POST
+        $routes->post('editar-publicacion/(:num)', 'PublicacionesController::editar/$1');
+        $routes->delete('eliminar-publicacion/(:num)', 'PublicacionesController::eliminar/$1');
+    });
+
+    // 📚 Tareas
+    $routes->group('grupos', function ($routes) {
+        $routes->get('tareas/(:num)', 'TareasController::index/$1');             // Carga vista parcial
+        $routes->get('listar-tareas/(:num)', 'TareasController::listar/$1');     // Lista tareas en JSON
+        $routes->get('detalle-tarea/(:num)', 'TareasController::detalle/$1');    // Obtener tarea con archivos
+        $routes->post('guardar-tarea', 'TareasController::guardar');             // Crear o editar tarea
+        $routes->delete('eliminar-tarea/(:num)', 'TareasController::eliminar/$1'); // Eliminar tarea completa
+        $routes->delete('eliminar-archivo-tarea/(:num)', 'TareasController::eliminarArchivo/$1'); // Eliminar solo un archivo
+    });
+
+
 });
 
 

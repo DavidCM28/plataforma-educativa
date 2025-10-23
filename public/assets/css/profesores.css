@@ -1,200 +1,321 @@
-/* =============================
-   DASHBOARD PROFESOR – ESTILO PLANO
-   ============================= */
+/* ============================================
+   🎓 DASHBOARD PROFESOR — ESTILO TEAMS
+   ============================================ */
 
 .dashboard-profesor {
-  padding: 2rem;
   color: var(--text);
-}
-
-/* --- TARJETAS RESUMEN --- */
-.cards-grid.enhanced {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.card-metric {
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius);
+  background: var(--bg-dark);
   padding: 1.5rem;
-  text-align: center;
-  transition: background 0.2s ease, transform 0.2s ease;
+  font-family: "Segoe UI", "Inter", system-ui, sans-serif;
 }
 
-.card-metric:hover {
-  background: #262a31;
-  transform: translateY(-2px);
-}
-
-.card-header {
+/* ================================
+   SECCIÓN TÍTULOS
+   ================================ */
+.seccion-titulo {
+  color: var(--text);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1.2rem;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 0.6rem;
-  margin-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.4rem;
+}
+
+.seccion-titulo i {
   color: var(--primary);
 }
 
-.card-value {
-  font-size: 1.1rem;
-  color: var(--text-muted);
-}
-
-.card-btn {
-  background: var(--primary);
-  color: #181a20;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  margin-top: 0.8rem;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: 0.2s;
-}
-
-.card-btn:hover {
-  background: var(--accent);
-}
-
-/* --- LISTA DE ASIGNACIONES --- */
-.seccion-titulo {
-  margin-bottom: 1rem;
-  color: var(--primary);
-  font-size: 1.2rem;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.08);
-  padding-bottom: 0.3rem;
-}
-
+/* ================================
+   GRID DE MATERIAS
+   ================================ */
 .materias-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
 }
 
+/* Card estilo Teams */
 .materia-card {
   background: var(--surface);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius);
-  padding: 1.2rem;
-  color: var(--text);
-  transition: background 0.2s, transform 0.2s;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 140px;
+  transition: background 0.2s, transform 0.15s;
+  cursor: pointer;
 }
 
 .materia-card:hover {
-  background: #2a2e35;
+  background: #1f2228;
   transform: translateY(-3px);
 }
 
+/* Encabezado */
 .materia-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  color: var(--primary);
-  margin-bottom: 0.6rem;
+  padding: 1rem;
+  gap: 0.8rem;
 }
 
-.materia-status.active {
-  color: var(--accent);
-  font-size: 0.85rem;
+.materia-iniciales {
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  background: #3a3a3a;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.materia-nombre {
+  font-size: 0.95rem;
   font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
 }
 
-.materia-info p {
-  margin: 0.3rem 0;
-  font-size: 0.9rem;
-  color: var(--text-muted);
-}
-
-.materia-info i {
-  color: var(--primary);
-  margin-right: 0.4rem;
-}
-
-/* --- BOTONES --- */
-.materia-actions {
+/* Footer con íconos pequeños */
+.materia-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  gap: 0.8rem;
+  padding: 0.6rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.materia-actions button {
-  background: var(--primary);
-  color: #181a20;
-  border: none;
-  padding: 0.4rem 0.9rem;
-  border-radius: 6px;
+.materia-footer i {
+  color: var(--text-muted);
   font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
 }
 
-.materia-actions button:hover {
-  background: var(--accent);
+.materia-card:hover .materia-footer i {
+  color: var(--accent);
 }
 
-/* =============================
-   HORARIO SEMANAL
-   ============================= */
-
+/* ================================
+   HORARIO SEMANAL (mantiene tu diseño sobrio)
+   ================================ */
 .horario-semanal {
-  margin-top: 3rem;
+  margin-top: 2rem;
 }
 
 .horario-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1rem;
-  margin-top: 1rem;
 }
 
 .horario-dia {
   background: var(--surface);
-  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   padding: 1rem;
 }
 
 .horario-dia h4 {
-  text-align: center;
-  margin-bottom: 0.8rem;
+  color: var(--text);
+  font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.4rem;
 }
 
 .horario-item {
-  background: #2a2e35;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid var(--primary);
   border-radius: 6px;
-  padding: 0.6rem;
-  margin-bottom: 0.6rem;
-  font-size: 0.85rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
+  padding: 0.5rem 0.6rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
+.horario-item:hover {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .horario-item strong {
+  display: block;
   color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .horario-item span {
+  display: block;
   color: var(--text-muted);
-}
-
-.horario-item .aula {
-  font-size: 0.8rem;
-  color: var(--accent);
+  font-size: 0.82rem;
 }
 
 .sin-clase {
   text-align: center;
   color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: 0.8rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .materias-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
+/* ===============================
+   🎯 Botones de acceso directo
+   =============================== */
+.materia-shortcuts {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 0.6rem 0.8rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.materia-shortcuts button {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.materia-shortcuts button:hover {
+  color: var(--accent);
+}
+
+/* ===============================
+   🧩 Sección de grupos resumen
+   =============================== */
+.grupos-resumen {
+  margin-top: 2rem;
+}
+
+.grupos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.grupo-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: background 0.2s;
+}
+
+.grupo-card:hover {
+  background: #1e2026;
+}
+
+.grupo-card h3 {
+  color: var(--primary);
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.grupo-card ul {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0.5rem 0;
+}
+
+.grupo-card li {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.3rem;
+}
+
+.grupo-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 0.6rem;
+}
+
+.grupo-footer button {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  padding: 0.3rem 0.7rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.grupo-footer button:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--accent);
+}
+
+/* ===============================
+   📅 HORARIO SEMANAL - CON GRUPO
+   =============================== */
+
+.horario-item {
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid var(--primary);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.6rem;
+  transition: background 0.15s ease;
+  cursor: pointer;
+}
+
+.horario-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.horario-item strong {
+  display: block;
+  color: var(--text);
   font-size: 0.9rem;
-  margin: 1rem 0;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+.horario-item span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.83rem;
+  line-height: 1.3;
+}
+
+.horario-item .grupo {
+  color: var(--accent-soft);
+  font-weight: 500;
+}
+
+.horario-item i {
+  color: var(--primary);
+  margin-right: 4px;
+  font-size: 0.85rem;
 }
