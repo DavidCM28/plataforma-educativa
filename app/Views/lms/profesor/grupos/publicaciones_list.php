@@ -36,9 +36,19 @@ $usuarioActual = session('id') ?? session('usuario_id') ?? session('id_usuario')
             </div>
 
             <!-- 📝 CONTENIDO -->
-            <div class="publicacion-contenido">
-                <p><?= nl2br(esc($p['contenido'])) ?></p>
+            <div class="publicacion-contenido <?= $p['tipo'] === 'aviso' ? 'publicacion-aviso' : '' ?>">
+                <?php if ($p['tipo'] === 'aviso'): ?>
+                    <div class="banner-aviso">
+                        <i class="fas fa-bullhorn"></i>
+                        <span>📢 Aviso importante</span>
+                    </div>
+                <?php endif; ?>
+
+                <div class="contenido-texto">
+                    <?= $p['contenido'] ?>
+                </div>
             </div>
+
 
             <!-- 📎 ARCHIVOS -->
             <?php

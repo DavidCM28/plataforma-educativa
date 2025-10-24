@@ -320,3 +320,103 @@
   background: #444;
   color: var(--text);
 }
+
+/* ============================================================
+   🟠 AVISOS IMPORTANTES (DISEÑO EDUCATIVO SIMPLE Y COMPACTO)
+   ============================================================ */
+
+.publicacion-aviso {
+  border: 1px solid var(--accent);
+  background: #1f2229;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: background 0.2s ease;
+  margin-top: 0.5rem;
+}
+
+.publicacion-aviso:hover {
+  background: #24272f;
+}
+
+/* 🔶 Banner superior */
+.banner-aviso {
+  background: var(--accent);
+  color: #000;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+}
+
+.banner-aviso i {
+  font-size: 0.9rem;
+}
+
+/* 🧾 Contenido principal del aviso */
+.publicacion-aviso .contenido-texto {
+  background: transparent;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.93rem;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.publicacion-aviso .contenido-texto b {
+  color: var(--accent);
+}
+
+/* 📘 Bloque interno del mensaje */
+.aviso-tarea {
+  background: rgba(255, 184, 76, 0.07);
+  border: 1px solid rgba(255, 184, 76, 0.2);
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  margin-top: 0.4rem;
+}
+
+.aviso-tarea p {
+  margin: 0.25rem 0;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+
+.aviso-tarea b {
+  color: var(--accent);
+}
+
+/* 🔗 Botón Ver tarea */
+.aviso-tarea .btn-ver-tarea {
+  display: inline-block;
+  margin-top: 0.4rem;
+  padding: 0.35rem 0.8rem;
+  background: var(--accent);
+  color: #000;
+  border-radius: 5px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.aviso-tarea .btn-ver-tarea:hover {
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+
+/* 🌗 Ajuste general de publicaciones */
+.publicacion {
+  padding: 0.9rem 1.1rem;
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+}
+
+.publicacion-header {
+  margin-bottom: 0.6rem;
+}
+
+.publicacion-contenido {
+  margin-bottom: 0.4rem;
+}

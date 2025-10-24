@@ -5,16 +5,19 @@ namespace App\Controllers\Profesor;
 use App\Controllers\BaseController;
 use App\Models\TareaModel;
 use App\Models\TareaArchivoModel;
+use App\Models\PublicacionModel;
 
 class TareasController extends BaseController
 {
     protected $tareaModel;
     protected $archivoModel;
+    protected $publicacionModel;
 
     public function __construct()
     {
         $this->tareaModel = new TareaModel();
         $this->archivoModel = new TareaArchivoModel();
+        $this->publicacionModel = new PublicacionModel(); // Usa la tabla publicaciones_grupo
     }
 
     // ============================================================
@@ -42,7 +45,7 @@ class TareasController extends BaseController
     }
 
     // ============================================================
-    // 💾 Crear o actualizar tarea
+    // 💾 Crear o actualizar tarea (+ publicación automática)
     // ============================================================
     public function guardar()
     {
@@ -54,10 +57,11 @@ class TareasController extends BaseController
         }
 
         $tareaId = $data['id'] ?? null;
+        $profesorId = session('id') ?? session('usuario_id') ?? session('id_usuario');
+
         $tareaData = [
             'asignacion_id' => $data['asignacion_id'],
-            'profesor_id' => session('id') ?? session('usuario_id') ?? session('id_usuario'),
-
+            'profesor_id' => $profesorId,
             'titulo' => trim($data['titulo']),
             'descripcion' => trim($data['descripcion'] ?? ''),
             'fecha_entrega' => !empty($data['fecha_entrega'])
@@ -65,10 +69,15 @@ class TareasController extends BaseController
                 : null,
         ];
 
+        // ✅ Insertar o actualizar tarea
         if ($tareaId) {
             $this->tareaModel->update($tareaId, $tareaData);
+            $mensaje = "Tarea actualizada correctamente.";
+            $accion = "actualizó";
         } else {
             $tareaId = $this->tareaModel->insert($tareaData);
+            $mensaje = "Tarea creada correctamente.";
+            $accion = "subió";
         }
 
         // 📎 Guardar archivos adjuntos
@@ -87,14 +96,42 @@ class TareasController extends BaseController
             }
         }
 
+        // 📰 Crear publicación automática en publicaciones_grupo
+        try {
+            date_default_timezone_set('America/Mexico_City');
+
+            // ⚙️ Enlace seguro con base_url y escapado de comillas
+            $urlTarea = base_url('profesor/tareas/ver/' . $tareaId);
+
+            // 📣 Contenido con diseño mejorado (usa HTML directo, sin esc())
+            $contenido = "
+        <div class='aviso-tarea'>
+            <p>📢 El profesor ha {$accion} una nueva tarea: <b>{$tareaData['titulo']}</b>.</p>
+            " . (!empty($tareaData['fecha_entrega']) ? "<p>📅 Fecha de entrega: <b>" . date('d/m/Y H:i', strtotime($tareaData['fecha_entrega'])) . "</b></p>" : "") . "
+            <a href='{$urlTarea}' class='btn-ver-tarea'>Ver tarea</a>
+        </div>";
+
+            // ✅ Insertar publicación
+            $this->publicacionModel->insert([
+                'grupo_materia_profesor_id' => $data['asignacion_id'],
+                'usuario_id' => $profesorId,
+                'tipo' => 'aviso',
+                'contenido' => $contenido,
+                'fecha_publicacion' => date('Y-m-d H:i:s'),
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', 'Error al crear publicación automática: ' . $e->getMessage());
+        }
+
         return $this->response->setJSON([
             'success' => true,
-            'mensaje' => $data['id'] ? 'Tarea actualizada correctamente.' : 'Tarea creada correctamente.',
+            'mensaje' => $mensaje,
         ]);
     }
 
+
     // ============================================================
-    // 📘 Obtener detalles de una tarea (para edición)
+    // 📘 Obtener detalles de una tarea
     // ============================================================
     public function detalle($id)
     {
@@ -108,7 +145,7 @@ class TareasController extends BaseController
     }
 
     // ============================================================
-    // 🗑️ Eliminar tarea completa
+    // 🗑️ Eliminar tarea completa (+ publicación aviso)
     // ============================================================
     public function eliminar($id)
     {
@@ -130,6 +167,21 @@ class TareasController extends BaseController
         $this->archivoModel->eliminarPorTarea($id);
         $this->tareaModel->delete($id);
 
+        // Crear publicación informativa
+        try {
+            date_default_timezone_set('America/Mexico_City');
+
+            $this->publicacionModel->insert([
+                'grupo_materia_profesor_id' => $tarea['asignacion_id'],
+                'usuario_id' => session('id') ?? session('usuario_id') ?? session('id_usuario'),
+                'tipo' => 'aviso',
+                'contenido' => "🗑️ El profesor ha eliminado la tarea <b>{$tarea['titulo']}</b>.",
+                'fecha_publicacion' => date('Y-m-d H:i:s'),
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', 'Error al registrar publicación de eliminación: ' . $e->getMessage());
+        }
+
         return $this->response->setJSON([
             'success' => true,
             'mensaje' => 'Tarea y archivos eliminados correctamente.'
@@ -146,13 +198,11 @@ class TareasController extends BaseController
             return $this->response->setJSON(['error' => 'Archivo no encontrado.']);
         }
 
-        // Eliminar archivo físico
         $ruta = FCPATH . 'uploads/tareas/' . $archivo['archivo'];
         if (is_file($ruta)) {
             @unlink($ruta);
         }
 
-        // Eliminar de la base
         $this->archivoModel->delete($id);
 
         return $this->response->setJSON([
