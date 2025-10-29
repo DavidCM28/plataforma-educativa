@@ -1,0 +1,387 @@
+/* ============================================================
+   📘 ESTILOS MÓDULO DE EXÁMENES (Profesores)
+   ============================================================ */
+
+.tareas-section {
+  color: var(--text);
+  padding: 1.4rem;
+}
+
+.tareas-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  box-shadow: var(--shadow);
+}
+
+.tareas-header h3 {
+  margin: 0;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tareas-grid {
+  margin-top: 1rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.tarea-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1rem;
+  color: var(--text);
+  transition: transform 0.2s;
+}
+
+.tarea-card:hover {
+  transform: translateY(-2px);
+}
+
+.tarea-info h4 {
+  margin: 0;
+  color: var(--accent);
+}
+
+.tarea-meta {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.4rem;
+}
+
+.tarea-acciones {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.btn-editar,
+.btn-eliminar,
+.btn-publicar,
+.btn-cerrar,
+.btn-respuestas {
+  background: var(--surface);
+  border: none;
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-editar:hover {
+  background: #2c3e50;
+}
+
+.btn-eliminar:hover {
+  background: #8b1e1e;
+}
+
+.btn-publicar:hover {
+  background: #2e7d32;
+}
+
+.btn-cerrar:hover {
+  background: #4e342e;
+}
+
+.btn-respuestas:hover {
+  background: #283593;
+}
+
+/* Modal */
+.modal-card.tarea-modal {
+  background: var(--surface);
+  color: var(--text);
+  padding: 1.4rem;
+  border-radius: var(--radius);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+}
+
+.preg-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.opciones-wrap {
+  margin-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 6px;
+}
+
+.opcion-card {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.chk-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.placeholder {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 2rem;
+}
+
+.editor-examen {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface);
+  padding: 1rem 1.4rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.editor-form .campo {
+  margin-bottom: 1rem;
+}
+
+.editor-preguntas {
+  background: var(--surface);
+  padding: 1rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.preguntas-lista .tarea-card {
+  background: #2a2d35;
+  padding: 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 0.8rem;
+}
+
+.preguntas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+/* ============================================================
+   ✨ ESTILOS AFINADOS DEL EDITOR DE EXÁMENES
+   ============================================================ */
+
+/* --- Formularios generales --- */
+.editor-form input[type="text"],
+.editor-form input[type="number"],
+.editor-form input[type="datetime-local"],
+.editor-form textarea,
+.editor-form select {
+  width: 100%;
+  background: #22252b;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.8rem;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+}
+
+.editor-form input:focus,
+.editor-form textarea:focus,
+.editor-form select:focus {
+  border-color: var(--accent);
+  outline: none;
+  background: #2b2f36;
+}
+
+.editor-form label {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.editor-form .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+/* --- Contenedor general de preguntas --- */
+.editor-preguntas {
+  background: var(--surface);
+  padding: 1.4rem 1.6rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.preguntas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.preguntas-header h3 {
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+}
+
+/* --- Cada pregunta --- */
+.pregunta-card {
+  background: #2a2d35;
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  margin-bottom: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.pregunta-card:hover {
+  transform: translateY(-2px);
+}
+
+.preg-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.preg-header strong {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.preg-header .btn-sec {
+  font-size: 0.85rem;
+  padding: 0.3rem 0.6rem;
+  background: #3a3d46;
+}
+
+.preg-header .btn-sec:hover {
+  background: #ff9e64;
+  color: #000;
+}
+
+/* --- Opciones --- */
+.opciones-wrap {
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.op-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.op-header strong {
+  color: var(--accent-soft);
+}
+
+.lista-opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.opcion-card {
+  background: #24262d;
+  border-radius: var(--radius);
+  padding: 0.6rem 0.8rem;
+  display: grid;
+  grid-template-columns: 80px 1fr 100px;
+  align-items: center;
+  gap: 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chk-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.opcion-card input[type="text"] {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  background: #1f2127;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  border-radius: var(--radius);
+}
+
+.opcion-card .btn-sec {
+  font-size: 0.8rem;
+  background: #333641;
+}
+
+.opcion-card .btn-sec:hover {
+  background: #8b1e1e;
+  color: #fff;
+}
+
+/* --- Botones secundarios --- */
+.btn-sec {
+  background: #2f323a;
+  border: none;
+  color: var(--text);
+  border-radius: var(--radius);
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+
+.btn-sec:hover {
+  background: var(--accent);
+  color: #000;
+}
+/* ============================================================
+   🧭 BOTONES FLOTANTES (Agregar pregunta / Guardar)
+   ============================================================ */
+
+.floating-actions {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 999;
+}
+
+.floating-actions button {
+  border: none;
+  border-radius: 50%;
+  width: 54px;
+  height: 54px;
+  background: var(--accent);
+  color: #000;
+  font-size: 1.3rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.floating-actions button:hover {
+  transform: scale(1.1);
+  background: var(--accent-soft);
+}

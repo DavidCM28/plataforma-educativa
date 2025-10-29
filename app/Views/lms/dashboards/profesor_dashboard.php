@@ -62,10 +62,9 @@
                             <button title="Lista de alumnos"><i class="fas fa-users"></i></button>
                             <button title="Asistencias"><i class="fas fa-calendar-check"></i></button>
                             <button title="Tareas"><i class="fas fa-tasks"></i></button>
-                            <button title="Actividades"><i class="fas fa-bullseye"></i></button>
-                            <button title="Participación"><i class="fas fa-comments"></i></button>
-                            <button title="Exámenes"><i class="fas fa-book"></i></button>
                             <button title="Proyectos"><i class="fas fa-rocket"></i></button>
+                            <button title="Exámenes"><i class="fas fa-book"></i></button>
+                            <button title="Participación"><i class="fas fa-comments"></i></button>
                             <button title="Calificaciones"><i class="fas fa-chart-line"></i></button>
                         </div>
                     </div>
@@ -175,7 +174,7 @@
                     "Asistencias": "asistencias",
                     "Tareas": "tareas",
                     "Actividades": "actividades",
-                    "Participación": "participacion",
+                    "Participación": "inicio",
                     "Exámenes": "examenes",
                     "Proyectos": "proyectos",
                     "Calificaciones": "calificaciones"

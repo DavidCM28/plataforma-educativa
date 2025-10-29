@@ -12,7 +12,11 @@
 <link rel="stylesheet" href="<?= base_url('assets/css/alert.css') ?>">
 <link rel="stylesheet" href="<?= base_url('assets/css/profesores/grupos.css') ?>">
 <link rel="stylesheet" href="<?= base_url('assets/css/profesores/tareas.css') ?>">
+<link rel="stylesheet" href="<?= base_url('assets/css/profesores/proyectos.css') ?>">
+<link rel="stylesheet" href="<?= base_url('assets/css/profesores/examenes.css') ?>">
 <script src="<?= base_url('assets/js/profesores/tareas.js') ?>"></script>
+<script src="<?= base_url('assets/js/profesores/proyectos.js') ?>"></script>
+<script src="<?= base_url('assets/js/profesores/examenes.js') ?>"></script>
 
 <!-- 🔔 Contenedor global de alertas -->
 <div id="alertContainer" class="alert-container"></div>
@@ -61,20 +65,12 @@
                 <i class="fas fa-tasks"></i> <span> Tareas</span>
             </button>
 
-            <button class="tab-btn" data-tab="actividades" title="Actividades">
-                <i class="fas fa-bullseye"></i> <span> Actividades</span>
-            </button>
-
-            <button class="tab-btn" data-tab="participacion" title="Participación">
-                <i class="fas fa-user-check"></i> <span> Participación</span>
+            <button class="tab-btn" data-tab="proyectos" title="Proyectos">
+                <i class="fas fa-rocket"></i> <span> Proyectos</span>
             </button>
 
             <button class="tab-btn" data-tab="examenes" title="Exámenes">
                 <i class="fas fa-book"></i> <span> Exámenes</span>
-            </button>
-
-            <button class="tab-btn" data-tab="proyectos" title="Proyectos">
-                <i class="fas fa-rocket"></i> <span> Proyectos</span>
             </button>
 
             <button class="tab-btn" data-tab="calificaciones" title="Calificaciones">
@@ -190,20 +186,6 @@
         <div id="contenedorTareas" class="tareas-cargando">
             <p><i class="fas fa-spinner fa-spin"></i> Cargando tareas...</p>
         </div>
-    </div>
-
-    <!-- ============================================================
-🎯 ACTIVIDADES
-============================================================ -->
-    <div class="tab-content" id="actividades">
-        <p class="placeholder"><i class="fas fa-spinner fa-spin"></i> Módulo de actividades en desarrollo...</p>
-    </div>
-
-    <!-- ============================================================
-🙋‍♂️ PARTICIPACIÓN
-============================================================ -->
-    <div class="tab-content" id="participacion">
-        <p class="placeholder"><i class="fas fa-spinner fa-spin"></i> Módulo de participación en desarrollo...</p>
     </div>
 
     <!-- ============================================================
@@ -490,6 +472,45 @@
                     contenedor.innerHTML = `<p class="error">❌ Error al cargar tareas: ${error.message}</p>`;
                 }
             }
+
+            // 🚀 Si es la pestaña de proyectos
+            if (btn.dataset.tab === "proyectos") {
+                const contenedor = document.getElementById("proyectos");
+                contenedor.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> Cargando proyectos...</p>`;
+                try {
+                    const res = await fetch("<?= base_url('profesor/grupos/proyectos/' . $asignacionId) ?>");
+                    const html = await res.text();
+                    contenedor.innerHTML = html;
+                    window.ProyectosUI?.inicializar(<?= $asignacionId ?>);
+                } catch (error) {
+                    contenedor.innerHTML = `<p class="error">❌ Error al cargar proyectos: ${error.message}</p>`;
+                }
+            }
+
+            // 🚀 Si es la pestaña de exámenes
+            if (btn.dataset.tab === "examenes") {
+                const contenedor = document.getElementById("examenes");
+                contenedor.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> Cargando exámenes...</p>`;
+                try {
+                    const res = await fetch("<?= base_url('profesor/grupos/examenes/' . $asignacionId) ?>");
+                    const html = await res.text();
+                    contenedor.innerHTML = html;
+
+                    // ⚡ Espera un breve instante para asegurar que el DOM del examen está cargado
+                    setTimeout(() => {
+                        if (window.ExamenesUI) {
+                            window.ExamenesUI.inicializar(<?= $asignacionId ?>);
+                        } else {
+                            console.error("⚠️ ExamenesUI no está definido, revisa si el script se está cargando.");
+                        }
+                    }, 100);
+                } catch (error) {
+                    contenedor.innerHTML = `<p class="error">❌ Error al cargar exámenes: ${error.message}</p>`;
+                }
+            }
+
+
+
         });
     });
 </script>

@@ -212,6 +212,39 @@ $routes->group('profesor', ['namespace' => 'App\Controllers\Profesor', 'filter' 
         $routes->delete('eliminar-archivo-tarea/(:num)', 'TareasController::eliminarArchivo/$1'); // Eliminar solo un archivo
     });
 
+    $routes->group('grupos', ['namespace' => 'App\Controllers\Profesor'], function ($routes) {
+        $routes->get('proyectos/(:num)', 'ProyectosController::index/$1');
+        $routes->get('listar-proyectos/(:num)', 'ProyectosController::listar/$1');
+        $routes->get('detalle-proyecto/(:num)', 'ProyectosController::detalle/$1');
+        $routes->post('guardar-proyecto', 'ProyectosController::guardar');
+        $routes->delete('eliminar-proyecto/(:num)', 'ProyectosController::eliminar/$1');
+        $routes->delete('eliminar-archivo-proyecto/(:num)', 'ProyectosController::eliminarArchivo/$1');
+        $routes->get('ver-proyecto/(:num)', 'ProyectosController::ver/$1');
+
+    });
+
+    // 📘 EXÁMENES (profesor)
+    $routes->group('grupos', function ($routes) {
+        $routes->get('examenes/(:num)', 'ExamenesController::index/$1');                // vista parcial
+        $routes->get('listar-examenes/(:num)', 'ExamenesController::listar/$1');        // JSON
+        $routes->get('detalle-examen/(:num)', 'ExamenesController::detalle/$1');        // JSON con preguntas
+        $routes->post('guardar-examen', 'ExamenesController::guardar');                 // crear/editar + preguntas
+        $routes->delete('eliminar-examen/(:num)', 'ExamenesController::eliminar/$1');   // eliminar
+
+        // Publicar/cerrar
+        $routes->post('publicar-examen/(:num)', 'ExamenesController::publicar/$1');
+        $routes->post('cerrar-examen/(:num)', 'ExamenesController::cerrar/$1');
+
+        // Resúmenes y calificación
+        $routes->get('resumen-examen/(:num)', 'ExamenesController::resumen/$1');
+        $routes->get('respuestas-examen/(:num)', 'ExamenesController::listarRespuestas/$1');
+        $routes->post('calificar-respuesta/(:num)', 'ExamenesController::calificarRespuesta/$1');
+
+        // ✅ CORRECCIÓN AQUÍ: elimina el prefijo "Profesor\"
+        $routes->get('examenes/crear/(:num)', 'ExamenesController::crear/$1');
+        $routes->get('examenes/editar/(:num)', 'ExamenesController::editar/$1');
+    });
+
 
 });
 

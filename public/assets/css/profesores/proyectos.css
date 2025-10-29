@@ -1,0 +1,226 @@
+/* ==========================================================
+   🎨 INTERFAZ DE TAREAS (tipo Teams)
+   ========================================================== */
+.tareas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 1.5rem;
+}
+
+.tareas-header h3 {
+  color: var(--text);
+  font-size: 1.2rem;
+}
+
+.tareas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.2rem;
+}
+
+.tarea-card {
+  background: var(--surface);
+  color: var(--text);
+  padding: 1.2rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarea-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+
+.tarea-card h4 {
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.tarea-card p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.tarea-meta {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.tarea-acciones {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tarea-acciones button {
+  flex: 1;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-editar {
+  background: var(--accent-soft);
+  color: #000;
+}
+
+.btn-eliminar {
+  background: #ff6b6b;
+  color: #fff;
+}
+
+.btn-editar:hover {
+  background: var(--accent);
+}
+.btn-eliminar:hover {
+  background: #ff4444;
+}
+
+/* 🧩 Modal de Tareas */
+.tarea-modal {
+  background: var(--surface);
+  color: var(--text);
+  width: 500px;
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.tarea-modal label {
+  display: block;
+  margin-top: 1rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.tarea-modal input,
+.tarea-modal textarea {
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: none;
+  background: #2a2d33;
+  color: var(--text);
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.form-group {
+  flex: 1;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+  gap: 0.6rem;
+}
+
+.btn-main {
+  background: var(--primary);
+  color: #000;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-main:hover {
+  background: var(--accent);
+}
+
+.btn-sec {
+  background: #33363f;
+  color: var(--text);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.placeholder {
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 2rem;
+}
+/* ==========================================================
+   🧾 Estilos mejorados del formulario de tareas
+   ========================================================== */
+.archivo-group {
+  margin-top: 1.5rem;
+}
+
+.archivo-group input[type="file"] {
+  margin-top: 0.5rem;
+  background: #2a2d33;
+  border-radius: 8px;
+  padding: 0.6rem;
+  color: var(--text);
+}
+
+.archivo-preview {
+  margin-top: 0.8rem;
+  background: #1f2228;
+  border-radius: 8px;
+  padding: 0.8rem;
+  max-height: 140px;
+  overflow-y: auto;
+  border: 1px dashed var(--accent-soft);
+}
+
+.archivo-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+}
+
+.archivo-item i {
+  color: var(--accent);
+}
+
+.archivo-item span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: row;
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+
+.form-group {
+  flex: 1;
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    flex-direction: column;
+  }
+}

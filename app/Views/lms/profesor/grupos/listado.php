@@ -9,7 +9,8 @@
     <?php if (!empty($asignaciones)): ?>
         <div class="grupos-grid">
             <?php foreach ($asignaciones as $asignacion): ?>
-                <div class="grupo-card" onclick="window.location='<?= base_url('profesor/grupos/ver/' . $asignacion['id']) ?>'">
+                <div class="grupo-card"
+                    onclick="window.location='<?= base_url('profesor/grupos/ver-proyecto/' . $asignacion['id']) ?>'">
                     <div class="grupo-header">
                         <h3><?= esc($asignacion['materia'] ?? 'Materia') ?></h3>
                         <span class="grupo-codigo"><?= esc($asignacion['grupo'] ?? 'Grupo') ?></span>
