@@ -17,7 +17,8 @@
 <script src="<?= base_url('assets/js/profesores/tareas.js') ?>"></script>
 <script src="<?= base_url('assets/js/profesores/proyectos.js') ?>"></script>
 <script src="<?= base_url('assets/js/profesores/examenes.js') ?>"></script>
-
+<link rel="stylesheet" href="<?= base_url('assets/css/profesores/tareas_entregas.css') ?>">
+<script src="<?= base_url('assets/js/profesores/tareas_entregas.js') ?>"></script>
 <!-- 🔔 Contenedor global de alertas -->
 <div id="alertContainer" class="alert-container"></div>
 

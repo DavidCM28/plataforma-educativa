@@ -210,6 +210,9 @@ $routes->group('profesor', ['namespace' => 'App\Controllers\Profesor', 'filter' 
         $routes->post('guardar-tarea', 'TareasController::guardar');             // Crear o editar tarea
         $routes->delete('eliminar-tarea/(:num)', 'TareasController::eliminar/$1'); // Eliminar tarea completa
         $routes->delete('eliminar-archivo-tarea/(:num)', 'TareasController::eliminarArchivo/$1'); // Eliminar solo un archivo
+        $routes->get('tareas/entregas/(:num)', 'TareasController::vistaEntregas/$1');
+        $routes->get('tareas/entregas-lista/(:num)', 'TareasController::listarEntregas/$1');
+        $routes->post('tareas/calificar/(:num)', 'TareasController::calificar/$1');
     });
 
     $routes->group('grupos', ['namespace' => 'App\Controllers\Profesor'], function ($routes) {
@@ -240,12 +243,57 @@ $routes->group('profesor', ['namespace' => 'App\Controllers\Profesor', 'filter' 
         $routes->get('respuestas-examen/(:num)', 'ExamenesController::listarRespuestas/$1');
         $routes->post('calificar-respuesta/(:num)', 'ExamenesController::calificarRespuesta/$1');
 
-        // ✅ CORRECCIÓN AQUÍ: elimina el prefijo "Profesor\"
         $routes->get('examenes/crear/(:num)', 'ExamenesController::crear/$1');
         $routes->get('examenes/editar/(:num)', 'ExamenesController::editar/$1');
+
     });
 
 
 });
+// ============================================================
+// 🎓 MÓDULO DE ALUMNOS
+// ============================================================
+$routes->group('alumno', ['namespace' => 'App\Controllers\Alumno', 'filter' => 'auth'], function ($routes) {
+
+    // 🏠 Dashboard principal
+    $routes->get('dashboard', 'Dashboard::index');
+
+    // ============================================================
+    // 📚 MATERIAS DEL ALUMNO
+    // ============================================================
+    $routes->get('materias', 'Materias::index');                 // Lista general de materias
+    $routes->get('materias/ver/(:num)', 'Materias::ver/$1');     // Vista principal de la materia (index.php)
+
+    // ================================
+    // 🧾 SECCIONES INTERNAS DE MATERIA
+    $routes->get('materias/tareas/(:num)', 'Materias::tareas/$1');          // Vista parcial de tareas
+    $routes->get('materias/proyectos/(:num)', 'Materias::proyectos/$1');    // Vista parcial de proyectos
+    $routes->get('materias/examenes/(:num)', 'Materias::examenes/$1');      // Vista parcial de exámenes
+    $routes->get('materias/asistencias/(:num)', 'Materias::asistencias/$1');// Vista parcial de asistencias
+
+    // ============================================================
+// 📘 TAREAS (Acciones y datos del alumno)
+// ============================================================
+    $routes->get('tareas/listar/(:num)', 'TareasController::listar/$1');   // JSON → Listado de tareas del grupo
+    $routes->get('tareas/detalle/(:num)', 'TareasController::detalle/$1'); // JSON → Detalle de una tarea
+    $routes->post('tareas/entregar', 'TareasController::entregar');        // POST → Entrega de tarea con archivos
+    $routes->delete('tareas/deshacer/(:num)', 'TareasController::deshacerEntrega/$1'); // DELETE → Deshacer entrega
+
+    // ============================================================
+    // 🚀 PROYECTOS (próximo módulo)
+    // ============================================================
+    $routes->get('proyectos/listar/(:num)', 'ProyectosController::listar/$1');
+    $routes->get('proyectos/detalle/(:num)', 'ProyectosController::detalle/$1');
+    $routes->post('proyectos/entregar', 'ProyectosController::entregar');
+
+    // ============================================================
+    // 📅 HORARIO SEMANAL
+    // ============================================================
+    $routes->get('horario', 'Dashboard::horario');
+});
+
+
+
+
 
 

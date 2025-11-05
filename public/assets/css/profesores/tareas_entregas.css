@@ -1,0 +1,167 @@
+/* ==========================================================
+   📁 ESTILOS — ENTREGAS DE TAREAS (vista profesor)
+   ========================================================== */
+
+.entregas-section {
+  padding: 25px;
+  color: var(--text);
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* ===============================
+   ENCABEZADO
+================================ */
+.entregas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.entregas-header h3 {
+  color: var(--text);
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.entregas-header i {
+  color: var(--primary);
+  font-size: 1.2rem;
+}
+
+/* ===============================
+   GRUPOS DE LISTAS
+================================ */
+.grupo-lista {
+  margin-bottom: 30px;
+}
+
+.grupo-lista h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+}
+
+.grupo-lista h4 i {
+  color: var(--accent);
+}
+
+/* ===============================
+   TARJETAS DE ENTREGA
+================================ */
+.entrega-card {
+  background: var(--bg-dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  transition: background 0.25s ease, transform 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.entrega-card:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.entrega-card.pendiente {
+  background: rgba(255, 184, 76, 0.08);
+  border: 1px solid var(--accent-soft);
+}
+
+/* ===============================
+   INFO DE ENTREGA
+================================ */
+.entrega-info h5 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.entrega-info p {
+  margin: 3px 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.entrega-info a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-top: 5px;
+}
+
+.entrega-info a:hover {
+  text-decoration: underline;
+}
+
+/* ===============================
+   EVALUACIÓN / CALIFICACIÓN
+================================ */
+.entrega-eval {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.entrega-eval label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.input-calif {
+  width: 90px;
+  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 500;
+  text-align: center;
+}
+
+textarea {
+  width: 100%;
+  min-height: 60px;
+  resize: vertical;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+/* ===============================
+   BOTÓN GUARDAR
+================================ */
+.btn-main.btn-guardar-eval {
+  background: var(--primary);
+  color: #000;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s ease;
+  box-shadow: 0 3px 8px rgba(255, 158, 100, 0.3);
+}
+
+.btn-main.btn-guardar-eval:hover {
+  background: var(--accent);
+  transform: scale(1.03);
+}

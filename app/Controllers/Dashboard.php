@@ -23,18 +23,22 @@ class Dashboard extends BaseController
         ];
 
         // ===============================
-        // 📘 CARGAR DATOS SEGÚN EL ROL
-        // ===============================
+// 📘 CARGAR DATOS SEGÚN EL ROL
+// ===============================
         switch ($rol) {
             case 'Profesor':
                 return redirect()->to(base_url('profesor/dashboard'));
+
             case 'Alumno':
-                return view('lms/dashboard-plataforma', $data);
+                return redirect()->to(base_url('alumno/dashboard')); // 🔹 antes mostraba una vista, ahora redirige
+
             case 'Superusuario':
                 return view('lms/dashboard-plataforma', $data);
+
             default:
                 return view('lms/dashboard-plataforma', $data);
         }
+
 
     }
 }

@@ -84,13 +84,17 @@ window.TareasUI = {
             ${archivosHTML}
           </div>
           <div class="tarea-acciones">
-            <button class="btn-editar" data-id="${
-              t.id
-            }"><i class="fas fa-edit"></i></button>
-            <button class="btn-eliminar" data-id="${
-              t.id
-            }"><i class="fas fa-trash"></i></button>
-          </div>
+  <button class="btn-ver-entregas" data-id="${t.id}" title="Ver entregas">
+    <i class="fas fa-folder-open"></i>
+  </button>
+  <button class="btn-editar" data-id="${t.id}" title="Editar tarea">
+    <i class="fas fa-edit"></i>
+  </button>
+  <button class="btn-eliminar" data-id="${t.id}" title="Eliminar tarea">
+    <i class="fas fa-trash"></i>
+  </button>
+</div>
+
         `;
 
         lista.appendChild(card);
@@ -196,9 +200,33 @@ window.TareasUI = {
       const btnEditar = e.target.closest(".btn-editar");
       const btnEliminar = e.target.closest(".btn-eliminar");
       const btnArchivo = e.target.closest(".btn-del-archivo");
+      const btnVerEntregas = e.target.closest(".btn-ver-entregas");
 
       // Editar tarea
       if (btnEditar) abrirModal(btnEditar.dataset.id);
+
+      // ============================================================
+      // 📂 Ver entregas de una tarea
+      // ============================================================
+      if (btnVerEntregas) {
+        const id = btnVerEntregas.dataset.id;
+        const contenedor = document.getElementById("contenedorTareas");
+        contenedor.innerHTML = `<p class="placeholder"><i class="fas fa-spinner fa-spin"></i> Cargando entregas...</p>`;
+
+        try {
+          const res = await fetch(
+            `${window.base_url}profesor/grupos/tareas/entregas/${id}`
+          );
+          const html = await res.text();
+          contenedor.innerHTML = html;
+
+          // Inicializar lógica de entregas
+          window.TareasEntregasUI?.init();
+        } catch (err) {
+          contenedor.innerHTML = `<p class="error">❌ Error al cargar entregas: ${err.message}</p>`;
+        }
+        return;
+      }
 
       // Eliminar tarea completa
       if (btnEliminar) {

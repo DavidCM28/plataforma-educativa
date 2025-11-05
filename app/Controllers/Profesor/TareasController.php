@@ -210,4 +210,116 @@ class TareasController extends BaseController
             'mensaje' => 'Archivo eliminado correctamente.'
         ]);
     }
+
+    // ============================================================
+// 👁️ Vista de entregas (interfaz completa)
+// ============================================================
+    public function vistaEntregas($tareaId)
+    {
+        $tarea = $this->tareaModel->find($tareaId);
+        if (!$tarea) {
+            return redirect()->back()->with('error', 'Tarea no encontrada.');
+        }
+
+        return view('lms/profesor/grupos/tareas_entregas', [
+            'tareaId' => $tareaId,
+            'tarea' => $tarea
+        ]);
+    }
+    // ============================================================
+// 📋 Listar entregas (alumnos con y sin entrega)
+// ============================================================
+    public function listarEntregas($tareaId)
+    {
+        try {
+            $entregaModel = new \App\Models\EntregaTareaModel();
+            $grupoMateriaProfesorModel = new \App\Models\GrupoMateriaProfesorModel();
+            $db = \Config\Database::connect();
+
+            // 🔍 Buscar la tarea
+            $tarea = $this->tareaModel->find($tareaId);
+            if (!$tarea) {
+                return $this->response->setJSON(['error' => 'Tarea no encontrada.']);
+            }
+
+            // 🔎 Determinar grupo_id a partir de la asignación
+            $grupoId = null;
+
+            if (!empty($tarea['grupo_id'])) {
+                // En caso de que la tarea tenga relación directa
+                $grupoId = $tarea['grupo_id'];
+            } elseif (!empty($tarea['asignacion_id'])) {
+                // Buscar en grupo_materia_profesor
+                $asignacion = $grupoMateriaProfesorModel->find($tarea['asignacion_id']);
+                if ($asignacion) {
+                    $grupoId = $asignacion['grupo_id'];
+                }
+            } elseif (!empty($tarea['grupo_materia_profesor_id'])) {
+                $asignacion = $grupoMateriaProfesorModel->find($tarea['grupo_materia_profesor_id']);
+                if ($asignacion) {
+                    $grupoId = $asignacion['grupo_id'];
+                }
+            }
+
+            if (!$grupoId) {
+                return $this->response->setJSON(['error' => 'No se pudo determinar el grupo asociado a la tarea.']);
+            }
+
+            // 👥 Obtener alumnos inscritos en el grupo
+            $alumnos = $db->table('grupo_alumno ga')
+                ->select('u.id, u.nombre, u.apellido_paterno, u.apellido_materno')
+                ->join('usuarios u', 'u.id = ga.alumno_id')
+                ->where('ga.grupo_id', $grupoId)
+                ->get()
+                ->getResultArray();
+
+            // 📦 Entregas de la tarea
+            $entregas = $entregaModel->where('tarea_id', $tareaId)->findAll();
+
+            // 🔗 Asociar estado de entrega a cada alumno
+            foreach ($alumnos as &$a) {
+                $entrega = array_values(array_filter($entregas, fn($e) => $e['alumno_id'] == $a['id']));
+                if ($entrega) {
+                    $a['entrega'] = end($entrega);
+                    $a['estado'] = 'entregado';
+                } else {
+                    $a['entrega'] = null;
+                    $a['estado'] = 'pendiente';
+                }
+            }
+
+            return $this->response->setJSON([
+                'tarea' => $tarea,
+                'alumnos' => $alumnos
+            ]);
+
+        } catch (\Throwable $e) {
+            log_message('error', 'Error en listarEntregas: ' . $e->getMessage());
+            return $this->response->setJSON(['error' => $e->getMessage()]);
+        }
+    }
+
+
+    // ============================================================
+// 🧾 Guardar calificación y retroalimentación
+// ============================================================
+    public function calificar($entregaId)
+    {
+        $entregaModel = new \App\Models\EntregaTareaModel();
+        $data = [
+            'calificacion' => $this->request->getPost('calificacion'),
+            'retroalimentacion' => trim($this->request->getPost('retroalimentacion') ?? '')
+        ];
+
+        if (!$entregaModel->find($entregaId)) {
+            return $this->response->setJSON(['error' => 'Entrega no encontrada.']);
+        }
+
+        $entregaModel->update($entregaId, $data);
+
+        return $this->response->setJSON([
+            'success' => true,
+            'mensaje' => 'Calificación guardada correctamente.'
+        ]);
+    }
 }
