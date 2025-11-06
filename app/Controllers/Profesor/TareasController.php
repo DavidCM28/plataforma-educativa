@@ -6,6 +6,8 @@ use App\Controllers\BaseController;
 use App\Models\TareaModel;
 use App\Models\TareaArchivoModel;
 use App\Models\PublicacionModel;
+use App\Models\CriterioEvaluacionModel;
+use App\Models\PonderacionCicloModel;
 
 class TareasController extends BaseController
 {
@@ -25,8 +27,11 @@ class TareasController extends BaseController
     // ============================================================
     public function index($asignacionId)
     {
+        $criterioModel = new CriterioEvaluacionModel();
+        $criterios = $criterioModel->where('activo', 1)->findAll();
         return view('lms/profesor/grupos/tareas', [
-            'asignacionId' => $asignacionId
+            'asignacionId' => $asignacionId,
+            'criterios' => $criterios
         ]);
     }
 
@@ -67,7 +72,11 @@ class TareasController extends BaseController
             'fecha_entrega' => !empty($data['fecha_entrega'])
                 ? date('Y-m-d H:i:s', strtotime($data['fecha_entrega']))
                 : null,
+            'parcial_numero' => $data['parcial_numero'] ?? 1,
+            'criterio_id' => $data['criterio_id'] ?? null,
+            'porcentaje_tarea' => $data['porcentaje_tarea'] ?? 0,
         ];
+
 
         // ✅ Insertar o actualizar tarea
         if ($tareaId) {
@@ -322,4 +331,75 @@ class TareasController extends BaseController
             'mensaje' => 'Calificación guardada correctamente.'
         ]);
     }
+
+    public function obtenerPorcentajeCriterio()
+    {
+        $criterioId = $this->request->getGet('criterio_id');
+        $parcialNum = $this->request->getGet('parcial_num');
+        $cicloId = $this->request->getGet('ciclo_id') ?? session('ciclo_id');
+
+        if (!$criterioId || !$parcialNum) {
+            return $this->response->setJSON(['error' => 'Faltan parámetros.']);
+        }
+
+        $ponderacionModel = new PonderacionCicloModel();
+
+        // Si no hay ciclo definido, tomamos el más reciente activo
+        if (!$cicloId) {
+            $registro = $ponderacionModel
+                ->where('criterio_id', $criterioId)
+                ->where('parcial_num', $parcialNum)
+                ->orderBy('id', 'DESC')
+                ->first();
+        } else {
+            $registro = $ponderacionModel
+                ->where('criterio_id', $criterioId)
+                ->where('parcial_num', $parcialNum)
+                ->where('ciclo_id', $cicloId)
+                ->first();
+        }
+
+        if (!$registro) {
+            return $this->response->setJSON([
+                'porcentaje' => 0,
+                'mensaje' => 'Este criterio no tiene ponderación definida para el parcial seleccionado.'
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'porcentaje' => (float) $registro['porcentaje']
+        ]);
+    }
+
+    public function obtenerPorcentajeUsado()
+    {
+        $criterioId = $this->request->getGet('criterio_id');
+        $parcialNum = $this->request->getGet('parcial_num');
+        $asignacionId = $this->request->getGet('asignacion_id');
+        $tareaId = $this->request->getGet('tarea_id'); // excluir tarea actual
+
+        if (!$criterioId || !$parcialNum || !$asignacionId) {
+            return $this->response->setJSON(['error' => 'Faltan parámetros']);
+        }
+
+        $db = \Config\Database::connect();
+
+        $builder = $db->table('tareas')
+            ->selectSum('porcentaje_tarea', 'total_usado')
+            ->where('criterio_id', $criterioId)
+            ->where('parcial_numero', $parcialNum)
+            ->where('asignacion_id', $asignacionId);
+
+        if ($tareaId) {
+            $builder->where('id !=', $tareaId);
+        }
+
+        $resultado = $builder->get()->getRowArray();
+        $usado = (float) ($resultado['total_usado'] ?? 0);
+
+        return $this->response->setJSON(['usado' => $usado]);
+    }
+
+
+
 }

@@ -8,6 +8,9 @@ use App\Models\ExamenPreguntaModel;
 use App\Models\ExamenOpcionModel;
 use App\Models\ExamenRespuestaModel;
 use App\Models\ExamenRespuestaDetalleModel;
+use App\Models\GrupoMateriaProfesorModel;
+use App\Models\CriterioEvaluacionModel;
+use App\Models\PonderacionCicloModel;
 
 class ExamenesController extends BaseController
 {
@@ -74,9 +77,32 @@ class ExamenesController extends BaseController
             return $this->response->setJSON(['error' => 'Título y asignación son obligatorios.']);
         }
 
+        // 🧭 Buscar ciclo del grupo
+        $asignacionModel = new GrupoMateriaProfesorModel();
+        $asignacion = $asignacionModel->find($asignacionId);
+        $cicloId = $asignacion['ciclo_id'] ?? null;
+
+        // 🧮 Determinar parcial (manual o primero por defecto)
+        $parcialNum = $data['parcial_num'] ?? 1;
+
+        // 🧾 Determinar criterio: buscar en ponderaciones_ciclo el criterio "Examen"
+        $pondModel = new PonderacionCicloModel();
+        $criterio = $pondModel
+            ->select('ponderaciones_ciclo.criterio_id')
+            ->join('criterios_evaluacion', 'criterios_evaluacion.id = ponderaciones_ciclo.criterio_id')
+            ->where('ponderaciones_ciclo.ciclo_id', $cicloId)
+            ->where('ponderaciones_ciclo.parcial_num', $parcialNum)
+            ->like('criterios_evaluacion.nombre', 'examen', 'both')
+            ->first();
+
+        $criterioId = $criterio['criterio_id'] ?? null;
+
+        // 📋 Preparar datos del examen
         $examenData = [
             'asignacion_id' => $asignacionId,
             'profesor_id' => $profesorId,
+            'parcial_num' => $parcialNum,
+            'criterio_id' => $criterioId,
             'titulo' => trim($data['titulo']),
             'descripcion' => trim($data['descripcion'] ?? ''),
             'instrucciones' => trim($data['instrucciones'] ?? ''),
@@ -110,8 +136,10 @@ class ExamenesController extends BaseController
                 'tipo' => $p['tipo'] === 'abierta' ? 'abierta' : 'opcion',
                 'pregunta' => $p['pregunta'],
                 'puntos' => (float) ($p['puntos'] ?? 1),
+                'es_extra' => !empty($p['extra']) ? 1 : 0,
                 'orden' => (int) ($p['orden'] ?? ($idx + 1)),
             ];
+
 
             // Imagen (si se subió)
             $keyImg = "pregunta_imagen_{$idx}";
@@ -127,7 +155,10 @@ class ExamenesController extends BaseController
                 $pregId = $this->preguntaModel->insert($fila);
             }
 
-            $puntosTotales += (float) $fila['puntos'];
+            if (empty($p['extra']) || !$p['extra']) {
+                $puntosTotales += (float) $fila['puntos'];
+            }
+
 
             // Opciones si es de opción múltiple
             if ($fila['tipo'] === 'opcion') {
@@ -222,10 +253,24 @@ class ExamenesController extends BaseController
     public function editar($id)
     {
         $examen = $this->examenModel->obtenerConPreguntas($id);
+
+        // 🔎 Buscar porcentaje del criterio si existe
+        $criterioPorcentaje = null;
+        if (!empty($examen['criterio_id'])) {
+            $db = \Config\Database::connect();
+            $criterioRow = $db->table('ponderaciones_ciclo')
+                ->select('porcentaje')
+                ->where('criterio_id', $examen['criterio_id'])
+                ->where('parcial_num', $examen['parcial_num'])
+                ->get()
+                ->getRowArray();
+            $criterioPorcentaje = $criterioRow['porcentaje'] ?? null;
+        }
+
         return view('lms/profesor/grupos/examen_editar', [
             'asignacionId' => $examen['asignacion_id'],
-            'examen' => $examen
+            'examen' => $examen,
+            'criterioPorcentaje' => $criterioPorcentaje
         ]);
     }
-
 }

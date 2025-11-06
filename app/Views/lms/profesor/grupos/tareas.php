@@ -13,6 +13,21 @@
     </div>
 
     <!-- ============================================================
+         Filtros
+    ============================================================ -->
+
+    <div class="filtros-tareas">
+        <label for="filtroParcial"><i class="fas fa-filter"></i> Filtrar por parcial:</label>
+        <select id="filtroParcial">
+            <option value="">Todos</option>
+            <option value="1">1° Parcial</option>
+            <option value="2">2° Parcial</option>
+            <option value="3">3° Parcial</option>
+        </select>
+    </div>
+
+
+    <!-- ============================================================
          📋 Contenedor dinámico de tareas
     ============================================================ -->
     <div id="listaTareas" class="tareas-grid" data-asignacion="<?= esc($asignacionId) ?>">
@@ -49,6 +64,43 @@
                         <input type="datetime-local" id="fechaEntrega" name="fecha_entrega">
                     </div>
                 </div>
+
+                <!-- Parcial -->
+                <div class="form-group">
+                    <label for="parcialNumero">Parcial</label>
+                    <select id="parcialNumero" name="parcial_numero" required>
+                        <option value="1">1° Parcial</option>
+                        <option value="2">2° Parcial</option>
+                        <option value="3">3° Parcial</option>
+                    </select>
+                </div>
+
+                <!-- Criterio -->
+                <div class="form-group">
+                    <label for="criterioId">Criterio de evaluación</label>
+                    <select id="criterioId" name="criterio_id" required>
+                        <option value="">Seleccione...</option>
+                        <?php foreach ($criterios as $c): ?>
+                            <option value="<?= esc($c['id']) ?>">
+                                <?= esc($c['nombre']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <!-- Info de ponderación -->
+                <div id="infoCriterio" class="info-criterio" style="display:none; margin-top:10px;">
+                    <p><strong>Porcentaje total del criterio:</strong>
+                        <span id="porcentajeCriterio">0%</span>
+                    </p>
+                    <p><strong>Porcentaje restante:</strong>
+                        <span id="porcentajeRestante">--%</span>
+                    </p>
+                    <label for="porcentajeTarea">Porcentaje que representará esta tarea:</label>
+                    <input type="number" id="porcentajeTarea" name="porcentaje_tarea" placeholder="Ejemplo: 25" min="1"
+                        max="100">
+                </div>
+
+
 
                 <!-- Archivos -->
                 <div class="form-group archivo-group">

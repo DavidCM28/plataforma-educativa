@@ -18,18 +18,30 @@ window.ProyectosUI = {
     // 🚀 Inicialización
     // ============================================================
     cargarProyectos();
+    const filtroParcial = document.getElementById("filtroParcialProyecto");
+    if (filtroParcial) {
+      filtroParcial.addEventListener("change", () => cargarProyectos());
+    }
 
     // ============================================================
     // 📋 Cargar lista de proyectos
     // ============================================================
     async function cargarProyectos() {
       lista.innerHTML = `<p class="placeholder"><i class="fas fa-spinner fa-spin"></i> Cargando proyectos...</p>`;
+      const parcialSeleccionado =
+        document.getElementById("filtroParcialProyecto")?.value || "";
 
       try {
         const res = await fetch(
           `${window.base_url}profesor/grupos/listar-proyectos/${asignacionId}`
         );
-        const proyectos = await res.json();
+        let proyectos = await res.json();
+
+        if (parcialSeleccionado) {
+          proyectos = proyectos.filter(
+            (p) => String(p.parcial_numero) === parcialSeleccionado
+          );
+        }
 
         if (!Array.isArray(proyectos) || proyectos.length === 0) {
           lista.innerHTML = `<p class="placeholder">No hay proyectos registrados.</p>`;
@@ -43,58 +55,65 @@ window.ProyectosUI = {
     }
 
     // ============================================================
-    // 🧱 Renderizar tarjetas de proyectos
+    // 🧱 Renderizar tabla de proyectos
     // ============================================================
     function renderProyectos(proyectos) {
       lista.innerHTML = "";
 
+      const tabla = document.createElement("table");
+      tabla.className = "tabla-tareas";
+      tabla.innerHTML = `
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Descripción</th>
+            <th>Entrega</th>
+            <th>Parcial</th>
+            <th>Criterio</th>
+            <th>% Proyecto</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      `;
+
+      const tbody = tabla.querySelector("tbody");
+
       proyectos.forEach((p) => {
-        const card = document.createElement("div");
-        card.className = "tarea-card proyecto-card";
-
+        const fila = document.createElement("tr");
         const fecha = p.fecha_entrega
-          ? new Date(p.fecha_entrega).toLocaleString()
-          : "Sin fecha";
+          ? new Date(p.fecha_entrega).toLocaleDateString("es-MX", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })
+          : "—";
+        const criterioNombre = p.criterio_nombre || p.criterio || "—";
 
-        let archivosHTML = "";
-        if (p.archivos?.length) {
-          archivosHTML =
-            `<div class="tarea-archivos">` +
-            p.archivos
-              .map(
-                (a) => `
-              <div class="archivo-item">
-                <i class="fas fa-paperclip"></i> ${a.archivo}
-                <button class="btn-del-archivo" data-id="${a.id}" title="Eliminar archivo">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>`
-              )
-              .join("") +
-            `</div>`;
-        }
+        fila.innerHTML = `
+  <td>${p.titulo}</td>
+  <td>${p.descripcion || "Sin descripción"}</td>
+  <td>${fecha}</td>
+  <td>${p.parcial_numero || "—"}</td>
+  <td>${criterioNombre}</td>
+  <td>${p.porcentaje_proyecto ? p.porcentaje_proyecto + "%" : "0%"}</td>
+  <td class="acciones">
+    <button class="btn-ver-entregas" data-id="${p.id}" title="Ver entregas">
+      <i class="fas fa-folder-open"></i>
+    </button>
+    <button class="btn-editar" data-id="${p.id}" title="Editar">
+      <i class="fas fa-edit"></i>
+    </button>
+    <button class="btn-eliminar" data-id="${p.id}" title="Eliminar">
+      <i class="fas fa-trash"></i>
+    </button>
+  </td>
+`;
 
-        card.innerHTML = `
-          <div class="tarea-info">
-            <h4><i class="fas fa-rocket"></i> ${p.titulo}</h4>
-            <p>${p.descripcion || "Sin descripción."}</p>
-            <div class="tarea-meta">
-              <span><i class="fas fa-clock"></i> Entrega: ${fecha}</span>
-            </div>
-            ${archivosHTML}
-          </div>
-          <div class="tarea-acciones">
-            <button class="btn-editar" data-id="${
-              p.id
-            }" title="Editar"><i class="fas fa-edit"></i></button>
-            <button class="btn-eliminar" data-id="${
-              p.id
-            }" title="Eliminar"><i class="fas fa-trash"></i></button>
-          </div>
-        `;
-
-        lista.appendChild(card);
+        tbody.appendChild(fila);
       });
+
+      lista.appendChild(tabla);
     }
 
     // ============================================================
@@ -108,10 +127,25 @@ window.ProyectosUI = {
     async function abrirModal(proyectoId = null) {
       modal.classList.remove("hidden");
       form.reset();
+
+      const infoCriterio = document.getElementById("infoCriterioProyecto");
+      const spanPorcentaje = document.getElementById(
+        "porcentajeCriterioProyecto"
+      );
+      const spanRestante = document.getElementById(
+        "porcentajeRestanteProyecto"
+      );
+      const inputPorcentaje = document.getElementById("porcentajeProyecto");
+
+      infoCriterio.style.display = "none";
+      spanPorcentaje.textContent = "0%";
+      spanRestante.textContent = "--%";
+      inputPorcentaje.value = "";
+      inputPorcentaje.max = "100";
       previewArchivos.innerHTML = "";
       document.getElementById("tituloModalProyecto").innerHTML = proyectoId
-        ? "<i class='fas fa-edit'></i> Editar proyecto"
-        : "<i class='fas fa-file-alt'></i> Nuevo proyecto";
+        ? "✏️ Editar proyecto"
+        : "➕ Nuevo proyecto";
       document.getElementById("proyectoId").value = proyectoId || "";
 
       if (proyectoId) {
@@ -130,7 +164,23 @@ window.ProyectosUI = {
             document.getElementById("fechaEntregaProyecto").value =
               data.fecha_entrega.replace(" ", "T");
 
-          // Archivos existentes
+          if (data.parcial_numero)
+            document.getElementById("parcialNumeroProyecto").value =
+              data.parcial_numero;
+
+          if (data.criterio_id) {
+            document.getElementById("criterioIdProyecto").value =
+              data.criterio_id;
+            const event = new Event("change");
+            document.getElementById("criterioIdProyecto").dispatchEvent(event);
+          }
+
+          if (data.porcentaje_proyecto) {
+            document.getElementById("porcentajeProyecto").value =
+              data.porcentaje_proyecto;
+            infoCriterio.style.display = "block";
+          }
+
           if (data.archivos?.length) {
             data.archivos.forEach((a) => {
               const item = document.createElement("div");
@@ -151,6 +201,60 @@ window.ProyectosUI = {
     }
 
     // ============================================================
+    // 🎯 Mostrar porcentaje de criterio
+    // ============================================================
+    const selectCriterio = document.getElementById("criterioIdProyecto");
+    const selectParcial = document.getElementById("parcialNumeroProyecto");
+    const infoCriterio = document.getElementById("infoCriterioProyecto");
+    const spanPorcentaje = document.getElementById(
+      "porcentajeCriterioProyecto"
+    );
+    const spanRestante = document.getElementById("porcentajeRestanteProyecto");
+    const inputPorcentaje = document.getElementById("porcentajeProyecto");
+
+    if (selectCriterio && selectParcial) {
+      selectCriterio.addEventListener("change", async () => {
+        const criterioId = selectCriterio.value;
+        const parcialNum = selectParcial.value;
+        const proyectoId = document.getElementById("proyectoId").value;
+        const asignacionId = document.querySelector(
+          "[name='asignacion_id']"
+        ).value;
+
+        if (!criterioId || !parcialNum) {
+          infoCriterio.style.display = "none";
+          return;
+        }
+
+        try {
+          // 1️⃣ Porcentaje total
+          const res = await fetch(
+            `${window.base_url}profesor/grupos/criterio-porcentaje?criterio_id=${criterioId}&parcial_num=${parcialNum}`
+          );
+          const data = await res.json();
+          const total = data.porcentaje || 0;
+          spanPorcentaje.textContent = total + "%";
+
+          // 2️⃣ Porcentaje usado
+          const res2 = await fetch(
+            `${window.base_url}profesor/grupos/criterio-usado-proyecto?criterio_id=${criterioId}&parcial_num=${parcialNum}&asignacion_id=${asignacionId}&proyecto_id=${proyectoId}`
+          );
+          const data2 = await res2.json();
+          const usado = data2.usado || 0;
+
+          // 3️⃣ Restante
+          const restante = Math.max(total - usado, 0);
+          spanRestante.textContent = restante + "% disponibles";
+          inputPorcentaje.max = restante;
+          infoCriterio.style.display = "block";
+        } catch (err) {
+          console.error("❌ Error al consultar criterio:", err);
+          infoCriterio.style.display = "none";
+        }
+      });
+    }
+
+    // ============================================================
     // ❌ Cerrar modal
     // ============================================================
     modal
@@ -164,6 +268,18 @@ window.ProyectosUI = {
     // ============================================================
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+
+      const maxPermitido = parseFloat(inputPorcentaje.max || 0);
+      const valorIngresado = parseFloat(inputPorcentaje.value || 0);
+
+      if (valorIngresado > maxPermitido) {
+        mostrarAlerta(
+          `No puedes asignar más del ${maxPermitido}% restante.`,
+          "error"
+        );
+        return;
+      }
+
       const formData = new FormData(form);
 
       try {
@@ -195,11 +311,10 @@ window.ProyectosUI = {
       const btnEditar = e.target.closest(".btn-editar");
       const btnEliminar = e.target.closest(".btn-eliminar");
       const btnArchivo = e.target.closest(".btn-del-archivo");
+      const btnVerEntregas = e.target.closest(".btn-ver-entregas");
 
-      // Editar proyecto
       if (btnEditar) abrirModal(btnEditar.dataset.id);
 
-      // Eliminar proyecto
       if (btnEliminar) {
         if (!confirm("¿Eliminar este proyecto y sus archivos?")) return;
         const id = btnEliminar.dataset.id;
@@ -220,7 +335,24 @@ window.ProyectosUI = {
         }
       }
 
-      // Eliminar archivo individual
+      if (btnVerEntregas) {
+        const idProyecto = btnVerEntregas.dataset.id;
+        const panel = document.getElementById("listaProyectos");
+        panel.innerHTML = `<p class="placeholder"><i class="fas fa-spinner fa-spin"></i> Cargando entregas...</p>`;
+        try {
+          const res = await fetch(
+            `${window.base_url}profesor/grupos/proyectos/entregas/${idProyecto}`
+          );
+          const html = await res.text();
+          panel.innerHTML = html;
+          // Inicializar lógica de entregas
+          window.ProyectosEntregasUI?.init();
+        } catch (err) {
+          panel.innerHTML = `<p class="error">❌ Error al cargar entregas: ${err.message}</p>`;
+        }
+        return;
+      }
+
       if (btnArchivo) {
         if (!confirm("¿Eliminar este archivo?")) return;
         const idArchivo = btnArchivo.dataset.id;
@@ -245,7 +377,7 @@ window.ProyectosUI = {
     });
 
     // ============================================================
-    // 📂 Previsualización de archivos seleccionados (nuevos)
+    // 📂 Previsualización de archivos
     // ============================================================
     if (inputArchivos && previewArchivos) {
       inputArchivos.addEventListener("change", () => {

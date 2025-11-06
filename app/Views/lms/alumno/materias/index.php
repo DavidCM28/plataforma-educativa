@@ -8,6 +8,7 @@
     window.base_url = "<?= rtrim(site_url(), '/') ?>/";
 </script>
 <script src="<?= base_url('assets/js/alumnos/tareas.js') ?>"></script>
+<script src="<?= base_url('assets/js/alumnos/proyectos.js') ?>"></script>
 <!-- 🔔 Contenedor global de alertas -->
 <div id="alertContainer" class="alert-container"></div>
 
@@ -151,6 +152,28 @@
                         // ✅ Inicializa el módulo JS una vez cargada la vista
                         if (window.TareasAlumnoUI) {
                             window.TareasAlumnoUI.inicializar(asignacionId);
+                        }
+                    })
+                    .catch(err => {
+                        tab.innerHTML = `<p class='error'>Error al cargar las tareas.</p>`;
+                        console.error(err);
+                    });
+            }
+
+            // Si es proyectos, cargar la vista parcial
+            if (tabId === "proyectos" && !tab.dataset.loaded) {
+                const asignacionId = <?= esc($materia['id']) ?>;
+
+                tab.innerHTML = `<div class='contenedor-carga'><i class='fas fa-spinner fa-spin'></i> Cargando tareas...</div>`;
+                fetch(`<?= base_url('alumno/materias/proyectos/') ?>${asignacionId}`)
+                    .then(res => res.text())
+                    .then(html => {
+                        tab.innerHTML = html;
+                        tab.dataset.loaded = true;
+
+                        // ✅ Inicializa el módulo JS una vez cargada la vista
+                        if (window.ProyectosAlumnoUI) {
+                            window.ProyectosAlumnoUI.inicializar(asignacionId);
                         }
                     })
                     .catch(err => {

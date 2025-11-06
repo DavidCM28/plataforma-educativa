@@ -215,44 +215,22 @@ window.TareasAlumnoUI = {
       );
 
       contenidoEntrega = `
-      <div class="entrega-info">
-        <div>
-          <p><i class="fas fa-clock"></i> <b>Fecha de entrega:</b> ${new Date(
-            miEntrega.fecha_entrega
-          ).toLocaleString()}</p>
-        </div>
-        <span class="estado ${estado}">
-          ${estado.charAt(0).toUpperCase() + estado.slice(1)}
-        </span>
+    <div class="entrega-info">
+      <div>
+        <p><i class="fas fa-clock"></i> <b>Fecha de entrega:</b> ${new Date(
+          miEntrega.fecha_entrega
+        ).toLocaleString()}</p>
       </div>
-      ${archivosAlumno}
+      <span class="estado ${estado}">
+        ${estado.charAt(0).toUpperCase() + estado.slice(1)}
+      </span>
+    </div>
+    ${archivosAlumno}
 
-${
-  miEntrega.calificacion || miEntrega.retroalimentacion
-    ? `
-  <div class="evaluacion-profesor">
-    <h5><i class="fas fa-star"></i> Evaluación del profesor</h5>
-    ${
-      miEntrega.calificacion
-        ? `<p><b>Calificación:</b> ${miEntrega.calificacion}/100</p>`
-        : `<p><b>Calificación:</b> Pendiente</p>`
-    }
-    ${
-      miEntrega.retroalimentacion
-        ? `<p><b>Retroalimentación:</b> ${miEntrega.retroalimentacion}</p>`
-        : ``
-    }
-  </div>`
-    : `<div class="evaluacion-profesor pendiente">
-      <h5><i class="fas fa-hourglass-half"></i> Evaluación pendiente</h5>
-      <p>Tu profesor aún no ha calificado esta tarea.</p>
-    </div>`
-}
-
-<button id="btnDeshacer" class="btn-deshacer" data-id="${t.id}">
-  <i class="fas fa-undo"></i> Deshacer entrega
-</button>
-`;
+    <button id="btnDeshacer" class="btn-deshacer" data-id="${t.id}">
+      <i class="fas fa-undo"></i> Deshacer entrega
+    </button>
+  `;
     }
 
     // ============================================================
@@ -280,9 +258,51 @@ ${
     }
 
     // ============================================================
+    // 🏁 Banner superior de calificación
+    // ============================================================
+    let bannerHTML = "";
+    if (entregada) {
+      const cal = miEntrega.calificacion;
+      const retro =
+        miEntrega.retroalimentacion || "Sin comentarios del profesor.";
+
+      let claseColor = "gris";
+      if (estado === "tarde") claseColor = "rojo";
+      else if (cal >= 80) claseColor = "verde";
+      else if (cal < 80 && cal != null) claseColor = "amarillo";
+
+      bannerHTML = `
+    <div class="banner-calificacion ${claseColor}">
+      <div class="info">
+        <i class="fas fa-star"></i>
+        <div>
+          <h4>${
+            cal != null
+              ? `Calificación: ${cal}/100`
+              : "Pendiente de calificación"
+          }</h4>
+          <p>${retro}</p>
+        </div>
+      </div>
+    </div>`;
+    } else {
+      bannerHTML = `
+    <div class="banner-calificacion gris">
+      <div class="info">
+        <i class="fas fa-hourglass-half"></i>
+        <div>
+          <h4>Tarea no entregada</h4>
+          <p>Entrega tus archivos antes de la fecha límite para recibir calificación.</p>
+        </div>
+      </div>
+    </div>`;
+    }
+
+    // ============================================================
     // 📄 Render final
     // ============================================================
     panel.innerHTML = `
+    ${bannerHTML}
     <div class="detalle-tarea">
       <h2>${t.titulo}</h2>
       <p class="descripcion">${t.descripcion || "Sin descripción."}</p>

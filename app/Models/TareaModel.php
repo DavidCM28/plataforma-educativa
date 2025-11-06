@@ -14,6 +14,9 @@ class TareaModel extends Model
         'titulo',
         'descripcion',
         'fecha_entrega',
+        'parcial_numero',
+        'criterio_id',
+        'porcentaje_tarea',
         'created_at',
         'updated_at'
     ];
@@ -24,12 +27,15 @@ class TareaModel extends Model
     /**
      * 🧩 Obtener todas las tareas de una asignación (grupo-materia-profesor)
      */
-    public function obtenerPorAsignacion(int $asignacionId)
+    public function obtenerPorAsignacion($asignacionId)
     {
-        return $this->where('asignacion_id', $asignacionId)
+        return $this->select('tareas.*, criterios_evaluacion.nombre AS criterio_nombre')
+            ->join('criterios_evaluacion', 'criterios_evaluacion.id = tareas.criterio_id', 'left')
+            ->where('asignacion_id', $asignacionId)
             ->orderBy('fecha_entrega', 'ASC')
             ->findAll();
     }
+
 
     /**
      * 📦 Obtener una tarea con sus archivos relacionados

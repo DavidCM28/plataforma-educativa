@@ -481,3 +481,81 @@
   border-color: #ffe299;
   color: #7a6a00;
 }
+/* ============================================================
+   🏁 BANNER DE CALIFICACIÓN SUPERIOR
+============================================================ */
+.banner-calificacion {
+  width: 100%;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 18px 24px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.banner-calificacion:hover {
+  transform: translateY(-2px);
+}
+
+.banner-calificacion .info {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.banner-calificacion i {
+  font-size: 26px;
+}
+
+.banner-calificacion h4 {
+  font-size: 17px;
+  margin: 0;
+  color: var(--text);
+}
+
+.banner-calificacion p {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* 🎨 Colores según estado */
+.banner-calificacion.verde {
+  background: rgba(76, 175, 80, 0.15);
+  border-left: 4px solid #4caf50;
+}
+
+.banner-calificacion.verde i {
+  color: #4caf50;
+}
+
+.banner-calificacion.amarillo {
+  background: rgba(255, 184, 76, 0.15);
+  border-left: 4px solid var(--accent);
+}
+
+.banner-calificacion.amarillo i {
+  color: var(--accent);
+}
+
+.banner-calificacion.rojo {
+  background: rgba(255, 92, 92, 0.15);
+  border-left: 4px solid #ff5c5c;
+}
+
+.banner-calificacion.rojo i {
+  color: #ff5c5c;
+}
+
+.banner-calificacion.gris {
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 4px solid #888;
+}
+
+.banner-calificacion.gris i {
+  color: #aaa;
+}

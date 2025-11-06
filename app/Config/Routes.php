@@ -213,6 +213,10 @@ $routes->group('profesor', ['namespace' => 'App\Controllers\Profesor', 'filter' 
         $routes->get('tareas/entregas/(:num)', 'TareasController::vistaEntregas/$1');
         $routes->get('tareas/entregas-lista/(:num)', 'TareasController::listarEntregas/$1');
         $routes->post('tareas/calificar/(:num)', 'TareasController::calificar/$1');
+        $routes->get('criterio-porcentaje', 'TareasController::obtenerPorcentajeCriterio');
+        $routes->get('criterio-usado', 'TareasController::obtenerPorcentajeUsado');
+
+
     });
 
     $routes->group('grupos', ['namespace' => 'App\Controllers\Profesor'], function ($routes) {
@@ -223,6 +227,11 @@ $routes->group('profesor', ['namespace' => 'App\Controllers\Profesor', 'filter' 
         $routes->delete('eliminar-proyecto/(:num)', 'ProyectosController::eliminar/$1');
         $routes->delete('eliminar-archivo-proyecto/(:num)', 'ProyectosController::eliminarArchivo/$1');
         $routes->get('ver-proyecto/(:num)', 'ProyectosController::ver/$1');
+        // 📁 Entregas de proyectos
+        $routes->get('proyectos/entregas/(:num)', 'ProyectosController::vistaEntregas/$1');
+        $routes->get('proyectos/entregas-lista/(:num)', 'ProyectosController::listarEntregas/$1');
+        $routes->post('proyectos/calificar/(:num)', 'ProyectosController::calificar/$1');
+
 
     });
 

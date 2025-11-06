@@ -18,18 +18,30 @@ window.TareasUI = {
     // 🚀 Inicialización
     // ============================================================
     cargarTareas();
+    const filtroParcial = document.getElementById("filtroParcial");
+    if (filtroParcial) {
+      filtroParcial.addEventListener("change", () => cargarTareas());
+    }
 
     // ============================================================
     // 📋 Cargar lista de tareas
     // ============================================================
     async function cargarTareas() {
       lista.innerHTML = `<p class="placeholder"><i class="fas fa-spinner fa-spin"></i> Cargando tareas...</p>`;
+      const parcialSeleccionado =
+        document.getElementById("filtroParcial")?.value || "";
 
       try {
         const res = await fetch(
           `${window.base_url}profesor/grupos/listar-tareas/${asignacionId}`
         );
-        const tareas = await res.json();
+        let tareas = await res.json();
+
+        if (parcialSeleccionado) {
+          tareas = tareas.filter(
+            (t) => String(t.parcial_numero) === parcialSeleccionado
+          );
+        }
 
         if (!Array.isArray(tareas) || tareas.length === 0) {
           lista.innerHTML = `<p class="placeholder">No hay tareas registradas.</p>`;
@@ -48,57 +60,59 @@ window.TareasUI = {
     function renderTareas(tareas) {
       lista.innerHTML = "";
 
+      const tabla = document.createElement("table");
+      tabla.className = "tabla-tareas";
+      tabla.innerHTML = `
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Descripción</th>
+        <th>Entrega</th>
+        <th>Parcial</th>
+        <th>Criterio</th>
+        <th>% Tarea</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  `;
+
+      const tbody = tabla.querySelector("tbody");
+
       tareas.forEach((t) => {
-        const card = document.createElement("div");
-        card.className = "tarea-card";
-
+        const fila = document.createElement("tr");
         const fecha = t.fecha_entrega
-          ? new Date(t.fecha_entrega).toLocaleString()
-          : "Sin fecha";
+          ? new Date(t.fecha_entrega).toLocaleDateString("es-MX", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })
+          : "—";
+        const criterioNombre = t.criterio_nombre || t.criterio || "—";
 
-        let archivosHTML = "";
-        if (t.archivos?.length) {
-          archivosHTML =
-            `<div class="tarea-archivos">` +
-            t.archivos
-              .map(
-                (a) => `
-                <div class="archivo-item">
-                  <i class="fas fa-paperclip"></i> ${a.archivo}
-                  <button class="btn-del-archivo" data-id="${a.id}" title="Eliminar archivo">
-                    <i class="fas fa-times"></i>
-                  </button>
-                </div>`
-              )
-              .join("") +
-            `</div>`;
-        }
-
-        card.innerHTML = `
-          <div class="tarea-info">
-            <h4>${t.titulo}</h4>
-            <p>${t.descripcion || "Sin descripción."}</p>
-            <div class="tarea-meta">
-              <span><i class="fas fa-clock"></i> Entrega: ${fecha}</span>
-            </div>
-            ${archivosHTML}
-          </div>
-          <div class="tarea-acciones">
-  <button class="btn-ver-entregas" data-id="${t.id}" title="Ver entregas">
-    <i class="fas fa-folder-open"></i>
-  </button>
-  <button class="btn-editar" data-id="${t.id}" title="Editar tarea">
-    <i class="fas fa-edit"></i>
-  </button>
-  <button class="btn-eliminar" data-id="${t.id}" title="Eliminar tarea">
-    <i class="fas fa-trash"></i>
-  </button>
-</div>
-
-        `;
-
-        lista.appendChild(card);
+        fila.innerHTML = `
+      <td>${t.titulo}</td>
+      <td>${t.descripcion || "Sin descripción"}</td>
+      <td>${fecha}</td>
+      <td>${t.parcial_numero || "—"}</td>
+      <td>${criterioNombre}</td>
+      <td>${t.porcentaje_tarea ? t.porcentaje_tarea + "%" : "0%"}</td>
+      <td class="acciones">
+        <button class="btn-ver-entregas" data-id="${t.id}" title="Ver entregas">
+          <i class="fas fa-folder-open"></i>
+        </button>
+        <button class="btn-editar" data-id="${t.id}" title="Editar">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn-eliminar" data-id="${t.id}" title="Eliminar">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    `;
+        tbody.appendChild(fila);
       });
+
+      lista.appendChild(tabla);
     }
 
     // ============================================================
@@ -112,6 +126,17 @@ window.TareasUI = {
     async function abrirModal(tareaId = null) {
       modal.classList.remove("hidden");
       form.reset();
+      // 🔄 Limpiar info de criterio
+      const infoCriterio = document.getElementById("infoCriterio");
+      const spanPorcentaje = document.getElementById("porcentajeCriterio");
+      const spanRestante = document.getElementById("porcentajeRestante");
+      const inputPorcentaje = document.getElementById("porcentajeTarea");
+
+      infoCriterio.style.display = "none";
+      spanPorcentaje.textContent = "0%";
+      spanRestante.textContent = "--%";
+      inputPorcentaje.value = "";
+      inputPorcentaje.max = "100";
       previewArchivos.innerHTML = "";
       document.getElementById("tituloModalTarea").innerHTML = tareaId
         ? "✏️ Editar tarea"
@@ -134,17 +159,40 @@ window.TareasUI = {
             document.getElementById("fechaEntrega").value =
               data.fecha_entrega.replace(" ", "T");
 
+          // ✅ Establecer parcial seleccionado
+          if (data.parcial_numero) {
+            document.getElementById("parcialNumero").value =
+              data.parcial_numero;
+          }
+
+          // 👇 NUEVO: establecer criterio seleccionado
+          if (data.criterio_id) {
+            document.getElementById("criterioId").value = data.criterio_id;
+
+            // Forzamos que se dispare el evento "change"
+            // para mostrar el porcentaje total del criterio
+            const event = new Event("change");
+            document.getElementById("criterioId").dispatchEvent(event);
+          }
+
+          // 👇 NUEVO: cargar porcentaje de tarea (si existe)
+          if (data.porcentaje_tarea) {
+            document.getElementById("porcentajeTarea").value =
+              data.porcentaje_tarea;
+            document.getElementById("infoCriterio").style.display = "block";
+          }
+
           // Archivos existentes
           if (data.archivos?.length) {
             data.archivos.forEach((a) => {
               const item = document.createElement("div");
               item.className = "archivo-item";
               item.innerHTML = `
-                <i class="fas fa-paperclip"></i>
-                <span>${a.archivo}</span>
-                <button class="btn-del-archivo" data-id="${a.id}">
-                  <i class="fas fa-times"></i>
-                </button>`;
+            <i class="fas fa-paperclip"></i>
+            <span>${a.archivo}</span>
+            <button class="btn-del-archivo" data-id="${a.id}">
+              <i class="fas fa-times"></i>
+            </button>`;
               previewArchivos.appendChild(item);
             });
           }
@@ -152,6 +200,58 @@ window.TareasUI = {
           mostrarAlerta("Error al cargar tarea: " + err.message, "error");
         }
       }
+    }
+
+    // ============================================================
+    // 🎯 Mostrar porcentaje de criterio al seleccionarlo
+    // ============================================================
+    const selectCriterio = document.getElementById("criterioId");
+    const selectParcial = document.getElementById("parcialNumero");
+    const infoCriterio = document.getElementById("infoCriterio");
+    const spanPorcentaje = document.getElementById("porcentajeCriterio");
+    const spanRestante = document.getElementById("porcentajeRestante");
+    const inputPorcentaje = document.getElementById("porcentajeTarea");
+
+    if (selectCriterio && selectParcial) {
+      selectCriterio.addEventListener("change", async () => {
+        const criterioId = selectCriterio.value;
+        const parcialNum = selectParcial.value;
+        const tareaId = document.getElementById("tareaId").value;
+        const asignacionId = document.querySelector(
+          "[name='asignacion_id']"
+        ).value;
+
+        if (!criterioId || !parcialNum) {
+          infoCriterio.style.display = "none";
+          return;
+        }
+
+        try {
+          // 1️⃣ Consultar porcentaje total del criterio
+          const res = await fetch(
+            `${window.base_url}profesor/grupos/criterio-porcentaje?criterio_id=${criterioId}&parcial_num=${parcialNum}`
+          );
+          const data = await res.json();
+          const total = data.porcentaje || 0;
+          spanPorcentaje.textContent = total + "%";
+
+          // 2️⃣ Consultar cuánto ya se ha usado
+          const res2 = await fetch(
+            `${window.base_url}profesor/grupos/criterio-usado?criterio_id=${criterioId}&parcial_num=${parcialNum}&asignacion_id=${asignacionId}&tarea_id=${tareaId}`
+          );
+          const data2 = await res2.json();
+          const usado = data2.usado || 0;
+
+          // 3️⃣ Calcular restante
+          const restante = Math.max(total - usado, 0);
+          spanRestante.textContent = restante + "% disponibles";
+          inputPorcentaje.max = restante; // limitar campo
+          infoCriterio.style.display = "block";
+        } catch (err) {
+          console.error("❌ Error al consultar criterio:", err);
+          infoCriterio.style.display = "none";
+        }
+      });
     }
 
     // ============================================================
@@ -168,6 +268,23 @@ window.TareasUI = {
     // ============================================================
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+
+      const parcial = document.getElementById("parcialNumero").value;
+      if (!parcial) {
+        mostrarAlerta("Selecciona un parcial.", "error");
+        return;
+      }
+
+      const maxPermitido = parseFloat(inputPorcentaje.max || 0);
+      const valorIngresado = parseFloat(inputPorcentaje.value || 0);
+
+      if (valorIngresado > maxPermitido) {
+        mostrarAlerta(
+          `No puedes asignar más del ${maxPermitido}% restante a este criterio.`,
+          "error"
+        );
+        return;
+      }
 
       const formData = new FormData(form);
 

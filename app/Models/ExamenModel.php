@@ -11,6 +11,8 @@ class ExamenModel extends Model
     protected $allowedFields = [
         'asignacion_id',
         'profesor_id',
+        'parcial_num',
+        'criterio_id',
         'titulo',
         'descripcion',
         'instrucciones',
