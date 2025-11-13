@@ -41,7 +41,9 @@
         <div class="grupo-info">
             <h2><?= esc($grupo['materia']) ?> <span class="grupo-tag"><?= esc($grupo['grupo']) ?></span></h2>
             <p class="grupo-sub"><i class="fas fa-chalkboard-teacher"></i> Profesor:
-                <?= esc($grupo['profesor'] ?? 'Sin asignar') ?>
+                <?= esc(($grupo['profesor_nombre'] ?? '') !== ''
+                    ? $grupo['profesor_nombre'] . ' ' . $grupo['profesor_ap'] . ' ' . $grupo['profesor_am']
+                    : 'Sin asignar') ?>
             </p>
         </div>
     </div>
@@ -194,14 +196,14 @@
 📘 EXÁMENES
 ============================================================ -->
     <div class="tab-content" id="examenes">
-        <p class="placeholder"><i class="fas fa-spinner fa-spin"></i> Módulo de exámenes en desarrollo...</p>
+
     </div>
 
     <!-- ============================================================
 🚀 PROYECTOS
 ============================================================ -->
     <div class="tab-content" id="proyectos">
-        <p class="placeholder"><i class="fas fa-spinner fa-spin"></i> Módulo de proyectos en desarrollo...</p>
+
     </div>
 
     <!-- ============================================================
@@ -428,8 +430,14 @@
 
             targetBtn.classList.add("active");
             targetTab.classList.add("active");
+
+            // ⭐ PEGA ESTA PARTE ⭐
+            setTimeout(() => {
+                targetBtn.click();  // Dispara el evento original que carga el módulo
+            }, 80);
         }
     });
+
 
 </script>
 

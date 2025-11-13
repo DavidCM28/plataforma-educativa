@@ -166,7 +166,7 @@ class SoftMinimalismLoginForm {
       const response = await fetch(`${baseUrl}auth/doLogin`, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        credentials: "same-origin",
+        credentials: "include",
         body: new URLSearchParams({
           usuario: this.usuarioInput.value.trim(),
           password: this.passwordInput.value.trim(),

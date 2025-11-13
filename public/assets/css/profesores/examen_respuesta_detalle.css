@@ -1,0 +1,251 @@
+/* ============================
+   🌙 REVISIÓN DETALLADA — PROFESOR
+   ============================ */
+
+.detalle-respuesta {
+  padding: 25px;
+  color: var(--text);
+}
+
+/* Título */
+.titulo {
+  color: var(--accent);
+  font-size: 26px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.titulo .mat {
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+/* Listado */
+.preguntas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* Tarjeta */
+.pregunta-card {
+  background: var(--surface);
+  padding: 22px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* Encabezado de pregunta */
+.pregunta-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.pregunta-titulo {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.pts {
+  background: var(--primary);
+  padding: 6px 12px;
+  border-radius: 10px;
+  color: #000;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Respuesta abierta */
+.subtitulo {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+}
+
+.respuesta-abierta {
+  background: #2a2e36;
+  width: 100%;
+  min-height: 95px;
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid #333;
+  color: var(--text);
+  resize: vertical;
+  margin-bottom: 15px;
+}
+
+/* Botones */
+.cal-buttons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.btn-grade {
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
+  color: #000;
+  transition: 0.2s;
+}
+
+.btn-ok {
+  background: #4ade80;
+}
+.btn-ok:hover {
+  background: #3ac06d;
+}
+
+.btn-mid {
+  background: #facc15;
+}
+.btn-mid:hover {
+  background: #e0b312;
+}
+
+.btn-bad {
+  background: #fb7185;
+}
+.btn-bad:hover {
+  background: #e75d6f;
+}
+
+/* Observación */
+.obs-label {
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.obs-input {
+  width: 100%;
+  min-height: 85px;
+  background: #2a2e36;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 12px;
+  color: var(--text);
+  resize: vertical;
+}
+
+/* Guardar */
+.btn-save {
+  margin-top: 12px;
+  background: var(--primary);
+  border: none;
+  padding: 10px 18px;
+  border-radius: var(--radius);
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-save:hover {
+  background: var(--accent);
+}
+/* Imagen de la pregunta */
+.pregunta-imagen {
+  width: 100%;
+  margin: 15px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.pregunta-imagen img {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 12px;
+  object-fit: contain;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.35);
+  border: 1px solid #333;
+}
+.btn-grade.activo {
+  outline: 2px solid var(--accent);
+  filter: brightness(1.2);
+}
+.guardar-todo {
+  margin-top: 25px;
+  text-align: right;
+}
+
+.btn-guardar-todo {
+  background: var(--primary);
+  padding: 12px 22px;
+  font-weight: bold;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  color: #000;
+  transition: 0.2s;
+}
+
+.btn-guardar-todo:hover {
+  background: var(--accent);
+}
+/* ================================
+   🔥 PANEL FLOTANTE DE CALIFICACIÓN
+================================ */
+.panel-flotante {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background: var(--surface);
+  padding: 18px 22px;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--accent-soft);
+}
+
+.panel-flotante .total-label {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--text);
+}
+
+.panel-flotante .total-label span {
+  color: var(--accent);
+  font-size: 18px;
+}
+
+.btn-guardar-todo {
+  background: var(--primary);
+  color: #000;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.btn-guardar-todo:hover {
+  background: var(--accent);
+}
+.btn-volver {
+  background: var(--accent);
+  color: var(--text);
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.btn-volver:hover {
+  background: var(--accent-soft);
+}

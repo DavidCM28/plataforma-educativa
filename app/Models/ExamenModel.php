@@ -55,4 +55,24 @@ class ExamenModel extends Model
         $examen['preguntas'] = $preguntas;
         return $examen;
     }
+
+    public function obtenerPorAsignacionConPorcentaje($asignacionId)
+    {
+        return $this
+            ->select('examenes.*, ponderaciones_ciclo.porcentaje')
+            ->join('grupo_materia_profesor gmp', 'gmp.id = examenes.asignacion_id')
+            ->join(
+                'ponderaciones_ciclo',
+                'ponderaciones_ciclo.ciclo_id = gmp.ciclo_id
+             AND ponderaciones_ciclo.parcial_num = examenes.parcial_num
+             AND ponderaciones_ciclo.criterio_id = examenes.criterio_id',
+                'left'
+            )
+            ->where('examenes.asignacion_id', $asignacionId)
+            ->orderBy('examenes.id', 'DESC')
+            ->findAll();
+    }
+
+
+
 }

@@ -1,0 +1,94 @@
+/* ==========================================================
+   🎓 VISTA — EXÁMENES (Alumno)
+   ========================================================== */
+.examenes-section {
+  padding: 1.5rem;
+}
+
+.examenes-section h3 {
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.examenes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.2rem;
+}
+
+.examen-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease;
+}
+
+.examen-card:hover {
+  transform: translateY(-4px);
+}
+
+.examen-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.examen-header h4 {
+  color: var(--primary);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.estado {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--accent);
+}
+
+.descripcion {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 0.8rem;
+}
+
+.info {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+
+.info li {
+  font-size: 0.9rem;
+  color: var(--text);
+  margin: 4px 0;
+}
+
+.acciones {
+  text-align: right;
+}
+
+.btn-main {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-main:hover {
+  background: var(--primary-hover);
+}
+
+.placeholder {
+  text-align: center;
+  color: var(--text-muted);
+  margin-top: 2rem;
+}

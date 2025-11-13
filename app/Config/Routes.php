@@ -254,6 +254,14 @@ $routes->group('profesor', ['namespace' => 'App\Controllers\Profesor', 'filter' 
 
         $routes->get('examenes/crear/(:num)', 'ExamenesController::crear/$1');
         $routes->get('examenes/editar/(:num)', 'ExamenesController::editar/$1');
+        $routes->delete('eliminar-pregunta/(:num)', 'ExamenesController::eliminarPregunta/$1');
+
+        $routes->get('examenes/respuestas/(:num)', 'ExamenesController::verRespuestas/$1');
+        $routes->get('examenes/detalle-respuesta/(:num)/(:num)', 'ExamenesController::detalleRespuesta/$1/$2');
+        $routes->get('api/examen/(:num)/alumno/(:num)', 'ExamenesController::apiAlumno/$1/$2');
+        $routes->post('examenes/calificar-detalle-multiple', 'ExamenesController::calificarDetalleMultiple');
+
+
 
     });
 
@@ -262,7 +270,9 @@ $routes->group('profesor', ['namespace' => 'App\Controllers\Profesor', 'filter' 
 // ============================================================
 // 🎓 MÓDULO DE ALUMNOS
 // ============================================================
-$routes->group('alumno', ['namespace' => 'App\Controllers\Alumno', 'filter' => 'auth'], function ($routes) {
+$routes->setAutoRoute(false); // para que CI no cree rutas fantasma
+
+$routes->group('alumno', ['namespace' => 'App\Controllers\Alumno'/*, 'filter' => 'auth'*/], function ($routes) {
 
     // 🏠 Dashboard principal
     $routes->get('dashboard', 'Dashboard::index');
@@ -280,6 +290,18 @@ $routes->group('alumno', ['namespace' => 'App\Controllers\Alumno', 'filter' => '
     $routes->get('materias/examenes/(:num)', 'Materias::examenes/$1');      // Vista parcial de exámenes
     $routes->get('materias/asistencias/(:num)', 'Materias::asistencias/$1');// Vista parcial de asistencias
 
+
+    // ============================================================
+// 📘 EXÁMENES (Alumno) — versión sin conflictos
+// ============================================================
+    $routes->post('examenes/guardar-respuestas/(:num)', 'ExamenesController::guardarAlumno/$1');
+    $routes->post('examenes/finalizar-examen/(:num)', 'ExamenesController::finalizarAlumno/$1');
+    $routes->get('examenes/(:num)', 'ExamenesController::index/$1');
+    $routes->get('examenes/listar/(:num)', 'ExamenesController::listar/$1');
+    $routes->get('examenes/detalle/(:num)', 'ExamenesController::detalle/$1');
+    $routes->get('examenes/resolver/(:num)', 'ExamenesController::resolver/$1');
+    $routes->get('examenes/resultados/(:num)', 'ExamenesController::resultados/$1');
+
     // ============================================================
 // 📘 TAREAS (Acciones y datos del alumno)
 // ============================================================
@@ -294,6 +316,9 @@ $routes->group('alumno', ['namespace' => 'App\Controllers\Alumno', 'filter' => '
     $routes->get('proyectos/listar/(:num)', 'ProyectosController::listar/$1');
     $routes->get('proyectos/detalle/(:num)', 'ProyectosController::detalle/$1');
     $routes->post('proyectos/entregar', 'ProyectosController::entregar');
+
+
+
 
     // ============================================================
     // 📅 HORARIO SEMANAL

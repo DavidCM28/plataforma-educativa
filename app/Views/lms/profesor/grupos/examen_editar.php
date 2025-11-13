@@ -3,7 +3,23 @@
 
 <link rel="stylesheet" href="<?= base_url('assets/css/profesores/examenes.css') ?>">
 <link rel="stylesheet" href="<?= base_url('assets/css/profesores/tareas.css') ?>">
+<link rel="stylesheet" href="<?= base_url('assets/css/alert.css') ?>">
+<script src="<?= base_url('assets/js/alert.js') ?>"></script>
 
+<!-- 🔔 Contenedor global de alertas -->
+<div id="alertContainer" class="alert-container"></div>
+
+<!-- ⚠️ Modal de confirmación -->
+<div id="confirmModal" class="confirm-modal hidden">
+    <div class="confirm-box">
+        <h3 id="confirmTitle">Confirmar acción</h3>
+        <p id="confirmMessage">¿Estás seguro de continuar?</p>
+        <div class="confirm-buttons">
+            <button id="confirmCancelar">Cancelar</button>
+            <button id="confirmAceptar">Aceptar</button>
+        </div>
+    </div>
+</div>
 <section class="editor-examen">
     <div class="editor-header">
         <button class="btn-sec" onclick="history.back()"><i class="fas fa-arrow-left"></i> Regresar</button>
@@ -103,6 +119,11 @@
             <div class="preguntas-header">
                 <h3><i class="fas fa-list-ol"></i> Preguntas</h3>
             </div>
+            <p id="totalPuntos"
+   style="font-weight:600;color:var(--text);margin-top:4px;">
+   Puntos totales: 0 / 100
+</p>
+
 
             <div id="contenedorPreguntas" class="preguntas-lista">
                 <?php if (!empty($examen['preguntas'])): ?>

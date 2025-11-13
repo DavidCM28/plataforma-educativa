@@ -1,0 +1,96 @@
+.examen-respuestas {
+  padding: 20px;
+}
+
+.titulo {
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+
+.lista-alumnos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-ver {
+  background: var(--primary);
+  color: var(--bg-dark);
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.alumno-card {
+  background: var(--surface);
+  padding: 16px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* === COLUMNAS FIJAS === */
+.col {
+  display: flex;
+  align-items: center;
+}
+
+/* Nombre ocupa más espacio */
+.nombre-col {
+  flex: 1; /* se expande */
+}
+
+/* Estado columna centrada visualmente */
+.estado-col {
+  width: 140px; /* ancho fijo = alineación perfecta */
+  display: flex;
+  justify-content: center;
+}
+
+/* Botón columna derecha */
+.boton-col {
+  width: 120px; /* el botón no empuja nada */
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Estado visual */
+.estado-box {
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 110px;
+  text-align: center;
+}
+
+/* Colores */
+.estado-no_iniciado {
+  background: #7f8c8d;
+  color: #000;
+}
+.estado-en_progreso {
+  background: #f1c40f;
+  color: #000;
+}
+.estado-finalizado {
+  background: #2ecc71;
+  color: #000;
+}
+.volver-examenes {
+  background: #eee;
+  color: #333;
+  border: 1px solid #ccc;
+  margin-bottom: 12px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.volver-examenes:hover {
+  background: #ddd;
+}

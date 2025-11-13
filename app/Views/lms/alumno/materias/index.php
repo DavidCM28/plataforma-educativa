@@ -9,6 +9,7 @@
 </script>
 <script src="<?= base_url('assets/js/alumnos/tareas.js') ?>"></script>
 <script src="<?= base_url('assets/js/alumnos/proyectos.js') ?>"></script>
+<script src="<?= base_url('assets/js/alumnos/examenes.js') ?>"></script>
 <!-- 🔔 Contenedor global de alertas -->
 <div id="alertContainer" class="alert-container"></div>
 
@@ -181,6 +182,30 @@
                         console.error(err);
                     });
             }
+
+            // Si es examenes, cargar la vista parcial
+            if (tabId === "examenes" && !tab.dataset.loaded) {
+                const asignacionId = <?= esc($materia['id']) ?>;
+
+                tab.innerHTML = `<div class='contenedor-carga'><i class='fas fa-spinner fa-spin'></i> Cargando exámenes...</div>`;
+                fetch(`<?= base_url('alumno/examenes/') ?>${asignacionId}`)
+                    .then(res => res.text())
+                    .then(html => {
+                        tab.innerHTML = html;
+                        tab.dataset.loaded = true;
+
+                        // ✅ Inicializa el módulo JS al cargar la vista
+                        if (window.ExamenesAlumnoUI) {
+                            window.ExamenesAlumnoUI.inicializar(asignacionId);
+                        }
+                    })
+                    .catch(err => {
+                        tab.innerHTML = `<p class='error'>Error al cargar los exámenes.</p>`;
+                        console.error(err);
+                    });
+            }
+
+
 
         });
     });

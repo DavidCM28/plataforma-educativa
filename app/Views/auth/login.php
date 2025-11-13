@@ -45,7 +45,8 @@
             <?php endif; ?>
 
 
-            <form class="comfort-form" id="loginForm" method="post" action="<?= base_url('/auth/login') ?>" novalidate>
+            <form class="comfort-form" id="loginForm" method="post" action="<?= base_url('/auth/doLogin') ?>"
+                novalidate>
                 <div class="soft-field">
                     <div class="field-container">
                         <input type="text" id="usuario" name="usuario" required autocomplete="off">

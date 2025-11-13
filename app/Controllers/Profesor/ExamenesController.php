@@ -11,6 +11,7 @@ use App\Models\ExamenRespuestaDetalleModel;
 use App\Models\GrupoMateriaProfesorModel;
 use App\Models\CriterioEvaluacionModel;
 use App\Models\PonderacionCicloModel;
+use \App\Models\MateriaGrupoAlumnoModel;
 
 class ExamenesController extends BaseController
 {
@@ -44,9 +45,10 @@ class ExamenesController extends BaseController
     // ============================
     public function listar($asignacionId)
     {
-        $rows = $this->examenModel->obtenerPorAsignacion($asignacionId);
+        $rows = $this->examenModel->obtenerPorAsignacionConPorcentaje($asignacionId);
         return $this->response->setJSON($rows);
     }
+
 
     // ============================
     // Detalle con preguntas/opciones
@@ -136,7 +138,7 @@ class ExamenesController extends BaseController
                 'tipo' => $p['tipo'] === 'abierta' ? 'abierta' : 'opcion',
                 'pregunta' => $p['pregunta'],
                 'puntos' => (float) ($p['puntos'] ?? 1),
-                'es_extra' => !empty($p['extra']) ? 1 : 0,
+                'es_extra' => isset($p['es_extra']) && (int) $p['es_extra'] === 1 ? 1 : 0,
                 'orden' => (int) ($p['orden'] ?? ($idx + 1)),
             ];
 
@@ -201,8 +203,50 @@ class ExamenesController extends BaseController
     // ============================
     public function publicar($id)
     {
-        $this->examenModel->update($id, ['estado' => 'publicado', 'fecha_publicacion' => date('Y-m-d H:i:s')]);
-        return $this->response->setJSON(['success' => true, 'mensaje' => 'Examen publicado']);
+        $this->examenModel->update($id, [
+            'estado' => 'publicado',
+            'fecha_publicacion' => date('Y-m-d H:i:s')
+        ]);
+
+        // ✅ Registrar automáticamente a los alumnos
+        $examen = $this->examenModel->find($id);
+        if ($examen && !empty($examen['asignacion_id'])) {
+            $this->registrarAlumnosPendientes($examen['asignacion_id'], $id);
+        }
+
+        return $this->response->setJSON([
+            'success' => true,
+            'mensaje' => 'Examen publicado y registros iniciales creados'
+        ]);
+    }
+
+    private function registrarAlumnosPendientes($asignacionId, $examenId)
+    {
+        $mgaModel = new MateriaGrupoAlumnoModel();
+        $respuestaModel = new ExamenRespuestaModel();
+
+        $alumnos = $mgaModel->obtenerAlumnosPorAsignacion($asignacionId);
+
+        foreach ($alumnos as $alumno) {
+            // Verificar si ya existe un registro (por ejemplo, si el examen fue republicado)
+            $existe = $respuestaModel
+                ->where('examen_id', $examenId)
+                ->where('alumno_id', $alumno['alumno_id'])
+                ->first();
+
+            if (!$existe) {
+                $respuestaModel->insert([
+                    'examen_id' => $examenId,
+                    'alumno_id' => $alumno['alumno_id'],
+                    'intento' => 0,
+                    'estado' => 'no_iniciado',
+                    'calificado' => 0,
+                    'calificacion' => null,
+                    'fecha_inicio' => null,
+                    'fecha_fin' => null,
+                ]);
+            }
+        }
     }
 
     public function cerrar($id)
@@ -273,4 +317,356 @@ class ExamenesController extends BaseController
             'criterioPorcentaje' => $criterioPorcentaje
         ]);
     }
+
+    // ============================
+// Eliminar una pregunta individual
+// ============================
+    public function eliminarPregunta($id)
+    {
+        $pregunta = $this->preguntaModel->find($id);
+        if (!$pregunta) {
+            return $this->response->setJSON(['success' => false, 'error' => 'Pregunta no encontrada']);
+        }
+
+        // 🔥 Eliminar opciones asociadas y la pregunta
+        $this->opcionModel->where('pregunta_id', $id)->delete();
+        $this->preguntaModel->delete($id);
+
+        return $this->response->setJSON(['success' => true, 'mensaje' => 'Pregunta eliminada']);
+    }
+
+    public function verRespuestas($examenId)
+    {
+        $examenModel = new ExamenModel();
+        $pregModel = new ExamenPreguntaModel();
+        $detModel = new ExamenRespuestaDetalleModel();
+        $respModel = new ExamenRespuestaModel();
+        $asigModel = new GrupoMateriaProfesorModel();
+        $mgaModel = new MateriaGrupoAlumnoModel();
+
+        $examen = $examenModel->obtenerConPreguntas($examenId);
+        if (!$examen) {
+            return redirect()->back()->with('error', 'Examen no encontrado.');
+        }
+
+        $asignacionId = $examen['asignacion_id'];
+
+        // Lista de alumnos de la materia
+        $alumnos = $mgaModel->obtenerAlumnosPorAsignacion($asignacionId);
+
+        // Para cada alumno, obtener su registro de respuestas (si existe)
+        foreach ($alumnos as &$a) {
+            $respuesta = $respModel
+                ->where('examen_id', $examenId)
+                ->where('alumno_id', $a['alumno_id'])
+                ->orderBy("FIELD(estado,'finalizado','en_progreso','no_iniciado')", '', false)
+                ->orderBy('id', 'DESC')
+                ->first();
+
+
+            $a['respuesta'] = $respuesta;
+
+            if ($respuesta) {
+                $detalles = $detModel
+                    ->where('respuesta_id', $respuesta['id'])
+                    ->findAll();
+
+                // indexar por pregunta
+                $map = [];
+                foreach ($detalles as $d) {
+                    $map[$d['pregunta_id']] = $d;
+                }
+                $a['detalles'] = $map;
+            } else {
+                $a['detalles'] = [];
+            }
+        }
+
+        // Ordenar por estado: finalizado -> en_progreso -> no_iniciado
+        usort($alumnos, function ($a, $b) {
+
+            $orden = [
+                'finalizado' => 1,
+                'en_progreso' => 2,
+                'no_iniciado' => 3
+            ];
+
+            $estadoA = $a['respuesta']['estado'] ?? 'no_iniciado';
+            $estadoB = $b['respuesta']['estado'] ?? 'no_iniciado';
+
+            return $orden[$estadoA] <=> $orden[$estadoB];
+        });
+
+        return view('lms/profesor/grupos/examen_respuestas_profesor', [
+            'examen' => $examen,
+            'alumnos' => $alumnos,
+            'asignacionId' => $asignacionId,
+        ]);
+    }
+
+
+    public function detalleRespuesta($examenId, $alumnoId)
+    {
+        // Obtener examen con todas sus preguntas y opciones
+        $examen = $this->examenModel->obtenerConPreguntas($examenId);
+        if (!$examen) {
+            return redirect()->back()->with('error', 'Examen no encontrado.');
+        }
+
+        $respModel = new ExamenRespuestaModel();
+        $detModel = new ExamenRespuestaDetalleModel();
+        $opModel = new ExamenOpcionModel();
+
+        // Registro principal del alumno en este examen
+        $respuesta = $respModel
+            ->where('examen_id', $examenId)
+            ->where('alumno_id', $alumnoId)
+            ->first();
+
+        if (!$respuesta) {
+            return redirect()->back()->with('error', 'El alumno no tiene registro en este examen.');
+        }
+
+        // Cargar detalles por pregunta
+        $detalles = $detModel
+            ->where('respuesta_id', $respuesta['id'])
+            ->findAll();
+
+        // ==============================
+        //  AUTOCALIFICAR OPCIÓN MÚLTIPLE
+        // ==============================
+        foreach ($detalles as &$d) {
+
+            // Buscar la pregunta asociada
+            $pregunta = null;
+            foreach ($examen['preguntas'] as $p) {
+                if ($p['id'] == $d['pregunta_id']) {
+                    $pregunta = $p;
+                    break;
+                }
+            }
+
+            if ($pregunta) {
+                $d['pregunta'] = $pregunta['pregunta'];
+                $d['tipo'] = $pregunta['tipo'];
+                $d['puntos'] = $pregunta['puntos'];
+                $d['imagen'] = $pregunta['imagen'] ?? null;
+            }
+
+            // Si es opción múltiple, autocalificar
+            if ($pregunta && $pregunta['tipo'] === 'opcion' && $d['opcion_id']) {
+
+                $opcion = $opModel->find($d['opcion_id']);
+
+                if ($opcion && $opcion['es_correcta']) {
+                    $d['puntos_obtenidos'] = $pregunta['puntos'];
+                } else {
+                    $d['puntos_obtenidos'] = 0;
+                }
+
+                // Guardar calificación en BD
+                $detModel->update($d['id'], [
+                    'puntos_obtenidos' => $d['puntos_obtenidos']
+                ]);
+
+                // Agregar texto de la opción elegida
+                $d['opcion_texto'] = $opcion['texto'] ?? null;
+            }
+        }
+
+        // ============================
+        //  Datos del alumno para vista
+        // ============================
+        $db = \Config\Database::connect();
+        $alumno = $db->table('usuarios')
+            ->where('id', $alumnoId)
+            ->get()
+            ->getRowArray();
+
+        if ($alumno) {
+            $respuesta['alumno_nombre'] = $alumno['nombre'] . ' ' . $alumno['apellido_paterno'];
+            $respuesta['matricula'] = $alumno['matricula'];
+        }
+
+        // ============================
+        //  Enviar a la vista final
+        // ============================
+        return view('lms/profesor/grupos/examen_respuesta_detalle', [
+            'examen' => $examen,
+            'respuesta' => $respuesta,
+            'detalles' => $detalles
+        ]);
+    }
+
+
+    public function calificarDetalle()
+    {
+        $detalleId = $this->request->getPost('detalle_id');
+        $puntos = $this->request->getPost('puntos');
+        $observacion = $this->request->getPost('observacion') ?? '';
+
+        if (!$detalleId) {
+            return $this->response->setJSON([
+                'success' => false,
+                'error' => 'ID inválido'
+            ]);
+        }
+
+        $detModel = new ExamenRespuestaDetalleModel();
+        $respModel = new ExamenRespuestaModel();
+
+        // ===========================
+        // 1. Actualizar el detalle
+        // ===========================
+        $detModel->update($detalleId, [
+            'puntos_obtenidos' => $puntos,
+            'observacion' => $observacion
+        ]);
+
+        // ===========================
+        // 2. Obtener el detalle actualizado
+        // ===========================
+        $detalle = $detModel->find($detalleId);
+
+        if (!$detalle) {
+            return $this->response->setJSON([
+                'success' => false,
+                'error' => 'Detalle no encontrado'
+            ]);
+        }
+
+        $respuestaId = $detalle['respuesta_id'];
+
+        // ===========================
+        // 3. Recalcular la calificación total
+        // ===========================
+        $sum = $detModel
+            ->selectSum('puntos_obtenidos')
+            ->where('respuesta_id', $respuestaId)
+            ->first();
+
+        $total = $sum['puntos_obtenidos'] ?? 0;
+
+        // ===========================
+        // 4. Guardar calificación total en examen_respuestas
+        // ===========================
+        $respModel->update($respuestaId, [
+            'calificacion' => $total,
+            'calificado' => 1
+        ]);
+
+        return $this->response->setJSON([
+            'success' => true,
+            'total' => $total
+        ]);
+    }
+
+
+    public function apiAlumno($examenId, $alumnoId)
+    {
+        $examen = $this->examenModel->obtenerConPreguntas($examenId);
+        if (!$examen) {
+            return $this->response->setJSON(['error' => 'Examen no encontrado']);
+        }
+
+        $resp = $this->respuestaModel
+            ->where('examen_id', $examenId)
+            ->where('alumno_id', $alumnoId)
+            ->first();
+
+        if (!$resp) {
+            return $this->response->setJSON(['error' => 'El alumno no ha abierto el examen']);
+        }
+
+        $detalles = $this->detalleModel
+            ->where('respuesta_id', $resp['id'])
+            ->findAll();
+
+        // mapa rápido por pregunta
+        $map = [];
+        foreach ($detalles as $d) {
+            $map[$d['pregunta_id']] = $d;
+        }
+
+        $listaPreguntas = [];
+        foreach ($examen['preguntas'] as $p) {
+            $p['detalle'] = $map[$p['id']] ?? null;
+
+            // mostrar texto de opción elegida
+            if ($p['tipo'] === 'opcion' && $p['detalle'] && $p['detalle']['opcion_id']) {
+                $op = model(ExamenOpcionModel::class)->find($p['detalle']['opcion_id']);
+                $p['detalle']['opcion_texto'] = $op['texto'] ?? null;
+            }
+
+            $listaPreguntas[] = $p;
+        }
+
+        // Obtener datos del alumno
+        $db = \Config\Database::connect();
+        $u = $db->table('usuarios')
+            ->where('id', $alumnoId)
+            ->get()
+            ->getRowArray();
+
+        return $this->response->setJSON([
+            'nombre' => $u['nombre'] . ' ' . $u['apellido_paterno'],
+            'matricula' => $u['matricula'],
+            'preguntas' => $listaPreguntas,
+        ]);
+    }
+    public function calificarDetalleMultiple()
+    {
+        $json = $this->request->getPost('detalles');
+        $items = json_decode($json, true);
+
+        if (!$items) {
+            return $this->response->setJSON([
+                'success' => false,
+                'error' => 'Datos inválidos'
+            ]);
+        }
+
+        $detModel = new ExamenRespuestaDetalleModel();
+        $respModel = new ExamenRespuestaModel();
+
+        $respuestaId = null;
+
+        foreach ($items as $d) {
+            $det = $detModel->find($d['id']);
+            if (!$det)
+                continue;
+
+            $respuestaId = $det['respuesta_id'];
+
+            $detModel->update($d['id'], [
+                'puntos_obtenidos' => $d['puntos'],
+                'observacion' => $d['observacion']
+            ]);
+        }
+
+        if ($respuestaId) {
+            $sum = $detModel
+                ->selectSum('puntos_obtenidos')
+                ->where('respuesta_id', $respuestaId)
+                ->first();
+
+            $total = $sum['puntos_obtenidos'] ?? 0;
+
+            $respModel->update($respuestaId, [
+                'calificacion' => $total,
+                'calificado' => 1
+            ]);
+
+            return $this->response->setJSON([
+                'success' => true,
+                'total' => $total
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success' => false,
+            'error' => 'No se pudo guardar'
+        ]);
+    }
+
 }

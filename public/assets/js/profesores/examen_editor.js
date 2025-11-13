@@ -17,9 +17,80 @@ document.addEventListener("DOMContentLoaded", () => {
           ? `Los alumnos tendrán un máximo de ${val} minutos para resolver el examen.`
           : "Sin límite de tiempo (podrán permanecer indefinidamente).";
     });
+
+    // 🔹 Ejecutar al cargar (para corregir el bug visual)
+    const inicial = parseInt(tiempoInput.value || 0);
+    previewTiempo.textContent =
+      inicial > 0
+        ? `Los alumnos tendrán un máximo de ${inicial} minutos para resolver el examen.`
+        : "Sin límite de tiempo (podrán permanecer indefinidamente).";
   }
 
+  actualizarTotalPuntos();
+
   if (!form || !contPreg) return;
+
+  // 🔁 Escucha cualquier cambio en puntos o check de extra dentro del contenedor
+  contPreg.addEventListener("input", (e) => {
+    if (e.target.classList.contains("preg-puntos")) {
+      actualizarTotalPuntos();
+    }
+  });
+
+  contPreg.addEventListener("change", (e) => {
+    if (e.target.classList.contains("preg-extra")) {
+      actualizarTotalPuntos();
+    }
+  });
+
+  // 🧩 Vincular eventos a preguntas existentes (modo edición)
+  contPreg.querySelectorAll(".pregunta-card").forEach((wrap) => {
+    const id = wrap.dataset.id || null;
+
+    // Botón eliminar
+    wrap
+      .querySelector(".eliminar-pregunta")
+      ?.addEventListener("click", async () => {
+        const confirmar = confirm("¿Seguro que deseas eliminar esta pregunta?");
+        if (!confirmar) return;
+
+        if (id) {
+          try {
+            const res = await fetch(
+              `${window.base_url}profesor/grupos/eliminar-pregunta/${id}`,
+              {
+                method: "DELETE",
+              }
+            );
+            const data = await res.json();
+            if (data.success) {
+              mostrarAlerta("✅ Pregunta eliminada correctamente", "success");
+              wrap.remove();
+              actualizarNumeracionYPuntaje();
+            } else {
+              mostrarAlerta(
+                data.error || "Error al eliminar pregunta",
+                "error"
+              );
+            }
+          } catch (err) {
+            console.error(err);
+            mostrarAlerta("❌ Error de conexión o servidor", "error");
+          }
+        } else {
+          wrap.remove();
+          actualizarNumeracionYPuntaje();
+        }
+      });
+
+    // Eventos para recalcular puntaje
+    wrap
+      .querySelector(".preg-puntos")
+      ?.addEventListener("input", actualizarTotalPuntos);
+    wrap
+      .querySelector(".preg-extra")
+      ?.addEventListener("change", actualizarTotalPuntos);
+  });
 
   // ==============================
   // ➕ Agregar nueva pregunta
@@ -132,12 +203,80 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // eliminar pregunta
-    wrap.querySelector(".eliminar-pregunta").addEventListener("click", () => {
-      wrap.remove();
-      [...contPreg.children].forEach((c, idx) => {
-        c.querySelector("strong").textContent = `Pregunta ${idx + 1}`;
+    wrap
+      .querySelector(".eliminar-pregunta")
+      .addEventListener("click", async () => {
+        const id = wrap.dataset.id || null;
+        const confirmar = confirm("¿Seguro que deseas eliminar esta pregunta?");
+        if (!confirmar) return;
+
+        if (id) {
+          try {
+            const res = await fetch(
+              `${window.base_url}profesor/grupos/eliminar-pregunta/${id}`,
+              {
+                method: "POST",
+              }
+            );
+            const data = await res.json();
+            if (data.success) {
+              mostrarAlerta("✅ Pregunta eliminada correctamente", "success");
+            } else {
+              mostrarAlerta(
+                data.error || "Error al eliminar pregunta",
+                "error"
+              );
+            }
+          } catch (err) {
+            console.error(err);
+            mostrarAlerta("❌ Error de conexión o servidor", "error");
+          }
+        }
+
+        wrap.remove();
+        [...contPreg.children].forEach((c, idx) => {
+          c.querySelector("strong").textContent = `Pregunta ${idx + 1}`;
+        });
+
+        wrap
+          .querySelector(".preg-puntos")
+          .addEventListener("input", actualizarTotalPuntos);
+        wrap
+          .querySelector(".preg-extra")
+          .addEventListener("change", actualizarTotalPuntos);
+        actualizarTotalPuntos(); // inicial
       });
+  }
+
+  function actualizarTotalPuntos() {
+    let total = 0;
+    [...contPreg.children].forEach((wrap) => {
+      const puntos = parseFloat(wrap.querySelector(".preg-puntos").value || 0);
+      const extra = wrap.querySelector(".preg-extra").checked;
+      if (!extra) total += puntos;
     });
+
+    const totalElem = document.getElementById("totalPuntos");
+    if (totalElem) {
+      totalElem.textContent = `Puntos totales: ${total.toFixed(1)} / 100`;
+
+      if (total < 100) {
+        totalElem.style.color = "#d35400"; // naranja: incompleto
+      } else if (total > 100) {
+        totalElem.style.color = "#e74c3c"; // rojo: exceso
+      } else {
+        totalElem.style.color = "#27ae60"; // verde: perfecto
+      }
+    }
+
+    return total;
+  }
+
+  function actualizarNumeracionYPuntaje() {
+    [...contPreg.children].forEach((c, idx) => {
+      c.querySelector("strong").textContent = `Pregunta ${idx + 1}`;
+    });
+    actualizarTotalPuntos();
   }
 
   // ==============================
@@ -146,6 +285,18 @@ document.addEventListener("DOMContentLoaded", () => {
   btnGuardar?.addEventListener("click", async (e) => {
     e.preventDefault();
 
+    const total = actualizarTotalPuntos();
+    if (total !== 100) {
+      mostrarAlerta(
+        total < 100
+          ? `⚠️ El total es ${total.toFixed(
+              1
+            )}. Debe sumar exactamente 100 puntos.`
+          : `⚠️ El total excede los 100 puntos (${total.toFixed(1)}).`,
+        "error"
+      );
+      return;
+    }
     const preguntas = [...contPreg.children].map((wrap, idx) => {
       const tipo = wrap.querySelector(".preg-tipo").value;
       const opciones =
@@ -164,7 +315,7 @@ document.addEventListener("DOMContentLoaded", () => {
         tipo,
         pregunta: wrap.querySelector(".preg-texto").value.trim(),
         puntos: parseFloat(wrap.querySelector(".preg-puntos").value || 0),
-        extra: wrap.querySelector(".preg-extra").checked ? 1 : 0,
+        es_extra: wrap.querySelector(".preg-extra").checked ? 1 : 0,
         orden: idx + 1,
         opciones,
       };
@@ -182,7 +333,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     btnGuardar.disabled = true;
-    btnGuardar.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Guardando...`;
+    btnGuardar.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
 
     try {
       const res = await fetch(
@@ -211,7 +362,7 @@ document.addEventListener("DOMContentLoaded", () => {
       mostrarAlerta("❌ Error de conexión o servidor", "error");
     } finally {
       btnGuardar.disabled = false;
-      btnGuardar.innerHTML = `<i class="fas fa-save"></i> Guardar`;
+      btnGuardar.innerHTML = `<i class="fas fa-save"></i>`;
     }
   });
 });

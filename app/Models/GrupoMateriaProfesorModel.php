@@ -129,18 +129,26 @@ class GrupoMateriaProfesorModel extends Model
         grupos.nombre AS grupo,
         grupos.periodo,
         grupos.turno,
+
         materias.id AS id_materia,
         materias.nombre AS materia,
         materias.clave AS clave_materia,
-        ciclos_academicos.nombre AS ciclo
+
+        ciclos_academicos.nombre AS ciclo,
+
+        usuarios.nombre AS profesor_nombre,
+        usuarios.apellido_paterno AS profesor_ap,
+        usuarios.apellido_materno AS profesor_am
     ')
             ->join('grupos', 'grupos.id = grupo_materia_profesor.grupo_id', 'left')
             ->join('materias', 'materias.id = grupo_materia_profesor.materia_id', 'left')
             ->join('ciclos_academicos', 'ciclos_academicos.id = grupo_materia_profesor.ciclo_id', 'left')
+            ->join('usuarios', 'usuarios.id = grupo_materia_profesor.profesor_id', 'left')
             ->where('grupo_materia_profesor.profesor_id', $profesorId)
             ->where('grupo_materia_profesor.id', $asignacionId)
             ->first();
     }
+
 
 
 
