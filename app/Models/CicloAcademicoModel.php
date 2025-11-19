@@ -19,7 +19,9 @@ class CicloAcademicoModel extends Model
         'descripcion',
         'num_parciales',
         'duracion_meses',
-        'activo'
+        'activo',
+        'fecha_inicio',
+        'fecha_fin'
     ];
 
     protected $validationRules = [

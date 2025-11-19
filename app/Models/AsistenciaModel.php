@@ -97,4 +97,34 @@ class AsistenciaModel extends Model
             ->get()
             ->getResultArray();
     }
+
+    public function obtenerAsistenciasPorParcial($asignacionId, $mgaId, $fechaInicio, $fechaFin)
+    {
+        return $this->db->table('asistencias a')
+            ->select('a.*')
+            ->join('materia_grupo_alumno mga', 'mga.id = a.materia_grupo_alumno_id')
+            ->where('mga.grupo_materia_profesor_id', $asignacionId)
+            ->where('a.materia_grupo_alumno_id', $mgaId)
+            ->where('a.fecha >=', $fechaInicio)
+            ->where('a.fecha <=', $fechaFin)
+            ->get()
+            ->getResultArray();
+    }
+    public function obtenerResumenAsistencia($asignacionId, $mgaId, $fechaInicio, $fechaFin)
+    {
+        $builder = $this->db->table('asistencias a')
+            ->select("
+            SUM(CASE WHEN a.estado = 'asistencia' THEN 1 ELSE 0 END) AS asistencias,
+            SUM(CASE WHEN a.estado = 'falta' THEN 1 ELSE 0 END) AS faltas,
+            COUNT(*) AS total_registros
+        ")
+            ->join('materia_grupo_alumno mga', 'mga.id = a.materia_grupo_alumno_id')
+            ->where('mga.grupo_materia_profesor_id', $asignacionId)
+            ->where('a.materia_grupo_alumno_id', $mgaId)
+            ->where('a.fecha >=', $fechaInicio)
+            ->where('a.fecha <=', $fechaFin);
+
+        return $builder->get()->getRowArray();
+    }
+
 }

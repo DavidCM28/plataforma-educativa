@@ -157,6 +157,8 @@ $routes->group('admin/ciclos', ['namespace' => 'App\Controllers\Admin'], static 
     $routes->post('crear', 'CiclosController::crear');
     $routes->get('eliminar/(:num)', 'CiclosController::eliminar/$1');
     $routes->get('estado/(:num)', 'CiclosController::cambiarEstado/$1');
+    $routes->post('actualizar', 'CiclosController::actualizar');
+
 });
 
 // Módulo de Criterios
@@ -174,6 +176,9 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function ($rou
     $routes->get('criterios/ciclo-parciales/(:num)', 'CriteriosController::getParcialesPorCiclo/$1');
     $routes->get('criterios/ponderaciones/listar/(:num)/(:num)', 'CriteriosController::listarPonderaciones/$1/$2');
 });
+
+$routes->get('api/ciclo-parcial/(:num)/(:num)', 'Api\CicloParcialController::buscar/$1/$2');
+
 
 // ============================================================
 // 📘 MÓDULO DE PROFESORES
@@ -260,9 +265,15 @@ $routes->group('profesor', ['namespace' => 'App\Controllers\Profesor', 'filter' 
         $routes->get('examenes/detalle-respuesta/(:num)/(:num)', 'ExamenesController::detalleRespuesta/$1/$2');
         $routes->get('api/examen/(:num)/alumno/(:num)', 'ExamenesController::apiAlumno/$1/$2');
         $routes->post('examenes/calificar-detalle-multiple', 'ExamenesController::calificarDetalleMultiple');
+    });
 
-
-
+    // CALIFICACIONES
+    $routes->group('grupos', function ($routes) {
+        $routes->get('calificar', 'CalificacionesController::index');
+        $routes->get('calificaciones/alumnos/(:num)', 'CalificacionesController::obtenerAlumnos/$1');
+        $routes->get('calificaciones/criterios/(:num)/(:num)', 'CalificacionesController::obtenerCriterios/$1/$2');
+        $routes->get('calificaciones/valores/(:num)/(:num)', 'CalificacionesController::obtenerValores/$1/$2');
+        $routes->post('calificaciones/guardar', 'CalificacionesController::guardarCalificaciones');
     });
 
 
@@ -311,14 +322,16 @@ $routes->group('alumno', ['namespace' => 'App\Controllers\Alumno'/*, 'filter' =>
     $routes->delete('tareas/deshacer/(:num)', 'TareasController::deshacerEntrega/$1'); // DELETE → Deshacer entrega
 
     // ============================================================
-    // 🚀 PROYECTOS (próximo módulo)
+    // 🚀 PROYECTOS
     // ============================================================
     $routes->get('proyectos/listar/(:num)', 'ProyectosController::listar/$1');
     $routes->get('proyectos/detalle/(:num)', 'ProyectosController::detalle/$1');
     $routes->post('proyectos/entregar', 'ProyectosController::entregar');
 
-
-
+    // ============================================================
+    // 🚀 CALIFICACIONES
+    // ============================================================
+    $routes->get('calificaciones/historial', 'CalificacionesController::index');
 
     // ============================================================
     // 📅 HORARIO SEMANAL

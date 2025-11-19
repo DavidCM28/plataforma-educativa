@@ -23,17 +23,17 @@ class MateriaGrupoAlumnoModel extends Model
     {
         return $this->db->table('materia_grupo_alumno mga')
             ->select('
-                mga.id AS mga_id,
-                u.id AS alumno_id,
-                u.nombre,
-                u.apellido_paterno,
-                u.apellido_materno,
-                u.matricula,
-                u.foto,
-                c.nombre AS carrera
-            ')
-            ->join('grupo_alumno ga', 'ga.id = mga.grupo_alumno_id', 'left')
-            ->join('usuarios u', 'u.id = ga.alumno_id', 'left')
+            mga.id AS mga_id,
+            u.id AS alumno_id,
+            u.nombre,
+            u.apellido_paterno,
+            u.apellido_materno,
+            u.matricula,
+            u.foto,
+            c.nombre AS carrera
+        ')
+            ->join('grupo_alumno ga', 'ga.id = mga.grupo_alumno_id')
+            ->join('usuarios u', 'u.id = ga.alumno_id')
             ->join('alumno_carrera ac', 'ac.alumno_id = u.id', 'left')
             ->join('carreras c', 'c.id = ac.carrera_id', 'left')
             ->where('mga.grupo_materia_profesor_id', $asignacionId)
@@ -42,6 +42,7 @@ class MateriaGrupoAlumnoModel extends Model
             ->getResultArray();
     }
 
+
     /**
      * 📚 Obtener todas las materias inscritas del alumno
      */
@@ -49,13 +50,12 @@ class MateriaGrupoAlumnoModel extends Model
     {
         return $this->db->table('materia_grupo_alumno mga')
             ->select('
-                gmp.id AS asignacion_id,       -- ID de la asignación (clave principal para ver materia)
-                m.nombre AS materia,           -- Nombre de la materia
-                g.nombre AS grupo,             -- Grupo
-                u.nombre AS profesor,          -- Profesor asignado
-                gmp.horario,                   -- Horario
-                gmp.aula,                      -- Aula
-                gmp.color                      -- Color personalizado si existe
+                gmp.id AS asignacion_id,      
+                m.nombre AS materia,         
+                g.nombre AS grupo,             
+                u.nombre AS profesor,        
+                gmp.horario,                 
+                gmp.aula             
             ')
             ->join('grupo_alumno ga', 'ga.id = mga.grupo_alumno_id', 'left')
             ->join('grupo_materia_profesor gmp', 'gmp.id = mga.grupo_materia_profesor_id', 'left')

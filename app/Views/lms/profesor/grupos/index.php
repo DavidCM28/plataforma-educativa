@@ -20,6 +20,8 @@
 <link rel="stylesheet" href="<?= base_url('assets/css/profesores/tareas_entregas.css') ?>">
 <script src="<?= base_url('assets/js/profesores/tareas_entregas.js') ?>"></script>
 <script src="<?= base_url('assets/js/profesores/proyectos_entregas.js') ?>"></script>
+
+
 <!-- 🔔 Contenedor global de alertas -->
 <div id="alertContainer" class="alert-container"></div>
 
@@ -77,9 +79,9 @@
                 <i class="fas fa-book"></i> <span> Exámenes</span>
             </button>
 
-            <button class="tab-btn" data-tab="calificaciones" title="Calificaciones">
+            <!--<button class="tab-btn" data-tab="calificaciones" title="Calificaciones">
                 <i class="fas fa-chart-line"></i> <span> Calificaciones</span>
-            </button>
+            </button>-->
         </div>
     </nav>
 
@@ -208,10 +210,10 @@
 
     <!-- ============================================================
 📊 CALIFICACIONES
-============================================================ -->
+============================================================ 
     <div class="tab-content" id="calificaciones">
         <p class="placeholder"><i class="fas fa-spinner fa-spin"></i> Módulo de calificaciones en desarrollo...</p>
-    </div>
+    </div> -->
 
 
     <!-- 🧩 Modal Detalles Alumno (Diseño Moderno Tipo Perfil) -->
@@ -519,8 +521,27 @@
                 }
             }
 
+            // Pestaña Calificaciones
+            /*if (btn.dataset.tab === "calificaciones") {
+                const contenedor = document.getElementById("calificaciones");
+                contenedor.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> Cargando calificaciones...</p>`;
+                try {
+                    const res = await fetch("<?= base_url('profesor/grupos/calificaciones/' . $asignacionId) ?>");
+            const html = await res.text();
+            contenedor.innerHTML = html;
 
-
+            // ⚡ Espera un breve instante para asegurar que el DOM del examen está cargado
+            setTimeout(() => {
+                if (window.CalificacionesUI) {
+                    window.CalificacionesUI.inicializar(<?= $asignacionId ?>);
+                } else {
+                    console.error("⚠️CalificacionesUI no está definido, revisa si el script se está cargando.");
+                }
+            }, 100);
+        } catch (error) {
+            contenedor.innerHTML = `<p class="error">❌ Error al cargar calificaciones: ${error.message}</p>`;
+        }
+    }*/
         });
     });
 </script>

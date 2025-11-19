@@ -21,6 +21,20 @@ class Dashboard extends BaseController
         $grupoAlumnoModel = new GrupoAlumnoModel();
         $materiaGrupoAlumnoModel = new MateriaGrupoAlumnoModel();
         $grupoMateriaProfesorModel = new GrupoMateriaProfesorModel();
+        // ============================================================
+        // Materias del alumno para el sidebar
+        // ============================================================
+        $materias = $materiaGrupoAlumnoModel->obtenerMateriasPorAlumno($alumnoId);
+
+        $listaSidebar = array_map(function ($m) {
+            return [
+                'asignacion_id' => $m['asignacion_id'],
+                'materia' => $m['materia'],
+                'grupo' => $m['grupo']
+            ];
+        }, $materias);
+
+        session()->set('sidebar_materias', $listaSidebar);
 
         // =========================================================
         // 🔹 1. Grupos en los que está inscrito el alumno

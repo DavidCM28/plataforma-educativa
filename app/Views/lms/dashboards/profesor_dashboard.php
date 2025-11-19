@@ -65,7 +65,7 @@
                             <button title="Proyectos"><i class="fas fa-rocket"></i></button>
                             <button title="Exámenes"><i class="fas fa-book"></i></button>
                             <button title="Participación"><i class="fas fa-comments"></i></button>
-                            <button title="Calificaciones"><i class="fas fa-chart-line"></i></button>
+                            <!--<button title="Calificaciones"><i class="fas fa-chart-line"></i></button>-->
                         </div>
                     </div>
                 <?php endforeach; ?>

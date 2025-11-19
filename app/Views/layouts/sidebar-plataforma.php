@@ -119,93 +119,79 @@
 
 
         <!-- =========================
-             👨‍🏫 PROFESOR
-        ========================== -->
+      👨‍🏫 PROFESOR
+========================== -->
         <?php if ($rol === 'Profesor'): ?>
+            <?php
+            $asignaciones = session('sidebar_materias') ?? [];
+            // Estructura esperada: cada item => ['id', 'materia', 'grupo']
+            ?>
+
             <li class="menu-group">
                 <button class="menu-toggle">
                     <i class="fas fa-book"></i>
                     <span>Mis Materias</span>
                     <i class="fas fa-chevron-down arrow"></i>
                 </button>
-                <ul class="submenu">
-                    <li><a href="<?= base_url('profesor/materias') ?>"><i
-                                class="fas fa-book-open"></i><span>Listado</span></a></li>
-                    <li><a href="<?= base_url('profesor/grupos') ?>"><i class="fas fa-users"></i><span>Grupos
-                                Asignados</span></a></li>
-                </ul>
-            </li>
 
-            <li class="menu-group">
-                <button class="menu-toggle">
-                    <i class="fas fa-edit"></i>
-                    <span>Evaluación</span>
-                    <i class="fas fa-chevron-down arrow"></i>
-                </button>
                 <ul class="submenu">
-                    <li><a href="<?= base_url('profesor/calificar') ?>"><i
-                                class="fas fa-check"></i><span>Calificar</span></a></li>
-                    <li><a href="<?= base_url('profesor/criterios') ?>"><i
-                                class="fas fa-percent"></i><span>Criterios</span></a></li>
+                    <?php if (!empty($asignaciones)): ?>
+                        <?php foreach ($asignaciones as $a): ?>
+                            <li>
+                                <a href="<?= base_url('profesor/grupos/ver/' . $a['id']) ?>">
+                                    <i class="fas fa-book-open"></i>
+                                    <span><?= $a['materia'] ?> (<?= $a['grupo'] ?>)</span>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <li><span style="color:#999; padding:10px;">Sin materias</span></li>
+                    <?php endif; ?>
                 </ul>
+            <li>
+                <a href="<?= base_url('profesor/grupos/calificar') ?>">
+                    <i class="fas fa-check"></i><span>Calificar</span>
+                </a>
             </li>
-
-            <li class="menu-group">
-                <button class="menu-toggle">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Reportes</span>
-                    <i class="fas fa-chevron-down arrow"></i>
-                </button>
-                <ul class="submenu">
-                    <li><a href="<?= base_url('profesor/reportes') ?>"><i class="fas fa-chart-line"></i><span>Mi
-                                Rendimiento</span></a></li>
-                </ul>
             </li>
         <?php endif; ?>
 
 
         <!-- =========================
-             🎓 ALUMNO
-        ========================== -->
+      🎓 ALUMNO
+========================== -->
         <?php if ($rol === 'Alumno'): ?>
+            <?php
+            $materiasAlumno = session('sidebar_materias') ?? [];
+            // Estructura esperada: ['asignacion_id', 'materia', 'grupo']
+            ?>
+
             <li class="menu-group">
                 <button class="menu-toggle">
                     <i class="fas fa-book-reader"></i>
                     <span>Mis Materias</span>
                     <i class="fas fa-chevron-down arrow"></i>
                 </button>
-                <ul class="submenu">
-                    <li><a href="<?= base_url('alumno/materias') ?>"><i class="fas fa-book"></i><span>Ver
-                                Materias</span></a></li>
-                    <li><a href="<?= base_url('alumno/calificaciones') ?>"><i
-                                class="fas fa-star"></i><span>Calificaciones</span></a></li>
-                </ul>
-            </li>
 
-            <li class="menu-group">
-                <button class="menu-toggle">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Asistencias</span>
-                    <i class="fas fa-chevron-down arrow"></i>
-                </button>
                 <ul class="submenu">
-                    <li><a href="<?= base_url('alumno/asistencias') ?>"><i
-                                class="fas fa-user-check"></i><span>Consultar</span></a></li>
+                    <?php if (!empty($materiasAlumno)): ?>
+                        <?php foreach ($materiasAlumno as $m): ?>
+                            <li>
+                                <a href="<?= base_url('alumno/materias/ver/' . $m['asignacion_id']) ?>">
+                                    <i class="fas fa-book"></i>
+                                    <span><?= $m['materia'] ?> (<?= $m['grupo'] ?>)</span>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <li><span style="color:#999; padding:10px;">Sin materias</span></li>
+                    <?php endif; ?>
                 </ul>
+            <li>
+                <a href="<?= base_url('alumno/calificaciones/historial') ?>">
+                    <i class="fas fa-star"></i><span>Historial de Calificaciones</span>
+                </a>
             </li>
-
-            <li class="menu-group">
-                <button class="menu-toggle">
-                    <i class="fas fa-bullhorn"></i>
-                    <span>Comunicados</span>
-                    <i class="fas fa-chevron-down arrow"></i>
-                </button>
-                <ul class="submenu">
-                    <li><a href="<?= base_url('alumno/anuncios') ?>"><i class="fas fa-bell"></i><span>Anuncios</span></a>
-                    </li>
-                    <li><a href="<?= base_url('alumno/soporte') ?>"><i class="fas fa-headset"></i><span>Soporte</span></a>
-                    </li>
-                </ul>
             </li>
         <?php endif; ?>
     </ul>

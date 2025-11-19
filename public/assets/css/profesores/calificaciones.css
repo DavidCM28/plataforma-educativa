@@ -1,0 +1,66 @@
+/* ==========================================================
+   🧮 TABLA DE CALIFICACIONES — ESTILO PROFESIONAL
+   ========================================================== */
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.tabla thead th {
+  background: #1f2024;
+  color: #f0f0f0;
+  padding: 12px 8px;
+  text-align: center;
+  border-bottom: 2px solid #333;
+  font-weight: 600;
+}
+
+.tabla tbody td {
+  padding: 10px 6px;
+  border-bottom: 1px solid #2e2e2e;
+  text-align: center;
+}
+
+.tabla tbody tr:hover {
+  background: #26272b;
+}
+
+/* Nombre del alumno alineado a la izquierda */
+.tabla tbody td:first-child,
+.tabla thead th:first-child {
+  text-align: left;
+  padding-left: 12px;
+}
+
+/* Ajuste del select */
+.cal-select {
+  background: #2a2b2f;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 6px;
+  width: 55px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.cal-select:focus {
+  outline: none;
+  border-color: #ff9e64;
+}
+
+/* Encabezado superior de criterios */
+.tabla thead tr:nth-child(1) th {
+  font-size: 0.95rem;
+  background: #17181c;
+  border-bottom: none;
+}
+
+/* Encabezado inferior de los ítems */
+.tabla thead tr:nth-child(2) th {
+  font-size: 0.8rem;
+  background: #1f2024;
+}

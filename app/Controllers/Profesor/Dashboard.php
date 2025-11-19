@@ -16,6 +16,21 @@ class Dashboard extends BaseController
         $datos = $model->obtenerTotalesPorProfesor($profesorId);
         $asignaciones = $model->obtenerAsignacionesPorProfesor($profesorId);
 
+        // ============================================================
+        // Cargar las materias para el sidebar
+        // ============================================================
+        $asignaciones = $model->obtenerAsignacionesPorProfesor($profesorId);
+
+        $listaSidebar = array_map(function ($a) {
+            return [
+                'id' => $a['id'],
+                'materia' => $a['materia'],
+                'grupo' => $a['grupo'],
+            ];
+        }, $asignaciones);
+
+        session()->set('sidebar_materias', $listaSidebar);
+
         foreach ($asignaciones as &$asignacion) {
             $texto = trim($asignacion['horario'] ?? '');
 
