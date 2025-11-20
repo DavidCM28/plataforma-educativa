@@ -1,7 +1,7 @@
 <?= $this->extend('lms/dashboard-plataforma') ?>
 <?= $this->section('contenidoDashboard') ?>
 
-<!-- 🌟 Alertas y modal global (compatibles con tu sistema) -->
+<!-- 🌟 Alertas y modal global -->
 <div id="alertContainer" class="alert-container"></div>
 
 <div id="confirmModal" class="confirm-modal hidden">
@@ -23,7 +23,7 @@
     </h2>
 
     <!-- =============================
-         🧭 TABS PRINCIPALES
+         🧭 TABS
     =============================== -->
     <div class="cal-tabs">
         <button class="tab-btn activo" data-tab="especificas">
@@ -35,51 +35,58 @@
     </div>
 
     <!-- =============================
-         1️⃣ CALIFICACIONES POR MATERIA
-    =============================== -->
+    1️⃣ POR MATERIA (TAB)
+============================== -->
     <div id="tab-especificas" class="tab-content" style="display:block">
 
-        <h3 class="subtitulo">
-            <i class="fas fa-graduation-cap"></i> Materias del ciclo actual
-        </h3>
+        <!-- 📌  TABLA GENERAL DEL CICLO -->
+        <div id="vista-tabla-general">
 
-        <?php if (!empty($materiasActuales)): ?>
-            <div class="lista-materias">
-                <?php foreach ($materiasActuales as $m): ?>
-                    <div class="materia-item" data-id="<?= $m['asignacion_id'] ?>">
-                        <div class="materia-info">
-                            <strong><?= esc($m['materia']) ?></strong>
-                            <span class="grupo"><?= esc($m['grupo']) ?></span>
-                        </div>
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                <?php endforeach; ?>
+            <h3 class="subtitulo">
+                <i class="fas fa-graduation-cap"></i> Desempeño del ciclo actual
+            </h3>
+
+            <table class="tabla-ciclo" id="tablaCiclo">
+                <thead id="theadCiclo"></thead>
+                <tbody id="tbodyCiclo"></tbody>
+            </table>
+
+        </div>
+
+        <!-- 📌 VISTA DE CRITERIOS DEL PARCIAL -->
+        <div id="vista-criterios" class="hidden">
+
+            <button id="btnVolverTabla" class="btn-volver">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+
+            <h3 class="subtitulo">
+                <i class="fas fa-list-ul"></i>
+                Criterios del Parcial <span id="critParcialNumero"></span> —
+                <span id="critMateriaNombre"></span>
+            </h3>
+
+            <table class="tabla-criterios">
+                <thead>
+                    <tr>
+                        <th>Criterio</th>
+                        <th>Porcentaje</th>
+                        <th>Calificación</th>
+                        <th>Obtenido</th>
+
+                    </tr>
+                </thead>
+                <tbody id="tbodyCriterios"></tbody>
+            </table>
+
+            <div class="resumen-criterios">
+                <h4>Calificación del Parcial: <span id="critParcialFinal"></span></h4>
             </div>
 
-            <!-- PARCIALES DINÁMICOS -->
-            <div id="cal-parciales" class="cal-parciales hidden">
-                <h3 class="subtitulo">
-                    <i class="fas fa-chart-line"></i> Parciales de la materia
-                </h3>
-
-                <table class="tabla-parciales">
-                    <thead>
-                        <tr>
-                            <th>Parcial</th>
-                            <th>Calificación</th>
-                        </tr>
-                    </thead>
-                    <tbody id="parciales-body">
-                        <!-- JS llenará esto -->
-                    </tbody>
-                </table>
-            </div>
-
-        <?php else: ?>
-            <p class="placeholder">Aún no tienes materias asignadas en este ciclo.</p>
-        <?php endif; ?>
+        </div>
 
     </div>
+
 
     <!-- =============================
          2️⃣ KÁRDEX GENERAL
@@ -128,49 +135,23 @@
 
 </div>
 
-<!-- =============================
-     SCRIPTS Y CSS
-============================== -->
-
 <script>
+    // Tabs
     document.querySelectorAll(".tab-btn").forEach(btn => {
         btn.addEventListener("click", () => {
             document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("activo"));
             btn.classList.add("activo");
 
-            let tab = btn.dataset.tab;
+            const tab = btn.dataset.tab;
             document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
             document.getElementById("tab-" + tab).style.display = "block";
-        });
-    });
-
-    // Selección de materia para mostrar parciales
-    document.querySelectorAll(".materia-item").forEach(item => {
-        item.addEventListener("click", () => {
-            const id = item.dataset.id;
-
-            // TODO — Aquí harás el fetch real
-            const parciales = {
-                1: 88,
-                2: 90,
-                3: 85,
-                final: 88.5
-            };
-
-            let html = `
-            <tr><td>Parcial 1</td><td>${parciales[1]}</td></tr>
-            <tr><td>Parcial 2</td><td>${parciales[2]}</td></tr>
-            <tr><td>Parcial 3</td><td>${parciales[3]}</td></tr>
-            <tr><td>Final</td><td>${parciales['final']}</td></tr>
-        `;
-
-            document.getElementById("parciales-body").innerHTML = html;
-            document.getElementById("cal-parciales").classList.remove("hidden");
         });
     });
 </script>
 
 <link rel="stylesheet" href="<?= base_url('assets/css/alert.css') ?>">
+<link rel="stylesheet" href="<?= base_url('assets/css/alumnos/calificaciones.css') ?>">
 <script src="<?= base_url('assets/js/alert.js') ?>"></script>
+<script src="<?= base_url('assets/js/alumnos/calificaciones.js') ?>"></script>
 
 <?= $this->endSection() ?>

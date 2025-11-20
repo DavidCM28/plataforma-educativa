@@ -332,6 +332,11 @@ $routes->group('alumno', ['namespace' => 'App\Controllers\Alumno'/*, 'filter' =>
     // 🚀 CALIFICACIONES
     // ============================================================
     $routes->get('calificaciones/historial', 'CalificacionesController::index');
+    $routes->get('calificaciones/parciales/(:num)', 'CalificacionesController::obtenerParciales/$1');
+    $routes->get('calificaciones/tabla-ciclo', 'CalificacionesController::tablaCiclo');
+    $routes->get('calificaciones/criterios/(:num)/(:num)', 'CalificacionesController::criterios/$1/$2');
+
+
 
     // ============================================================
     // 📅 HORARIO SEMANAL

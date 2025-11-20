@@ -1,0 +1,27 @@
+.hidden {
+  display: none !important;
+}
+
+#vista-tabla-general,
+#vista-criterios {
+  transition: opacity 0.25s ease;
+}
+
+.btn-volver {
+  background: var(--primary);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+#vista-criterios {
+  margin-top: 1rem;
+}
+
+#btnVolverTabla {
+  margin-bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
