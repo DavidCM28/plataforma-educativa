@@ -54,7 +54,7 @@
         </div>
 
         <!-- 📌 VISTA DE CRITERIOS DEL PARCIAL -->
-        <div id="vista-criterios" class="hidden">
+        <div id="vista-criterios" class="oculto">
 
             <button id="btnVolverTabla" class="btn-volver">
                 <i class="fas fa-arrow-left"></i> Volver

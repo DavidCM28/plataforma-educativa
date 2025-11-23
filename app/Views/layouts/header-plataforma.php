@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="<?= base_url('assets/css/header.css') ?>">
 <header class="navbar-dark">
     <div class="navbar-left">
         <button id="sidebarToggle" class="btn-toggle">
@@ -8,13 +9,11 @@
     </div>
 
     <div class="navbar-right">
-        <div class="nav-icon">
-            <i class="fas fa-bell"></i>
-            <span class="badge">3</span>
-        </div>
-        <div class="nav-icon">
-            <i class="fas fa-envelope"></i>
-            <span class="badge">5</span>
+
+        <!-- 💬 Ícono de mensajes -->
+        <div class="nav-icon" id="chatToggle">
+            <i class="fas fa-comments"></i>
+            <span class="badge" id="chatBadge">0</span>
         </div>
 
         <!-- 👤 Avatar del usuario -->
@@ -43,8 +42,22 @@
                 </ul>
             </div>
         </div>
+
+        <!-- 📬 Mini bandeja -->
+        <div class="chat-dropdown" id="chatDropdown">
+
+            <div class="chat-list" id="chatList">
+                <p class="placeholder">No hay mensajes recientes</p>
+            </div>
+
+            <div class="chat-footer">
+                <a href="<?= base_url('mensajes') ?>">Ver todos los mensajes →</a>
+            </div>
+        </div>
+
     </div>
 </header>
+
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

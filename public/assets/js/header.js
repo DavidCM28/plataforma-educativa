@@ -84,4 +84,18 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   }
+
+  const chatToggle = document.getElementById("chatToggle");
+  const chatDropdown = document.getElementById("chatDropdown");
+
+  chatToggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    chatDropdown.classList.toggle("active");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!chatDropdown.contains(e.target) && e.target !== chatToggle) {
+      chatDropdown.classList.remove("active");
+    }
+  });
 });

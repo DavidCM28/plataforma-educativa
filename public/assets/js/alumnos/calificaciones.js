@@ -20,13 +20,11 @@ document.addEventListener("DOMContentLoaded", () => {
   async function cargarTablaCiclo() {
     const resp = await fetch(`${baseURL}alumno/calificaciones/tabla-ciclo`);
     const data = await resp.json();
-
     renderTablaGeneral(data);
   }
 
   // Render dinámico de tabla general
   function renderTablaGeneral(data) {
-    // Crear encabezados dinámicos de parciales
     let head = `<tr><th>Materia</th>`;
     data.parciales.forEach((p) => {
       head += `<th>Parcial ${p.numero}</th>`;
@@ -45,21 +43,20 @@ document.addEventListener("DOMContentLoaded", () => {
         const cal = mat.parciales[p.numero] ?? "—";
 
         row += `
-                    <td class="td-parcial" 
-                        data-asignacion="${mat.asignacion_id}" 
-                        data-parcial="${p.numero}">
-                        ${cal}
-                    </td>`;
+          <td class="td-parcial" 
+              data-asignacion="${mat.asignacion_id}" 
+              data-parcial="${p.numero}">
+              ${cal}
+          </td>`;
       });
 
       row += `<td>${mat.final ?? "—"}</td></tr>`;
-
       rows += row;
     });
 
     tbodyCiclo.innerHTML = rows;
 
-    // Activar clics en cada parcial
+    // Activar clics
     document.querySelectorAll(".td-parcial").forEach((td) => {
       td.addEventListener("click", () => {
         const asignacionId = td.dataset.asignacion;
@@ -71,11 +68,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =======================================================
-  // 2️⃣ Cargar criterios al dar clic en un parcial
+  // 2️⃣ Cargar criterios (vista animada)
   // =======================================================
   async function cargarCriterios(asignacionId, parcialNum) {
-    vistaTabla.classList.add("hidden");
-    vistaCriterios.classList.remove("hidden");
+    // Animación: tabla → criterios
+    vistaTabla.classList.add("oculto");
+    vistaTabla.classList.remove("mostrando");
+
+    vistaCriterios.classList.remove("oculto");
+    vistaCriterios.classList.add("mostrando");
 
     const resp = await fetch(
       `${baseURL}alumno/calificaciones/criterios/${asignacionId}/${parcialNum}`
@@ -101,11 +102,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =======================================================
-  // 3️⃣ Botón volver
+  // 3️⃣ Botón volver (criterios → tabla)
   // =======================================================
   btnVolver.addEventListener("click", () => {
-    vistaCriterios.classList.add("hidden");
-    vistaTabla.classList.remove("hidden");
+    vistaCriterios.classList.add("oculto");
+    vistaCriterios.classList.remove("mostrando");
+
+    vistaTabla.classList.remove("oculto");
+    vistaTabla.classList.add("mostrando");
   });
 
   // Inicializar

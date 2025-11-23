@@ -25,3 +25,208 @@
   align-items: center;
   gap: 6px;
 }
+
+/* ==========================================================
+   🎓 CALIFICACIONES ALUMNO — ESTILO MODERNO
+   ========================================================== */
+
+.tabla-ciclo,
+.tabla-criterios,
+.tabla-kardex {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  background: #1b1c20;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* ---------- Encabezados ---------- */
+.tabla-ciclo thead th,
+.tabla-criterios thead th,
+.tabla-kardex thead th {
+  background: #202226;
+  color: #fafafa;
+  padding: 12px 8px;
+  text-align: center;
+  border-bottom: 2px solid #2e2e2e;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Primera columna alineada a la izquierda */
+.tabla-ciclo thead th:first-child,
+.tabla-ciclo tbody td:first-child,
+.tabla-kardex thead th:first-child,
+.tabla-kardex tbody td:first-child {
+  text-align: left;
+  padding-left: 14px;
+}
+
+/* ---------- Celdas ---------- */
+.tabla-ciclo tbody td,
+.tabla-criterios tbody td,
+.tabla-kardex tbody td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #2c2c2c;
+  text-align: center;
+  color: #e8e8e8;
+}
+
+.tabla-ciclo tbody tr:hover,
+.tabla-criterios tbody tr:hover,
+.tabla-kardex tbody tr:hover {
+  background: #26272b;
+}
+
+/* ---------- Celdas clickeables (parciales) ---------- */
+.td-parcial {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.td-parcial:hover {
+  background: #303238 !important;
+  color: #ff9e64;
+  font-weight: 600;
+}
+
+/* ---------- Vista de criterios ---------- */
+.tabla-criterios thead th {
+  background: #242529;
+}
+
+.tabla-criterios tbody td {
+  font-size: 0.88rem;
+}
+
+/* Resumen parcial */
+.resumen-criterios {
+  margin-top: 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffae72;
+}
+
+/* ---------- Botón volver ---------- */
+.btn-volver {
+  background: #ff9e64;
+  border: none;
+  padding: 8px 14px;
+  color: #121212;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.btn-volver:hover {
+  background: #ffb983;
+}
+
+/* ---------- Kárdex ---------- */
+.tabla-kardex tbody td {
+  font-size: 0.87rem;
+}
+
+.promedio-global {
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  color: #f5f5f5;
+}
+
+.promedio-global span {
+  color: #ffcf87;
+  font-weight: 600;
+}
+/* ==========================================================
+   🌟 ANIMACIONES ENTRE VISTAS
+   ========================================================== */
+
+.tab-content {
+  animation: fadeIn 0.25s ease;
+}
+
+#vista-tabla-general,
+#vista-criterios {
+  opacity: 1;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.hidden {
+  opacity: 0 !important;
+  pointer-events: none;
+  transform: translateX(20px); /* pequeño slide */
+}
+
+/* Fade suave */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================
+   🌟 TABS MODERNOS
+   ========================================================== */
+
+.cal-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1.2rem;
+}
+
+.tab-btn {
+  background: #1f1f23;
+  color: #e6e6e6;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: 0.25s ease;
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+}
+
+.tab-btn:hover {
+  background: #2a2a2e;
+  color: #ffb983;
+  transform: translateY(-1px);
+}
+
+.tab-btn.activo {
+  background: #ff9e64;
+  color: #121212;
+  box-shadow: 0 4px 10px rgba(255, 158, 100, 0.35);
+  transform: translateY(0);
+}
+
+/* ==========================================================
+   🌟 TRANSICIÓN ENTRE TABLA GENERAL ↔ CRITERIOS
+   ========================================================== */
+
+#vista-tabla-general.mostrando,
+#vista-criterios.mostrando {
+  opacity: 1 !important;
+  transform: translateX(0);
+  display: block !important;
+}
+
+#vista-tabla-general.oculto,
+#vista-criterios.oculto {
+  opacity: 0 !important;
+  pointer-events: none;
+  transform: translateX(-20px);
+  display: none !important; /* ← esto es lo que faltaba */
+}

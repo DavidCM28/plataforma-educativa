@@ -201,7 +201,7 @@ class CalificacionesController extends BaseController
             return $this->response->setJSON(['error' => 'No autorizado']);
         }
 
-        // 1) Obtener ciclo actual desde cualquier asignación activa
+        // 1) Obtener ciclo actual
         $asignacion = $this->db->table('grupo_materia_profesor gmp')
             ->select('gmp.ciclo_id')
             ->join('grupo_alumno ga', 'ga.grupo_id = gmp.grupo_id')
@@ -226,19 +226,17 @@ class CalificacionesController extends BaseController
             ->get()
             ->getResultArray();
 
-        // Formato que el JS espera
         $listaParciales = array_map(fn($p) => [
             'id' => $p['id'],
             'numero' => $p['numero_parcial']
         ], $parciales);
 
-        // 3) Obtener todas las materias del alumno
+        // 3) Obtener materias del alumno
         $materias = $this->db->table('materia_grupo_alumno mga')
             ->select('
             mga.id AS mga_id,
             gmp.id AS asignacion_id,
-            m.nombre AS materia,
-            gmp.materia_id
+            m.nombre AS materia
         ')
             ->join('grupo_alumno ga', 'ga.id = mga.grupo_alumno_id')
             ->join('grupo_materia_profesor gmp', 'gmp.id = mga.grupo_materia_profesor_id')
@@ -247,38 +245,103 @@ class CalificacionesController extends BaseController
             ->get()
             ->getResultArray();
 
-        // 4) Calificaciones por cada materia/parcial
+        // 4) Calcular calificaciones por cada parcial
         $resultadoMaterias = [];
 
         foreach ($materias as $m) {
 
-            // Calificaciones parciales del alumno en esta materia
+            // Traer todos los registros de calificaciones parciales
             $califs = $this->parcialModel
                 ->where('materia_grupo_alumno_id', $m['mga_id'])
                 ->findAll();
 
-            // Indexar por ciclo_parcial_id
+            // MAP: ciclo_parcial_id → sumatoria de aportaciones
             $map = [];
+
             foreach ($califs as $c) {
-                $map[$c['ciclo_parcial_id']] = $c['calificacion'];
+
+                $itemId = $c['item_id'];
+                $tipo = $c['item_tipo'];
+                $calif = $c['calificacion']; // 0–10
+                $criterioId = $c['criterio_id'];
+                $porcentaje = 0;
+
+                // ------------------------------------------
+                // 1) Detección del porcentaje real por item
+                // ------------------------------------------
+                if ($tipo === 'tarea' && preg_match('/^t_(\d+)$/', $itemId, $mm)) {
+
+                    $idReal = intval($mm[1]);
+
+                    $row = $this->db->table('tareas')
+                        ->select('porcentaje_tarea')
+                        ->where('id', $idReal)
+                        ->get()->getRowArray();
+
+                    $porcentaje = floatval($row['porcentaje_tarea'] ?? 0);
+                } elseif ($tipo === 'proyecto' && preg_match('/^p_(\d+)$/', $itemId, $mm)) {
+
+                    $idReal = intval($mm[1]);
+
+                    $row = $this->db->table('proyectos')
+                        ->select('porcentaje_proyecto')
+                        ->where('id', $idReal)
+                        ->get()->getRowArray();
+
+                    $porcentaje = floatval($row['porcentaje_proyecto'] ?? 0);
+                } else {
+                    // examen / participación / asistencia
+                    $numParcial = $this->db->table('ciclos_parciales')
+                        ->select('numero_parcial')
+                        ->where('id', $c['ciclo_parcial_id'])
+                        ->get()->getRowArray()['numero_parcial'];
+
+                    $pond = $this->db->table('ponderaciones_ciclo')
+                        ->where('ciclo_id', $cicloId)
+                        ->where('criterio_id', $criterioId)
+                        ->where('parcial_num', $numParcial)
+                        ->get()->getRowArray();
+
+                    $porcentaje = floatval($pond['porcentaje'] ?? 0);
+                }
+
+                // ------------------------------------------
+                // 2) Calcular aportación
+                // ------------------------------------------
+                $aportacion = ($porcentaje > 0 && $calif !== null)
+                    ? round(($calif / 10) * $porcentaje, 1)
+                    : 0;
+
+                // Acumular por ciclo_parcial_id
+                $map[$c['ciclo_parcial_id']] =
+                    ($map[$c['ciclo_parcial_id']] ?? 0) + $aportacion;
             }
 
-            // Generar matriz parcial → calificación
+            // ------------------------------------------
+            // 3) Convertir aportación → calificación final
+            // ------------------------------------------
             $porParcial = [];
             $suma = 0;
             $cuenta = 0;
 
             foreach ($parciales as $p) {
-                $cal = $map[$p['id']] ?? null;
-                $porParcial[$p['numero_parcial']] = $cal;
 
-                if ($cal !== null) {
-                    $suma += $cal;
+                $total = $map[$p['id']] ?? null;
+
+                // Convertir 79 → 7.9
+                if ($total !== null) {
+                    $total = round(($total / 10), 0);
+                }
+
+                $porParcial[$p['numero_parcial']] = $total;
+
+                if ($total !== null) {
+                    $suma += $total;
                     $cuenta++;
                 }
             }
 
-            // Promedio final dinámico
+            // Calificación final de la materia
             $final = $cuenta > 0 ? round($suma / $cuenta, 1) : null;
 
             $resultadoMaterias[] = [
@@ -294,6 +357,7 @@ class CalificacionesController extends BaseController
             'materias' => $resultadoMaterias
         ]);
     }
+
     public function criterios($asignacionId, $parcialNum)
     {
         $alumnoId = session('id');
@@ -388,15 +452,15 @@ class CalificacionesController extends BaseController
                 // ===========================
                 case 'tarea':
                     if (preg_match('/^t_(\d+)$/', $r['item_id'], $m)) {
-                        $num = intval($m[1]); // tarea N
 
-                        $tareas = $this->db->table('tareas')
-                            ->where('asignacion_id', $asignacionId)
-                            ->where('parcial_numero', $parcialNum)
-                            ->orderBy('id', 'ASC')
-                            ->get()->getResultArray();
+                        $idReal = intval($m[1]);
 
-                        $task = $tareas[$num - 1] ?? null;
+                        // Buscar tarea por ID REAL
+                        $task = $this->db->table('tareas')
+                            ->select('porcentaje_tarea')
+                            ->where('id', $idReal)
+                            ->get()->getRowArray();
+
                         $porcentaje = floatval($task['porcentaje_tarea'] ?? 0);
                     }
                     break;
@@ -406,15 +470,15 @@ class CalificacionesController extends BaseController
                 // ===========================
                 case 'proyecto':
                     if (preg_match('/^p_(\d+)$/', $r['item_id'], $m)) {
-                        $num = intval($m[1]);
 
-                        $proyectos = $this->db->table('proyectos')
-                            ->where('asignacion_id', $asignacionId)
-                            ->where('parcial_numero', $parcialNum)
-                            ->orderBy('id', 'ASC')
-                            ->get()->getResultArray();
+                        $idReal = intval($m[1]);
 
-                        $proj = $proyectos[$num - 1] ?? null;
+                        // Buscar proyecto por ID REAL
+                        $proj = $this->db->table('proyectos')
+                            ->select('porcentaje_proyecto')
+                            ->where('id', $idReal)
+                            ->get()->getRowArray();
+
                         $porcentaje = floatval($proj['porcentaje_proyecto'] ?? 0);
                     }
                     break;
