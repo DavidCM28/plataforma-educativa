@@ -1,5 +1,27 @@
-// assets/js/global/header.js
 document.addEventListener("DOMContentLoaded", () => {
+  console.warn("HEADER usuario_id:", window.usuario_id);
+  async function cargarNoLeidos() {
+    try {
+      const res = await fetch(`${window.base_url}api/chat/unreadCount`);
+      const data = await res.json();
+
+      const badge = document.getElementById("chatBadge");
+      const total = data.total ?? 0;
+
+      if (total > 0) {
+        badge.textContent = total;
+        badge.style.display = "inline-block";
+      } else {
+        badge.textContent = "";
+        badge.style.display = "none";
+      }
+    } catch (e) {
+      console.error("Error al obtener no leídos:", e);
+    }
+  }
+
+  cargarNoLeidos();
+
   // === Sidebar ===
   const sidebar = document.getElementById("sidebar");
   const content = document.querySelector(".content-dark");
@@ -91,11 +113,127 @@ document.addEventListener("DOMContentLoaded", () => {
   chatToggle.addEventListener("click", (e) => {
     e.stopPropagation();
     chatDropdown.classList.toggle("active");
+
+    if (chatDropdown.classList.contains("active")) {
+      cargarChatsRecientes();
+    }
   });
 
   document.addEventListener("click", (e) => {
     if (!chatDropdown.contains(e.target) && e.target !== chatToggle) {
       chatDropdown.classList.remove("active");
     }
+  });
+
+  async function cargarChatsRecientes() {
+    try {
+      const res = await fetch(`${window.base_url}api/chat/recientes`);
+      const data = await res.json();
+
+      const cont = document.getElementById("chatList");
+      cont.innerHTML = "";
+
+      if (!data.data || data.data.length === 0) {
+        cont.innerHTML = `<p class="placeholder">No hay mensajes recientes</p>`;
+        return;
+      }
+
+      data.data.forEach((chat) => {
+        const usuario = chat.con;
+        const foto =
+          usuario.foto && usuario.foto !== ""
+            ? usuario.foto
+            : window.base_url + "assets/img/user-default.jpg";
+
+        // Determinar preview según tipo
+        let preview = chat.ultimo_mensaje;
+
+        if (chat.tipo_mensaje === "archivo") {
+          const filename = chat.ultimo_mensaje || "Archivo";
+          preview =
+            filename.endsWith(".jpg") ||
+            filename.endsWith(".png") ||
+            filename.endsWith(".jpeg")
+              ? "📷 Imagen"
+              : "📎 " + filename;
+        }
+
+        const item = document.createElement("div");
+        item.classList.add("chat-item");
+        item.dataset.chat = chat.chat_id;
+
+        item.innerHTML = `
+                <img src="${foto}">
+                <div class="chat-info">
+                    <strong>${usuario.nombre} ${usuario.apellido_paterno}</strong>
+                    <small>${preview}</small>
+                </div>
+            `;
+
+        // Abrir el chat completo
+        item.addEventListener("click", () => {
+          window.location.href = `${window.base_url}api/chat/mensajes/${chat.chat_id}`;
+        });
+
+        cont.appendChild(item);
+      });
+    } catch (error) {
+      console.error("Error cargando chats:", error);
+    }
+  }
+
+  // ================================
+  // 🔊 SONIDO DE NOTIFICACIÓN
+  // ================================
+  const sonidoNotif = new Audio(
+    `${window.base_url}assets/sounds/notificacion.mp3`
+  );
+  sonidoNotif.volume = 0.5; // opcional, ajusta volumen
+
+  // ================================
+  //       SOCKET.IO — HEADER
+  // ================================
+
+  const socket = io("http://localhost:3001");
+
+  // Registrar usuario en socket
+  if (window.usuario_id) {
+    socket.emit("registrarUsuario", window.usuario_id);
+  }
+
+  function incrementarBadge() {
+    const badge = document.getElementById("chatBadge");
+
+    // animación (esto sí queda)
+    badge.style.transform = "scale(1.3)";
+    setTimeout(() => (badge.style.transform = "scale(1)"), 200);
+
+    // recargar del servidor
+    cargarNoLeidos();
+
+    badge.style.display = "inline-block";
+  }
+
+  socket.on("mensajeRecibido", (msg) => {
+    console.log("🔥 HEADER RECIBE:", msg);
+
+    const noEsElChatAbierto =
+      !window.chat_abierto || window.chat_abierto != msg.chat_id;
+
+    if (noEsElChatAbierto) {
+      incrementarBadge();
+      cargarChatsRecientes();
+
+      // 🔊 reproducir sonido
+      try {
+        sonidoNotif.play();
+      } catch (e) {
+        console.warn("No se pudo reproducir el sonido:", e);
+      }
+
+      return;
+    }
+
+    // Si estoy dentro del chat, no suena ni incrementa
   });
 });

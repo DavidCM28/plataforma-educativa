@@ -1,422 +1,168 @@
 /* ============================================================
-   📰 ESTILOS DE PUBLICACIONES, COMENTARIOS Y RESPUESTAS
-   ============================================================ */
+   🎨 PUBLICACIONES PROFESOR — DISEÑO COMPACTO (SCOPED)
+   Nada externo afecta esta vista
+============================================================== */
 
+/* RESET SÓLO DENTRO DE ESTE MÓDULO */
+#feedPublicaciones *,
+.feed-publicaciones-prof * {
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+  line-height: normal !important;
+}
+
+/* Elimina márgenes globales de <p> que inflan la tarjeta */
+#feedPublicaciones p,
+.feed-publicaciones-prof p {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.25 !important;
+  display: inline !important;
+}
+
+/* Permitimos padding interno SOLO dentro de la tarjeta */
+.feed-publicaciones-prof .publicacion {
+  padding: 0.8rem 1rem !important;
+  margin: 0 !important;
+}
+
+/* Separación entre publicaciones */
+.feed-publicaciones-prof .publicacion + .publicacion {
+  margin-top: 0.75rem !important;
+}
+
+/* VARIABLES */
 :root {
-  --bg-dark: #181a20;
-  --surface: #21242b;
+  --bg-main: #181a20;
+  --card: #1f2127;
+  --card-alt: #252830;
   --primary: #ff9e64;
   --accent: #ffb84c;
-  --accent-soft: #ffc87a;
-  --text: #f9f9fb;
-  --text-muted: #b5b5b5;
-  --radius: 16px;
-  --shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+  --text: #e8e8e8;
+  --text-muted: #a6a6a6;
+  --radius: 10px;
 }
 
-/* ==============================
-   📦 Contenedor principal
-============================== */
-.publicacion {
-  background: var(--surface);
-  color: var(--text);
-  padding: 1.4rem 1.6rem;
+/* CONTENEDOR */
+.feed-publicaciones-prof {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* PUBLICACIÓN */
+.feed-publicaciones-prof .publicacion {
+  background: var(--card);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  margin-bottom: 1.8rem;
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem !important;
+  height: auto !important;
 }
 
-.publicacion:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-}
-
-/* ==============================
-   🧑 Encabezado
-============================== */
-.publicacion-header {
+/* HEADER */
+.feed-publicaciones-prof .publicacion-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 1rem;
+  gap: 0.7rem;
+  margin-bottom: 0.5rem !important;
 }
 
-.publicacion-avatar {
-  width: 46px;
-  height: 46px;
+.feed-publicaciones-prof .publicacion-avatar {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--primary);
 }
 
-.publicacion-datos {
+.feed-publicaciones-prof .publicacion-meta {
   flex: 1;
 }
 
-.publicacion-nombre {
-  font-weight: 600;
-  color: var(--text);
-}
-
-.publicacion-fecha {
+.feed-publicaciones-prof .publicacion-nombre {
   font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.feed-publicaciones-prof .publicacion-fecha {
+  font-size: 0.75rem;
   color: var(--text-muted);
 }
 
-.publicacion-acciones {
+.feed-publicaciones-prof .publicacion-acciones {
   display: flex;
-  gap: 6px;
+  gap: 0.25rem;
 }
 
-.publicacion-acciones button {
+.feed-publicaciones-prof .btn-icono {
   background: transparent;
-  color: var(--text-muted);
   border: none;
+  color: var(--text-muted);
   cursor: pointer;
-  font-size: 1rem;
-  transition: color 0.2s;
+  padding: 0.2rem !important;
+  font-size: 0.9rem;
 }
 
-.publicacion-acciones button:hover {
+.feed-publicaciones-prof .btn-icono:hover {
   color: var(--primary);
 }
 
-/* ==============================
-   📝 Contenido
-============================== */
-.publicacion-contenido {
-  font-size: 1rem;
-  line-height: 1.6;
+/* CUERPO */
+.feed-publicaciones-prof .publicacion-body {
+  margin-top: 0.2rem !important;
+}
+
+.feed-publicaciones-prof .publicacion-contenido {
+  font-size: 0.88rem;
   color: var(--text);
-  margin-bottom: 1rem;
-  padding-left: 6px;
+  line-height: 1.35 !important;
 }
 
-/* ==============================
-   📎 Archivos adjuntos
-============================== */
-.publicacion-archivos {
-  margin: 0.8rem 0 1.4rem;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.publicacion-archivos a {
-  color: var(--accent-soft);
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: color 0.2s;
-}
-
-.publicacion-archivos a:hover {
-  color: var(--accent);
-}
-
-/* ==============================
-   💬 Comentarios
-============================== */
-.publicacion-comentarios {
-  background: #1b1e25;
-  border-radius: var(--radius);
-  padding: 1rem 1.2rem;
-}
-
-.comentario {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 1rem;
-  padding-bottom: 0.8rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.comentario:last-child {
-  border-bottom: none;
-}
-
-.comentario-avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--accent);
-}
-
-.comentario-body {
-  flex: 1;
-}
-
-.comentario-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 4px;
-}
-
-.comentario-nombre {
-  font-weight: 500;
-  color: var(--text);
-}
-
-.comentario-fecha {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-left: 8px;
-}
-
-.comentario-texto {
-  color: var(--text);
-  font-size: 0.95rem;
-  margin-bottom: 6px;
-}
-
-.comentario-acciones {
+/* CHIP */
+.feed-publicaciones-prof .chip-aviso {
   display: inline-flex;
-  gap: 4px;
-}
-
-.comentario-acciones button {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.comentario-acciones button:hover {
-  color: var(--accent);
-}
-
-/* ==============================
-   ↩️ Botón de respuesta
-============================== */
-.btn-responder {
-  background: none;
-  border: none;
-  color: var(--accent-soft);
-  font-size: 0.85rem;
-  cursor: pointer;
-  margin-top: 3px;
-  transition: color 0.2s;
-}
-
-.btn-responder:hover {
-  color: var(--accent);
-}
-
-/* ==============================
-   ✍️ Formulario de nuevo comentario
-============================== */
-.form-comentario {
-  display: flex;
-  align-items: center;
-  margin-top: 1rem;
-  background: var(--bg-dark);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-}
-
-.form-comentario textarea {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: var(--text);
-  padding: 0.7rem 1rem;
-  resize: none;
-  font-size: 0.95rem;
-}
-
-.form-comentario textarea::placeholder {
-  color: var(--text-muted);
-}
-
-.form-comentario button {
-  background: var(--primary);
-  border: none;
-  color: var(--bg-dark);
-  padding: 0.7rem 1rem;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.form-comentario button:hover {
-  background: var(--accent);
-}
-
-/* ==============================
-   💬 Subcomentarios (respuestas)
-============================== */
-.respuestas {
-  margin-left: 3rem;
-  margin-top: 0.6rem;
-  border-left: 2px solid rgba(255, 255, 255, 0.08);
-  padding-left: 1rem;
-}
-
-.placeholder {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  text-align: center;
-  padding: 0.5rem 0;
-}
-/* ==============================
-   ✏️ EDICIÓN INLINE
-============================== */
-.form-editar {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  background: var(--bg-dark);
-  border-radius: var(--radius);
-  padding: 0.8rem;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-}
-
-.editar-textarea {
-  width: 100%;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: var(--text);
-  resize: vertical;
-  font-size: 1rem;
-  min-height: 70px;
-  line-height: 1.4;
-}
-
-.editar-acciones {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-}
-
-.editar-acciones button {
-  border: none;
-  cursor: pointer;
-  padding: 0.4rem 0.8rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-}
-
-.btn-guardar {
-  background: var(--primary);
-  color: var(--bg-dark);
-}
-
-.btn-guardar:hover {
-  background: var(--accent);
-}
-
-.btn-cancelar {
-  background: #333;
-  color: var(--text-muted);
-}
-
-.btn-cancelar:hover {
-  background: #444;
-  color: var(--text);
-}
-
-/* ============================================================
-   🟠 AVISOS IMPORTANTES (DISEÑO EDUCATIVO SIMPLE Y COMPACTO)
-   ============================================================ */
-
-.publicacion-aviso {
-  border: 1px solid var(--accent);
-  background: #1f2229;
-  border-radius: 8px;
-  overflow: hidden;
-  transition: background 0.2s ease;
-  margin-top: 0.5rem;
-}
-
-.publicacion-aviso:hover {
-  background: #24272f;
-}
-
-/* 🔶 Banner superior */
-.banner-aviso {
-  background: var(--accent);
-  color: #000;
-  font-weight: 600;
-  padding: 0.35rem 0.75rem;
-  border-radius: 8px 8px 0 0;
-  display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.88rem;
-}
-
-.banner-aviso i {
-  font-size: 0.9rem;
-}
-
-/* 🧾 Contenido principal del aviso */
-.publicacion-aviso .contenido-texto {
-  background: transparent;
-  padding: 0.6rem 0.9rem;
-  font-size: 0.93rem;
-  line-height: 1.4;
-  color: var(--text);
-}
-
-.publicacion-aviso .contenido-texto b {
+  padding: 0.15rem 0.5rem !important;
+  border-radius: 999px;
+  background: rgba(255, 184, 76, 0.12);
   color: var(--accent);
-}
-
-/* 📘 Bloque interno del mensaje */
-.aviso-tarea {
-  background: rgba(255, 184, 76, 0.07);
-  border: 1px solid rgba(255, 184, 76, 0.2);
-  padding: 0.6rem 0.8rem;
-  border-radius: 6px;
-  margin-top: 0.4rem;
-}
-
-.aviso-tarea p {
-  margin: 0.25rem 0;
-  font-size: 0.92rem;
-  color: var(--text);
-}
-
-.aviso-tarea b {
-  color: var(--accent);
-}
-
-/* 🔗 Botón Ver tarea */
-.aviso-tarea .btn-ver-tarea {
-  display: inline-block;
-  margin-top: 0.4rem;
-  padding: 0.35rem 0.8rem;
-  background: var(--accent);
-  color: #000;
-  border-radius: 5px;
+  font-size: 0.78rem;
   font-weight: 600;
-  font-size: 0.85rem;
+  margin-bottom: 0.4rem !important;
+}
+
+.feed-publicaciones-prof .chip-aviso i {
+  font-size: 0.8rem;
+}
+
+/* ARCHIVOS */
+.feed-publicaciones-prof .publicacion-archivos {
+  margin-top: 0.25rem !important;
+}
+
+.feed-publicaciones-prof .publicacion-archivos a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--accent);
   text-decoration: none;
-  transition: background 0.2s ease, transform 0.2s ease;
 }
 
-.aviso-tarea .btn-ver-tarea:hover {
-  background: var(--accent-soft);
-  transform: translateY(-1px);
+.feed-publicaciones-prof .publicacion-archivos a:hover {
+  text-decoration: underline;
 }
 
-/* 🌗 Ajuste general de publicaciones */
-.publicacion {
-  padding: 0.9rem 1.1rem;
-  border-radius: 10px;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
-}
+/* (Comentarios están eliminados en tu nueva versión, pero dejo el estilo por si vuelven) */
 
-.publicacion-header {
-  margin-bottom: 0.6rem;
-}
-
-.publicacion-contenido {
-  margin-bottom: 0.4rem;
+.feed-publicaciones-prof .publicacion,
+.feed-publicaciones-prof article,
+.feed-publicaciones-prof header,
+.feed-publicaciones-prof .publicacion-body {
+  min-height: unset !important;
+  height: auto !important;
 }

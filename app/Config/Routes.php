@@ -345,7 +345,25 @@ $routes->group('alumno', ['namespace' => 'App\Controllers\Alumno'/*, 'filter' =>
 });
 
 
+$routes->group('api/chat', ['namespace' => 'App\Controllers\Api'], function ($routes) {
+
+    // Crear chat privado (dos usuarios)
+    $routes->post('crearPrivado', 'ChatController::crearPrivado');
+
+    // Obtener historial de un chat
+    $routes->get('historial/(:num)', 'ChatController::historial/$1');
+
+    // Enviar mensaje
+    $routes->post('enviar', 'ChatController::enviar');
+
+    $routes->get('recientes', 'ChatController::recientes');
+
+    $routes->get('mensajes', 'ChatVistaController::vistaCompleta');
+    $routes->get('mensajes/(:num)', 'ChatVistaController::vistaCompleta/$1');
+    $routes->post('enviarArchivo', 'ChatController::enviarArchivo');
+    $routes->get('unreadCount', 'ChatController::contarNoLeidos');
 
 
+});
 
-
+$routes->get('api/usuarios/buscar', 'Api\UsuarioController::buscar');

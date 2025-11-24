@@ -1,0 +1,113 @@
+.chat-wrapper {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 140px);
+  overflow: hidden;
+}
+
+/* HEADER */
+.chat-header {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 158, 100, 0.05);
+  border-bottom: 1px solid rgba(255, 158, 100, 0.2);
+}
+
+.chat-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chat-user img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+}
+
+.typing {
+  color: var(--accent);
+}
+
+.hidden {
+  display: none;
+}
+
+/* HISTORIAL */
+.chat-body {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  background: var(--background);
+}
+
+.msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 70%;
+  margin-bottom: 12px;
+}
+
+.msg.yo {
+  align-self: flex-end;
+  text-align: right;
+}
+
+.burbuja {
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: var(--primary);
+  color: black;
+  box-shadow: var(--shadow);
+}
+
+.msg.otro .burbuja {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.hora {
+  font-size: 0.7rem;
+  opacity: 0.6;
+  margin-top: 3px;
+}
+
+/* INPUT */
+.chat-input {
+  display: flex;
+  padding: 0.8rem;
+  background: rgba(255, 158, 100, 0.05);
+  border-top: 1px solid rgba(255, 158, 100, 0.12);
+  align-items: center;
+  gap: 10px;
+}
+
+.chat-input input[type="text"] {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 0.7rem;
+  color: white;
+}
+
+.file-btn {
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--accent);
+}
+
+#sendBtn {
+  background: var(--accent);
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: black;
+  font-weight: bold;
+}

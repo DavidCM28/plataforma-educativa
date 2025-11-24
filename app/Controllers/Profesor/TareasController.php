@@ -117,7 +117,6 @@ class TareasController extends BaseController
         <div class='aviso-tarea'>
             <p>📢 El profesor ha {$accion} una nueva tarea: <b>{$tareaData['titulo']}</b>.</p>
             " . (!empty($tareaData['fecha_entrega']) ? "<p>📅 Fecha de entrega: <b>" . date('d/m/Y H:i', strtotime($tareaData['fecha_entrega'])) . "</b></p>" : "") . "
-            <a href='{$urlTarea}' class='btn-ver-tarea'>Ver tarea</a>
         </div>";
 
             // ✅ Insertar publicación

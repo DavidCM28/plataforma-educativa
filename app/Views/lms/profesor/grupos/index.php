@@ -9,17 +9,18 @@
 <script src="<?= base_url('assets/js/alert.js') ?>"></script>
 <script src="<?= base_url('assets/js/profesores/asistencias.js') ?>"></script>
 <script src="<?= base_url('assets/js/profesores/publicaciones.js') ?>"></script>
+<script src="<?= base_url('assets/js/profesores/tareas.js') ?>"></script>
+<script src="<?= base_url('assets/js/profesores/proyectos.js') ?>"></script>
+<script src="<?= base_url('assets/js/profesores/examenes.js') ?>"></script>
+<script src="<?= base_url('assets/js/profesores/tareas_entregas.js') ?>"></script>
+<script src="<?= base_url('assets/js/profesores/proyectos_entregas.js') ?>"></script>
 <link rel="stylesheet" href="<?= base_url('assets/css/alert.css') ?>">
 <link rel="stylesheet" href="<?= base_url('assets/css/profesores/grupos.css') ?>">
 <link rel="stylesheet" href="<?= base_url('assets/css/profesores/tareas.css') ?>">
 <link rel="stylesheet" href="<?= base_url('assets/css/profesores/proyectos.css') ?>">
 <link rel="stylesheet" href="<?= base_url('assets/css/profesores/examenes.css') ?>">
-<script src="<?= base_url('assets/js/profesores/tareas.js') ?>"></script>
-<script src="<?= base_url('assets/js/profesores/proyectos.js') ?>"></script>
-<script src="<?= base_url('assets/js/profesores/examenes.js') ?>"></script>
 <link rel="stylesheet" href="<?= base_url('assets/css/profesores/tareas_entregas.css') ?>">
-<script src="<?= base_url('assets/js/profesores/tareas_entregas.js') ?>"></script>
-<script src="<?= base_url('assets/js/profesores/proyectos_entregas.js') ?>"></script>
+<link rel="stylesheet" href="<?= base_url('assets/css/profesores/publicaciones.css') ?>">
 
 
 <!-- 🔔 Contenedor global de alertas -->
@@ -101,7 +102,9 @@
             </form>
         </div>
 
-        <div id="feedPublicaciones" class="feed-publicaciones" data-asignacion="<?= $asignacionId ?>">
+        <div id="feedPublicaciones" class="feed-publicaciones feed-publicaciones-prof"
+            data-asignacion="<?= $asignacionId ?>">
+
             <p class="placeholder"><i class="fas fa-spinner fa-spin"></i> Cargando publicaciones...</p>
         </div>
 

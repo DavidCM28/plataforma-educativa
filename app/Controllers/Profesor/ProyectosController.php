@@ -115,7 +115,6 @@ class ProyectosController extends BaseController
             <div class='aviso-tarea'>
                 <p>🚀 El profesor ha {$accion} un nuevo proyecto: <b>{$proyectoData['titulo']}</b>.</p>
                 " . (!empty($proyectoData['fecha_entrega']) ? "<p>📅 Fecha de entrega: <b>" . date('d/m/Y H:i', strtotime($proyectoData['fecha_entrega'])) . "</b></p>" : "") . "
-                <a href='{$urlProyecto}' class='btn-ver-tarea'>Ver proyecto</a>
             </div>";
 
             $this->publicacionModel->insert([

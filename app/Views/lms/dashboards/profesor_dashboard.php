@@ -30,10 +30,6 @@
                             <li><i class="fas fa-book"></i> <?= esc($m['materia']) ?></li>
                         <?php endforeach; ?>
                     </ul>
-                    <div class="grupo-footer">
-                        <button><i class="fas fa-chart-bar"></i> Ver Reporte</button>
-                        <button><i class="fas fa-folder-open"></i> Ver Detalles</button>
-                    </div>
                 </div>
             <?php endforeach; ?>
         </div>

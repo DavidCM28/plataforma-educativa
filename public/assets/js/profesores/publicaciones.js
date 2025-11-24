@@ -103,45 +103,50 @@ document.addEventListener("DOMContentLoaded", () => {
     /* =======================
      ✏️ EDITAR PUBLICACIÓN INLINE
   ======================= */
+    /* =======================
+       ✏️ EDITAR PUBLICACIÓN INLINE
+    ======================= */
     document.querySelectorAll(".btn-editar-publicacion").forEach((btn) => {
       btn.addEventListener("click", () => {
         const card = btn.closest(".publicacion");
         const id = btn.dataset.id;
         const contenedor = card.querySelector(".publicacion-contenido");
-        const p = contenedor.querySelector("p");
-        const textoOriginal = p.innerText.trim();
+        const textoDiv = contenedor.querySelector(".contenido-texto");
+
+        if (!textoDiv) return;
+
+        const textoOriginal = textoDiv.innerText.trim();
 
         // Evitar múltiples ediciones simultáneas
-        if (card.querySelector(".form-editar")) return;
+        if (contenedor.querySelector(".form-editar")) return;
 
-        // Crear formulario inline
         const form = document.createElement("form");
         form.className = "form-editar";
         form.innerHTML = `
-        <textarea class="editar-textarea">${textoOriginal}</textarea>
-        <div class="editar-acciones">
-          <button type="submit" class="btn-guardar"><i class="fas fa-save"></i> Guardar</button>
-          <button type="button" class="btn-cancelar"><i class="fas fa-times"></i> Cancelar</button>
-        </div>
-      `;
+          <textarea class="editar-textarea">${textoOriginal}</textarea>
+          <div class="editar-acciones">
+            <button type="submit" class="btn-guardar"><i class="fas fa-save"></i> Guardar</button>
+            <button type="button" class="btn-cancelar"><i class="fas fa-times"></i> Cancelar</button>
+          </div>
+        `;
 
-        contenedor.innerHTML = "";
-        contenedor.appendChild(form);
+        // Reemplazar solo el contenido de texto
+        textoDiv.replaceWith(form);
 
         const textarea = form.querySelector(".editar-textarea");
         textarea.focus();
 
-        // 🔹 CANCELAR EDICIÓN
+        // Cancelar
         form.querySelector(".btn-cancelar").addEventListener("click", () => {
-          contenedor.innerHTML = `<p>${textoOriginal}</p>`;
+          form.replaceWith(textoDiv);
         });
 
-        // 💾 GUARDAR EDICIÓN
+        // Guardar
         form.addEventListener("submit", async (e) => {
           e.preventDefault();
           const nuevoTexto = textarea.value.trim();
           if (!nuevoTexto || nuevoTexto === textoOriginal) {
-            contenedor.innerHTML = `<p>${textoOriginal}</p>`;
+            form.replaceWith(textoDiv);
             return;
           }
 
@@ -160,17 +165,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (data.success) {
               mostrarAlerta("✅ Publicación actualizada", "success");
-              contenedor.innerHTML = `<p>${nuevoTexto.replace(
-                /\n/g,
-                "<br>"
-              )}</p>`;
+              const nuevoDiv = document.createElement("div");
+              nuevoDiv.className = "contenido-texto";
+              nuevoDiv.innerHTML = nuevoTexto.replace(/\n/g, "<br>");
+              form.replaceWith(nuevoDiv);
             } else {
               mostrarAlerta(data.error || "❌ Error al editar.", "error");
-              contenedor.innerHTML = `<p>${textoOriginal}</p>`;
+              form.replaceWith(textoDiv);
             }
           } catch (err) {
             mostrarAlerta("❌ Fallo al editar: " + err.message, "error");
-            contenedor.innerHTML = `<p>${textoOriginal}</p>`;
+            form.replaceWith(textoDiv);
           }
         });
       });

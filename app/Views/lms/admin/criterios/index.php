@@ -15,6 +15,18 @@
     <?= $this->include('layouts/header-plataforma') ?>
     <?= $this->include('layouts/sidebar-plataforma') ?>
 
+    <div id="alertContainer" class="alert-container"></div>
+    <!-- ✅ Modal de confirmación -->
+    <div id="confirmModal" class="confirm-modal hidden">
+        <div class="confirm-box">
+            <h3 id="confirmTitle">Confirmar acción</h3>
+            <p id="confirmMessage"></p>
+            <div class="confirm-buttons">
+                <button id="confirmAceptar" class="btn-confirmar">Aceptar</button>
+                <button id="confirmCancelar" class="btn-cancelar">Cancelar</button>
+            </div>
+        </div>
+    </div>
     <main class="content-dark">
         <div class="crud-container">
             <h2>Gestión de Criterios y Ponderaciones</h2>
@@ -148,17 +160,23 @@
             window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
 
             // === Acciones eliminar criterio ===
+            // === Acciones eliminar criterio con sistema de alertas ===
             document.querySelectorAll(".btn-delete").forEach(btn => {
-                btn.addEventListener("click", async () => {
+                btn.addEventListener("click", () => {
                     const url = btn.dataset.url;
-                    const confirm = await Swal.fireConfirm("¿Eliminar?", "No podrás revertirlo");
-                    if (confirm.isConfirmed) {
-                        await fetch(url);
-                        Swal.fireSuccess("Eliminado correctamente");
-                        setTimeout(() => location.reload(), 1000);
-                    }
+
+                    mostrarConfirmacion(
+                        "¿Eliminar criterio?",
+                        "No podrás revertirlo.",
+                        async () => {
+                            await fetch(url);
+                            mostrarAlerta("Criterio eliminado correctamente", "success");
+                            setTimeout(() => location.reload(), 800);
+                        }
+                    );
                 });
             });
+
 
             // === Control de Ponderaciones ===
             const formPond = document.querySelector(".form-asignacion");
@@ -237,18 +255,22 @@
                             const cicloActual = cicloSel.value;
                             const parcialActual = parcialSel.value;
 
-                            const confirm = await Swal.fireConfirm("¿Eliminar ponderación?", "No podrás revertirlo");
-                            if (!confirm.isConfirmed) return;
+                            mostrarConfirmacion(
+                                "¿Eliminar ponderación?",
+                                "No podrás revertir esta acción.",
+                                async () => {
+                                    await fetch(`${window.location.origin}/admin/criterios/ponderaciones/eliminar/${btn.dataset.id}`);
 
-                            await fetch(`${window.location.origin}/admin/criterios/ponderaciones/eliminar/${btn.dataset.id}`);
-                            Swal.fireSuccess("Eliminado correctamente");
+                                    mostrarAlerta("Ponderación eliminada", "success");
 
-                            // Mantener selección actual y refrescar
-                            cicloSel.value = cicloActual;
-                            parcialSel.value = parcialActual;
+                                    cicloSel.value = cicloActual;
+                                    parcialSel.value = parcialActual;
 
-                            cargarPonderaciones();
-                            actualizarBarra();
+                                    cargarPonderaciones();
+                                    actualizarBarra();
+                                }
+                            );
+
                         });
                     });
                 }
@@ -278,60 +300,47 @@
 
                     const cicloActual = cicloSel.value;
                     const parcialActual = parcialSel.value;
+
                     btnGuardar.disabled = true;
 
-                    // 🚫 Validar si ya está al 100%
-                    const totalTexto = barra.textContent.replace("%", "").trim();
-                    const totalActual = parseFloat(totalTexto) || 0;
+                    // Validar límite 100%
+                    const totalActual = parseFloat(barra.textContent.replace("%", "")) || 0;
 
                     if (totalActual >= 100) {
-                        Swal.close(); // cierra cualquier alerta previa
-                        await Swal.fire({
-                            icon: "warning",
-                            title: "Límite alcanzado",
-                            text: "Este parcial ya tiene el 100% asignado. No puedes añadir más criterios.",
-                            confirmButtonText: "Entendido",
-                            confirmButtonColor: "#ff9e64",
-                            background: "#1e1e1e",
-                            color: "#fff",
-                            customClass: { popup: "swal-custom" },
-                        });
-
-
-                        // 🔹 Forzar limpieza de posibles modales residuales
-                        document.querySelectorAll(".modal").forEach(m => (m.style.display = "none"));
-
-
+                        mostrarAlerta("Este parcial ya tiene el 100% asignado", "warning", 4000);
                         btnGuardar.disabled = false;
                         return;
                     }
 
-
-
                     const formData = new FormData(formPond);
-                    const res = await fetch(formPond.action, { method: "POST", body: formData });
+                    const res = await fetch(formPond.action, {
+                        method: "POST",
+                        body: formData
+                    });
+
                     const data = await res.json();
 
                     if (data.success) {
-                        Swal.fireSuccess("Ponderación guardada correctamente");
+                        mostrarAlerta("Ponderación guardada correctamente", "success");
 
-                        // 🔹 Limpiar solo criterio y porcentaje
+                        // Limpia criterio y porcentaje, pero NO ciclo ni parcial
                         criterioSel.value = "";
                         porcentajeInput.value = "";
 
-                        // 🔹 Mantener selección
+                        // Mantener selección previamente elegida
                         cicloSel.value = cicloActual;
                         parcialSel.value = parcialActual;
 
-                        // 🔹 Actualizar dinámicamente
+                        // Recargar datos dinámicos sin refrescar todo
                         await cargarPonderaciones();
                         await actualizarBarra();
                     } else {
-                        Swal.fireError("Error al guardar ponderación");
+                        mostrarAlerta("Error al guardar ponderación", "error");
                     }
 
                     btnGuardar.disabled = false;
                 });
+
 
 
                 // === 5️⃣ Eventos reactivos ===

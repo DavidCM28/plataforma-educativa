@@ -51,13 +51,20 @@
             </div>
 
             <div class="chat-footer">
-                <a href="<?= base_url('mensajes') ?>">Ver todos los mensajes →</a>
+                <a href="<?= base_url('api/chat/mensajes') ?>">Ver todos los mensajes →</a>
             </div>
         </div>
 
     </div>
 </header>
 
+<script>
+    window.base_url = "<?= rtrim(site_url(), '/') ?>/";
+    window.usuario_id = "<?= session('id') ?>";
+</script>
+
+
+<script src="http://localhost:3001/socket.io/socket.io.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
